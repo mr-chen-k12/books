@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Key Ideas Library — Millionaire Mindset & Focus</title>
+<style>
+  :root{
+    --bg:#0f1011; --panel:#16181b; --text:#e9e9ec; --muted:#b9bcc4;
+    --brand:#d6b06d; --accent:#ffd37a; --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:linear-gradient(180deg,#0b0c0f 0%, #131417 100%);
+    color:var(--text); font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+  }
+  .app{display:grid; grid-template-columns:260px 1fr; min-height:100svh}
+  aside{
+    background:var(--panel); border-right:1px solid #24262b; position:sticky; top:0; height:100svh;
+    padding:18px 14px; overflow:auto;
+  }
+  h1{
+    font-size:18px; letter-spacing:.6px; margin:8px 10px 16px; color:var(--brand);
+    text-transform:uppercase; font-weight:800;
+  }
+  .book-btn{
+    width:100%; text-align:left; padding:12px 12px; margin:6px 4px; border-radius:12px;
+    color:var(--text); background:#1c1f24; border:1px solid #2a2d33; cursor:pointer;
+    display:flex; gap:10px; align-items:center; transition:transform .05s ease, background .2s ease;
+  }
+  .book-btn:hover{background:#22262c}
+  .book-btn:active{transform:scale(.99)}
+  .dot{width:10px; height:10px; border-radius:50%; background:var(--brand); box-shadow:0 0 0 3px #2b2413 inset}
+  main{padding:32px 6vw 64px}
+  .hero{
+    display:grid; gap:12px; padding:28px; border-radius:18px; background:radial-gradient(1200px 500px at 10% -20%, rgba(214,176,109,.15), transparent 50%), #101215; border:1px solid #202227; box-shadow:var(--shadow);
+  }
+  .hero h2{margin:0; font-size:28px}
+  .hero p{margin:0; color:var(--muted)}
+  .hint{color:#9aa0aa; font-size:14px; margin-top:4px}
+  .kbd{padding:2px 8px; border:1px solid #33363e; border-radius:6px; background:#171a1f; color:#cbd1dc}
+  /* Modal */
+  dialog{
+    border:none; padding:0; width:min(860px, 92vw); border-radius:18px; background:#111316; color:var(--text);
+    box-shadow:0 40px 100px rgba(0,0,0,.6);
+  }
+  dialog::backdrop{background:rgba(0,0,0,.6)}
+  .modal-head{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:18px 20px; border-bottom:1px solid #23262c; background:#121419;
+    border-top-left-radius:18px; border-top-right-radius:18px;
+  }
+  .modal-title{
+    font-weight:800; letter-spacing:.3px;
+  }
+  .chip{color:#101215; background:var(--brand); padding:3px 8px; border-radius:999px; font-size:12px; font-weight:700}
+  .close{
+    background:#1d2127; color:#cfd3dc; border:1px solid #2b3037; padding:8px 12px; border-radius:10px; cursor:pointer;
+  }
+  .modal-body{padding:18px 8px 22px}
+  ol.points{list-style:none; padding:0; margin:0; display:grid; gap:6px}
+  .row{
+    display:grid; grid-template-columns:30px 1fr; align-items:start; gap:10px;
+    padding:10px 12px; border-radius:12px; border:1px solid #21242a; background:#14171c;
+  }
+  .row strong{display:block; font-weight:800}
+  .row p{margin:3px 0 0; color:#c7cbd5}
+  canvas.icon{width:26px; height:26px; background:#151920; border-radius:8px; border:1px solid #252a33}
+  .footer-note{padding:12px 0 0; color:#9aa0aa; font-size:13px}
+  /* Responsive */
+  @media (max-width: 900px){
+    .app{grid-template-columns:1fr}
+    aside{position:static; height:auto; border-right:none; border-bottom:1px solid #24262b}
+    main{padding-inline:18px}
+  }
+</style>
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <h1>Books</h1>
+      <button class="book-btn" data-book="millionaire">
+        <span class="dot" style="background:#d6b06d"></span>
+        Secrets of the Millionaire Mind
+      </button>
+      <button class="book-btn" data-book="one">
+        <span class="dot" style="background:#ffcc80"></span>
+        The One Thing
+      </button>
+      <button class="book-btn" data-book="willpower">
+        <span class="dot" style="background:#f1c27d"></span>
+        Willpower
+      </button>
+      <button class="book-btn" data-book="deep">
+        <span class="dot" style="background:#e6b769"></span>
+        Deep Work
+      </button>
+      <button class="book-btn" data-book="atomic">
+        <span class="dot" style="background:#ffd37a"></span>
+        Atomic Habits
+      </button>
+      <div class="hint" style="margin:12px 6px 0">
+        Tip: Press <span class="kbd">1…5</span> to open a book.
+      </div>
+    </aside>
+
+    <main>
+      <section class="hero">
+        <h2>Millionaire Thinking & Deep Focus — Quick Library</h2>
+        <p>Click a title on the left to pop up the 10 most useful, action-ready ideas. Clean icons are drawn on-the-fly with Canvas—no external libraries.</p>
+        <div class="hint">Made to read fast on phone or desktop.</div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal -->
+  <dialog id="modal">
+    <div class="modal-head">
+      <div>
+        <div class="chip" id="modal-series">10 KEY POINTS</div>
+        <div class="modal-title" id="modal-title" style="margin-top:6px; font-size:18px"></div>
+      </div>
+      <button class="close" id="closeBtn" aria-label="Close (Esc)">Close</button>
+    </div>
+    <div class="modal-body">
+      <ol class="points" id="pointsList"></ol>
+      <div class="footer-note">Icons are simple Canvas drawings (target, lightning, brain, clock, etc.). Keyboard: <span class="kbd">Esc</span> to close.</div>
+    </div>
+  </dialog>
+
+<script>
+/* ---------- DATA: 10 points per book + icon names ---------- */
+const BOOKS = {
+  millionaire: {
+    title: "Secrets of the Millionaire Mind — T. Harv Eker",
+    items: [
+      ["Reprogram Your Blueprint","brain","Your money results mirror your beliefs. Change the script to change outcomes."],
+      ["You Create Your Life","target","Adopt ownership over victimhood: act like a creator, not a reactor."],
+      ["See Opportunities, Not Obstacles","compass","Direct attention to possibilities; energy follows focus."],
+      ["Commit 100% to Wealth","flame","Make a real commitment (ethically) instead of a vague wish."],
+      ["Play to Win","trophy","Take calculated risks aimed at winning, not just avoiding loss."],
+      ["Admire the Rich","heart","Drop envy; learn from success so you can model it."],
+      ["Earn from Value, Not Time","gear","Build assets and systems that scale beyond your hours."],
+      ["Think “Both/And”","yin","Refuse false limits (rich and happy, generous and secure)."],
+      ["6-Jar Money System","jars","Be intentional: invest, learn, give, live, play, plan."],
+      ["Act Despite Fear","bolt","Courage = action while afraid; consistency compounds."]
+    ]
+  },
+  one: {
+    title: "The One Thing — Gary Keller & Jay Papasan",
+    items: [
+      ["The Focusing Question","target","“What’s the ONE Thing I can do such that by doing it, everything else will be easier or unnecessary?”"],
+      ["Extraordinary from Narrow Focus","spot","Do fewer things better; depth beats breadth."],
+      ["Time Blocking Is Sacred","calendar","Protect daily blocks for your One Thing—non-negotiable."],
+      ["Success Is Sequential","domino","Big wins come one step at a time, in order."],
+      ["Willpower Is Limited","battery","Schedule hardest work when willpower is highest."],
+      ["Goal-Setting to the Now","map","Cascade: someday → 5y → 1y → month → week → day → now."],
+      ["Multitasking Is a Lie","no","Task-switching torpedoes quality and time."],
+      ["Say No to Everything Else","shield","Every yes has a cost—guard your priority."],
+      ["Purpose → Priority → Productivity","path","Purpose clarifies priorities; priorities drive results."],
+      ["Live a Life of Priority","star","Align work and life around what matters most."]
+    ]
+  },
+  willpower: {
+    title: "Willpower — Baumeister & Tierney",
+    items: [
+      ["Willpower Is Like a Muscle","bicep","It fatigues with use and strengthens with training."],
+      ["Ego Depletion","batteryLow","Self-control drops after heavy exertion—plan around it."],
+      ["Glucose Fuels Control","drop","Low fuel, lower discipline—mind your nutrition."],
+      ["Decision Fatigue","clock","Too many choices drain you; use routines."],
+      ["Set Clear, Specific Goals","flag","Concrete, measurable targets beat vague intentions."],
+      ["Precommit to Avoid Temptation","lock","Design defaults that make the right thing automatic."],
+      ["Train Gradually","steps","Tiny disciplined reps build capacity."],
+      ["Self-Control Predicts Success","medal","Discipline outperforms raw IQ across domains."],
+      ["Rest & Renewal","moon","Sleep, breaks, and positive emotion restore willpower."],
+      ["Use Willpower Wisely","funnel","Save effort by shaping environments, not white-knuckling."]
+    ]
+  },
+  deep: {
+    title: "Deep Work — Cal Newport",
+    items: [
+      ["Deep Work Is a Superpower","brain","Rare, valuable focus wins in the distraction era."],
+      ["Shallow Work Drains","inbox","Email/meetings feel busy but move little."],
+      ["Work Deeply","door","Engineer spaces & rituals that protect attention."],
+      ["Schedule Every Minute","calendar","Block deep, shallow, admin, and breaks."],
+      ["Embrace Boredom","pause","Train attention by not reaching for distractions."],
+      ["Quit/Prune Social Media","scissors","Keep only tools with clear, proven value."],
+      ["Drain the Shallows","broom","Batch admin, say no, automate relentlessly."],
+      ["Measure by Output","chart","Value intensity & results, not hours logged."],
+      ["Craft a Deep Life","leaf","Depth brings meaning as well as success."],
+      ["Ritualize Focus","wand","Cues, locations, and rules make focus automatic."]
+    ]
+  },
+  atomic: {
+    title: "Atomic Habits — James Clear",
+    items: [
+      ["Small Habits Compound","loop","1% better daily → massive over time."],
+      ["Systems > Goals","gear","Goals set direction; systems drive progress."],
+      ["Identity-Based Habits","id","Be the kind of person who… then act like it."],
+      ["4 Laws of Change","grid","Make it obvious, attractive, easy, satisfying."],
+      ["Habit Stacking","plus","Attach a new habit to an existing one."],
+      ["Environment Shapes Behavior","home","Design spaces where the right choice is easy."],
+      ["Motion vs Action","play","Less planning theater, more doing."],
+      ["Plateau of Latent Potential","mount","Results lag—keep going to the breakthrough."],
+      ["Track the Habits","check","What gets measured improves; keep streaks visible."],
+      ["Never Miss Twice","redo","Slip once, but don’t let it become a habit."]
+    ]
+  }
+};
+
+/* ---------- ICONS: tiny Canvas drawings ---------- */
+function drawIcon(ctx, name){
+  const c = ctx.canvas, w = c.width, h = c.height;
+  // scale to fit
+  ctx.clearRect(0,0,w,h);
+  ctx.lineWidth = 2;
+  const gold = "#d6b06d";
+  const white = "#e9e9ec";
+  ctx.strokeStyle = gold; ctx.fillStyle = gold;
+
+  const S = {
+    target: ()=>{ // bullseye + arrow
+      ctx.beginPath(); ctx.arc(13,13,11,0,Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(13,13,6,0,Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(13,13,2.3,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(13,13); ctx.lineTo(22.5,4.5); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(22.5,4.5); ctx.lineTo(20,8); ctx.lineTo(26,6); ctx.closePath(); ctx.fill();
+    },
+    brain: ()=>{ ctx.beginPath(); ctx.roundRect?.(5,6,18,14,6); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(14,6); ctx.lineTo(14,20); ctx.moveTo(8,9); ctx.lineTo(20,17);
+      ctx.moveTo(20,9); ctx.lineTo(8,17); ctx.stroke();
+    },
+    compass: ()=>{ ctx.beginPath(); ctx.arc(13,13,11,0,2*Math.PI); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(13,7); ctx.lineTo(9,18); ctx.lineTo(13,13); ctx.lineTo(18,16); ctx.closePath(); ctx.fill();
+    },
+    flame: ()=>{ ctx.beginPath(); ctx.moveTo(13,4); ctx.quadraticCurveTo(19,10,13,20); ctx.quadraticCurveTo(7,14,13,4); ctx.fill();},
+    trophy: ()=>{ ctx.beginPath(); ctx.rect(10,18,6,2); ctx.fill(); ctx.beginPath(); ctx.arc(13,8,6,0,Math.PI,false); ctx.lineTo(7,14); ctx.lineTo(19,14); ctx.closePath(); ctx.stroke();},
+    heart: ()=>{ ctx.beginPath(); ctx.moveTo(13,20); ctx.bezierCurveTo(2,12,8,5,13,9); ctx.bezierCurveTo(18,5,24,12,13,20); ctx.fill();},
+    gear: ()=>{ for(let i=0;i<8;i++){ const a=i*Math.PI/4; ctx.beginPath(); ctx.moveTo(13,13); ctx.lineTo(13+10*Math.cos(a),13+10*Math.sin(a)); ctx.stroke();}
+      ctx.beginPath(); ctx.arc(13,13,5,0,2*Math.PI); ctx.stroke(); },
+    yin: ()=>{ ctx.beginPath(); ctx.arc(13,13,11,Math.PI/2,-Math.PI/2); ctx.arc(13,9,4,Math.PI,0,true); ctx.arc(13,17,4,0,Math.PI,true); ctx.closePath(); ctx.fillStyle=gold; ctx.fill(); ctx.fillStyle=white;
+      ctx.beginPath(); ctx.arc(13,9,1.5,0,2*Math.PI); ctx.fill(); ctx.fillStyle="#1b1f26";},
+    jars: ()=>{ ctx.strokeRect(5,8,6,10); ctx.strokeRect(12,8,6,10); ctx.strokeRect(19,8,6,10); },
+    bolt: ()=>{ ctx.beginPath(); ctx.moveTo(15,4); ctx.lineTo(8,15); ctx.lineTo(14,15); ctx.lineTo(11,24); ctx.lineTo(19,12); ctx.lineTo(13,12); ctx.closePath(); ctx.fill();},
+    spot: ()=>{ ctx.beginPath(); ctx.arc(13,13,11,0,2*Math.PI); ctx.stroke(); ctx.beginPath(); ctx.arc(13,13,4,0,2*Math.PI); ctx.fill();},
+    calendar: ()=>{ ctx.strokeRect(6,8,16,12); ctx.beginPath(); ctx.moveTo(6,11); ctx.lineTo(22,11); ctx.stroke(); ctx.beginPath(); ctx.moveTo(10,6); ctx.lineTo(10,10); ctx.moveTo(18,6); ctx.lineTo(18,10); ctx.stroke();},
+    domino: ()=>{ ctx.strokeRect(7,6,12,14); ctx.beginPath(); ctx.moveTo(13,6); ctx.lineTo(13,20); ctx.stroke(); ctx.beginPath(); [9,11,15,17].forEach(y=>{ctx.moveTo(10,y); ctx.arc(10,y,1.2,0,2*Math.PI)}); ctx.fill();},
+    battery: ()=>{ ctx.strokeRect(6,8,16,10); ctx.fillRect(22,11,2,4); ctx.fillRect(8,10,6,6);},
+    map: ()=>{ ctx.beginPath(); ctx.moveTo(5,7); ctx.lineTo(12,5); ctx.lineTo(18,9); ctx.lineTo(25,7); ctx.stroke();},
+    no: ()=>{ ctx.beginPath(); ctx.arc(13,13,10,0,2*Math.PI); ctx.stroke(); ctx.beginPath(); ctx.moveTo(6,20); ctx.lineTo(20,6); ctx.stroke();},
+    shield: ()=>{ ctx.beginPath(); ctx.moveTo(13,5); ctx.lineTo(22,9); ctx.lineTo(19,20); ctx.lineTo(7,20); ctx.lineTo(4,9); ctx.closePath(); ctx.stroke();},
+    path: ()=>{ ctx.beginPath(); ctx.moveTo(6,20); ctx.quadraticCurveTo(13,4,20,20); ctx.stroke(); ctx.beginPath(); ctx.arc(13,10,2,0,2*Math.PI); ctx.fill();},
+    star: ()=>{ let a= -Math.PI/2; const r1=10,r2=4; ctx.beginPath(); for(let i=0;i<5;i++,a+=Math.PI*2/5){ ctx.lineTo(13+Math.cos(a)*r1,13+Math.sin(a)*r1); ctx.lineTo(13+Math.cos(a+Math.PI/5)*r2,13+Math.sin(a+Math.PI/5)*r2);} ctx.closePath(); ctx.fill();},
+    bicep: ()=>{ ctx.beginPath(); ctx.arc(10,13,6,Math.PI*.2,Math.PI*1.6); ctx.stroke(); ctx.beginPath(); ctx.moveTo(10,9); ctx.lineTo(16,7); ctx.lineTo(19,10); ctx.stroke();},
+    batteryLow: ()=>{ ctx.strokeRect(6,8,16,10); ctx.fillRect(22,11,2,4); ctx.fillRect(7.5,11.5,5,3);},
+    drop: ()=>{ ctx.beginPath(); ctx.moveTo(13,5); ctx.quadraticCurveTo(20,12,13,22); ctx.quadraticCurveTo(6,12,13,5); ctx.fill();},
+    clock: ()=>{ ctx.beginPath(); ctx.arc(13,13,10,0,2*Math.PI); ctx.stroke(); ctx.beginPath(); ctx.moveTo(13,13); ctx.lineTo(13,7); ctx.moveTo(13,13); ctx.lineTo(18,13); ctx.stroke();},
+    flag: ()=>{ ctx.beginPath(); ctx.moveTo(8,6); ctx.lineTo(8,22); ctx.stroke(); ctx.beginPath(); ctx.moveTo(8,6); ctx.lineTo(21,9); ctx.lineTo(8,12); ctx.closePath(); ctx.fill();},
+    lock: ()=>{ ctx.strokeRect(7,12,12,9); ctx.beginPath(); ctx.arc(13,12,5,Math.PI,0,false); ctx.stroke();},
+    steps: ()=>{ [18,14,10].forEach((y,i)=>{ctx.fillRect(6+i*6, y, 6, 4);});},
+    medal: ()=>{ ctx.beginPath(); ctx.arc(13,17,5,0,2*Math.PI); ctx.stroke(); ctx.beginPath(); ctx.moveTo(13,6); ctx.lineTo(8,12); ctx.moveTo(13,6); ctx.lineTo(18,12); ctx.stroke();},
+    moon: ()=>{ ctx.beginPath(); ctx.arc(13,13,9,0,2*Math.PI); ctx.stroke(); ctx.beginPath(); ctx.fillStyle= "#0f1318"; ctx.arc(16,11,9,0,2*Math.PI); ctx.fill(); ctx.fillStyle=gold;},
+    funnel: ()=>{ ctx.beginPath(); ctx.moveTo(5,6); ctx.lineTo(21,6); ctx.lineTo(15,12); ctx.lineTo(15,20); ctx.lineTo(11,22); ctx.lineTo(11,12); ctx.closePath(); ctx.stroke();},
+    inbox: ()=>{ ctx.strokeRect(6,8,16,10); ctx.beginPath(); ctx.moveTo(6,15); ctx.lineTo(11,15); ctx.lineTo(13,18); ctx.lineTo(15,15); ctx.lineTo(22,15); ctx.stroke();},
+    door: ()=>{ ctx.strokeRect(8,6,12,16); ctx.beginPath(); ctx.arc(18,14,1.3,0,2*Math.PI); ctx.fill();},
+    pause: ()=>{ ctx.fillRect(9,6,4,14); ctx.fillRect(16,6,4,14);},
+    scissors: ()=>{ ctx.beginPath(); ctx.arc(10,10,3,0,2*Math.PI); ctx.arc(17,16,3,0,2*Math.PI); ctx.stroke(); ctx.beginPath(); ctx.moveTo(8,14); ctx.lineTo(20,6); ctx.moveTo(12,6); ctx.lineTo(21,19); ctx.stroke();},
+    broom: ()=>{ ctx.beginPath(); ctx.moveTo(9,6); ctx.lineTo(18,22); ctx.stroke(); ctx.beginPath(); ctx.moveTo(17,18); ctx.lineTo(23,18); ctx.lineTo(22,22); ctx.lineTo(16,22); ctx.closePath(); ctx.fill();},
+    chart: ()=>{ ctx.fillRect(7,16,4,6); ctx.fillRect(13,12,4,10); ctx.fillRect(19,9,4,13);},
+    leaf: ()=>{ ctx.beginPath(); ctx.moveTo(7,18); ctx.quadraticCurveTo(18,3,23,10); ctx.quadraticCurveTo(16,12,7,18); ctx.fill();},
+    wand: ()=>{ ctx.beginPath(); ctx.moveTo(8,19); ctx.lineTo(20,7); ctx.stroke(); [ [20,7],[15,5],[23,3] ].forEach(([x,y])=>{ctx.beginPath(); ctx.moveTo(x,y-2); ctx.lineTo(x,y+2); ctx.moveTo(x-2,y); ctx.lineTo(x+2,y); ctx.stroke();})},
+    loop: ()=>{ ctx.beginPath(); ctx.arc(11,12,6,0,2*Math.PI); ctx.stroke(); ctx.beginPath(); ctx.moveTo(16,17); ctx.lineTo(22,23); ctx.stroke();},
+    id: ()=>{ ctx.beginPath(); ctx.arc(13,9,4,0,2*Math.PI); ctx.stroke(); ctx.beginPath(); ctx.arc(13,18,6,0,Math.PI,true); ctx.stroke();},
+    grid: ()=>{ for(let i=0;i<3;i++){ for(let j=0;j<3;j++){ ctx.strokeRect(7+i*6,7+j*6,5,5);} } },
+    plus: ()=>{ ctx.fillRect(12,7,2,12); ctx.fillRect(7,12,12,2);},
+    home: ()=>{ ctx.beginPath(); ctx.moveTo(6,12); ctx.lineTo(13,6); ctx.lineTo(20,12); ctx.closePath(); ctx.stroke(); ctx.strokeRect(8,12,10,8);},
+    play: ()=>{ ctx.beginPath(); ctx.moveTo(10,7); ctx.lineTo(20,13); ctx.lineTo(10,19); ctx.closePath(); ctx.fill();},
+    mount: ()=>{ ctx.beginPath(); ctx.moveTo(5,20); ctx.lineTo(13,8); ctx.lineTo(21,20); ctx.closePath(); ctx.stroke();},
+    check: ()=>{ ctx.beginPath(); ctx.moveTo(7,14); ctx.lineTo(12,19); ctx.lineTo(21,8); ctx.stroke();},
+    redo: ()=>{ ctx.beginPath(); ctx.arc(13,13,7,Math.PI*.1,Math.PI*1.7); ctx.stroke(); ctx.beginPath(); ctx.moveTo(7,9); ctx.lineTo(11,9); ctx.lineTo(9,5); ctx.closePath(); ctx.fill();}
+  };
+  (S[name] || S.target)();
+}
+
+/* ---------- RENDER ---------- */
+const listEl = document.getElementById('pointsList');
+const modal = document.getElementById('modal');
+const titleEl = document.getElementById('modal-title');
+
+function openBook(key){
+  const book = BOOKS[key]; if(!book) return;
+  titleEl.textContent = book.title;
+  listEl.innerHTML = '';
+  book.items.forEach(([title, icon, desc], i)=>{
+    const li = document.createElement('li');
+    li.className = 'row';
+    li.innerHTML = `
+      <canvas class="icon" width="26" height="26" aria-hidden="true"></canvas>
+      <div><strong>${i+1}. ${title}</strong><p>${desc}</p></div>`;
+    listEl.appendChild(li);
+    const ctx = li.querySelector('canvas').getContext('2d');
+    drawIcon(ctx, icon);
+  });
+  modal.showModal();
+}
+
+document.querySelectorAll('.book-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>openBook(btn.dataset.book));
+});
+
+document.getElementById('closeBtn').addEventListener('click', ()=>modal.close());
+modal.addEventListener('click', (e)=>{ if(e.target === modal) modal.close(); });
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape' && modal.open) modal.close();
+  const map = ['millionaire','one','willpower','deep','atomic'];
+  if(/^[1-5]$/.test(e.key)) openBook(map[+e.key-1]);
+});
+</script>
+</body>
+</html>
