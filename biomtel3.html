@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Biology Flashcards — 100 Questions</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+  margin: 0;
+  background: #0b0b0f;
+  font-family: system-ui, sans-serif;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.card {
+  background: #13151a;
+  border: 1px solid #2a2f3a;
+  border-radius: 16px;
+  padding: 20px;
+  width: 90vw;
+  max-width: 420px;
+  min-height: 220px;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.3rem;
+  text-align: center;
+  user-select: none;
+}
+.card.active { display: flex; }
+
+.choice-btn {
+  background: #1d1f27;
+  border: 1px solid #333;
+  padding: 10px;
+  width: 100%;
+  color: white;
+  border-radius: 8px;
+  margin: 6px 0;
+  font-size: 1rem;
+}
+.choice-btn:hover { background: #272a35; }
+
+.feedback { margin-top: 12px; font-size: 1.2rem; }
+.correct { color: #66ff88; }
+.incorrect { color: #ff6666; }
+
+.menuButton {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 48px;
+  height: 48px;
+  background: #1a1d24;
+  border-radius: 50%;
+  border: 1px solid #333;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size: 24px;
+  cursor:pointer;
+}
+#menuDish {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  background:#13151a;
+  padding:20px;
+  border-radius:14px;
+  border:1px solid #333;
+  display:none;
+  flex-direction:column;
+  gap:10px;
+}
+#menuDish button {
+  background:#1d1f27;
+  color:white;
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #333;
+}
+</style>
+</head>
+<body>
+
+<h1>Biology Flashcards — 100 Questions</h1>
+
+<div class="card" id="card0">
+  <div class="question">Which property of water allows insects to walk on its surface?</div>
+  <button class="choice-btn" data-correct="0">High heat capacity</button>
+  <button class="choice-btn" data-correct="1">Cohesion and surface tension</button>
+  <button class="choice-btn" data-correct="0">Capillary action</button>
+  <button class="choice-btn" data-correct="0">Low density</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card1">
+  <div class="question">What organelle produces ATP in eukaryotic cells?</div>
+  <button class="choice-btn" data-correct="0">Golgi apparatus</button>
+  <button class="choice-btn" data-correct="1">Mitochondria</button>
+  <button class="choice-btn" data-correct="0">Chloroplast</button>
+  <button class="choice-btn" data-correct="0">Ribosome</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card2">
+  <div class="question">What is the monomer of proteins?</div>
+  <button class="choice-btn" data-correct="1">Amino acids</button>
+  <button class="choice-btn" data-correct="0">Monosaccharides</button>
+  <button class="choice-btn" data-correct="0">Fatty acids</button>
+  <button class="choice-btn" data-correct="0">Nucleotides</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card3">
+  <div class="question">Which biomolecule stores genetic information?</div>
+  <button class="choice-btn" data-correct="0">Lipids</button>
+  <button class="choice-btn" data-correct="0">Proteins</button>
+  <button class="choice-btn" data-correct="1">Nucleic acids</button>
+  <button class="choice-btn" data-correct="0">Carbohydrates</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card4">
+  <div class="question">Which structure controls what enters and leaves the cell?</div>
+  <button class="choice-btn" data-correct="1">Cell membrane</button>
+  <button class="choice-btn" data-correct="0">Nucleus</button>
+  <button class="choice-btn" data-correct="0">Lysosome</button>
+  <button class="choice-btn" data-correct="0">Ribosome</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card5">
+  <div class="question">What is the main function of enzymes?</div>
+  <button class="choice-btn" data-correct="0">Provide energy</button>
+  <button class="choice-btn" data-correct="1">Speed up reactions</button>
+  <button class="choice-btn" data-correct="0">Store DNA</button>
+  <button class="choice-btn" data-correct="0">Build membranes</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card6">
+  <div class="question">Photosynthesis occurs in which organelle?</div>
+  <button class="choice-btn" data-correct="1">Chloroplast</button>
+  <button class="choice-btn" data-correct="0">Mitochondria</button>
+  <button class="choice-btn" data-correct="0">Nucleus</button>
+  <button class="choice-btn" data-correct="0">Ribosome</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card7">
+  <div class="question">Which gas is required for cellular respiration?</div>
+  <button class="choice-btn" data-correct="0">Nitrogen</button>
+  <button class="choice-btn" data-correct="1">Oxygen</button>
+  <button class="choice-btn" data-correct="0">Carbon dioxide</button>
+  <button class="choice-btn" data-correct="0">Hydrogen</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card8">
+  <div class="question">Which molecule is the cell's main energy currency?</div>
+  <button class="choice-btn" data-correct="0">DNA</button>
+  <button class="choice-btn" data-correct="0">Glucose</button>
+  <button class="choice-btn" data-correct="1">ATP</button>
+  <button class="choice-btn" data-correct="0">ADP</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card9">
+  <div class="question">Which macromolecule forms cell membranes?</div>
+  <button class="choice-btn" data-correct="0">Carbohydrates</button>
+  <button class="choice-btn" data-correct="0">Proteins</button>
+  <button class="choice-btn" data-correct="1">Lipids</button>
+  <button class="choice-btn" data-correct="0">Nucleic acids</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card10">
+  <div class="question">What is osmosis?</div>
+  <button class="choice-btn" data-correct="1">Diffusion of water</button>
+  <button class="choice-btn" data-correct="0">Active transport</button>
+  <button class="choice-btn" data-correct="0">Protein synthesis</button>
+  <button class="choice-btn" data-correct="0">Energy production</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card11">
+  <div class="question">Which phase does DNA replicate in?</div>
+  <button class="choice-btn" data-correct="0">G1</button>
+  <button class="choice-btn" data-correct="1">S phase</button>
+  <button class="choice-btn" data-correct="0">G2</button>
+  <button class="choice-btn" data-correct="0">M phase</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card12">
+  <div class="question">What is the powerhouse of the cell?</div>
+  <button class="choice-btn" data-correct="0">Chloroplast</button>
+  <button class="choice-btn" data-correct="1">Mitochondria</button>
+  <button class="choice-btn" data-correct="0">Nucleus</button>
+  <button class="choice-btn" data-correct="0">Ribosome</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card13">
+  <div class="question">Which process makes gametes?</div>
+  <button class="choice-btn" data-correct="0">Mitosis</button>
+  <button class="choice-btn" data-correct="1">Meiosis</button>
+  <button class="choice-btn" data-correct="0">Binary fission</button>
+  <button class="choice-btn" data-correct="0">Budding</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card14">
+  <div class="question">Which blood cells fight infection?</div>
+  <button class="choice-btn" data-correct="0">Platelets</button>
+  <button class="choice-btn" data-correct="0">Red blood cells</button>
+  <button class="choice-btn" data-correct="1">White blood cells</button>
+  <button class="choice-btn" data-correct="0">Plasma</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card15">
+  <div class="question">What carries genetic traits?</div>
+  <button class="choice-btn" data-correct="0">Proteins</button>
+  <button class="choice-btn" data-correct="0">Lipids</button>
+  <button class="choice-btn" data-correct="1">DNA</button>
+  <button class="choice-btn" data-correct="0">Amino acids</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card16">
+  <div class="question">Which process releases energy from glucose?</div>
+  <button class="choice-btn" data-correct="0">Photosynthesis</button>
+  <button class="choice-btn" data-correct="1">Respiration</button>
+  <button class="choice-btn" data-correct="0">Mitosis</button>
+  <button class="choice-btn" data-correct="0">Diffusion</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card17">
+  <div class="question">What pigment traps light in plants?</div>
+  <button class="choice-btn" data-correct="0">Keratin</button>
+  <button class="choice-btn" data-correct="0">Melanin</button>
+  <button class="choice-btn" data-correct="1">Chlorophyll</button>
+  <button class="choice-btn" data-correct="0">Hemoglobin</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card18">
+  <div class="question">Which organ filters blood?</div>
+  <button class="choice-btn" data-correct="0">Liver</button>
+  <button class="choice-btn" data-correct="1">Kidney</button>
+  <button class="choice-btn" data-correct="0">Stomach</button>
+  <button class="choice-btn" data-correct="0">Pancreas</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card19">
+  <div class="question">What do ribosomes make?</div>
+  <button class="choice-btn" data-correct="0">Lipids</button>
+  <button class="choice-btn" data-correct="0">Glucose</button>
+  <button class="choice-btn" data-correct="1">Proteins</button>
+  <button class="choice-btn" data-correct="0">DNA</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card20">
+  <div class="question">Which property of water allows insects to walk on its surface?</div>
+  <button class="choice-btn" data-correct="0">High heat capacity</button>
+  <button class="choice-btn" data-correct="1">Cohesion and surface tension</button>
+  <button class="choice-btn" data-correct="0">Capillary action</button>
+  <button class="choice-btn" data-correct="0">Low density</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card21">
+  <div class="question">What organelle produces ATP in eukaryotic cells?</div>
+  <button class="choice-btn" data-correct="0">Golgi apparatus</button>
+  <button class="choice-btn" data-correct="1">Mitochondria</button>
+  <button class="choice-btn" data-correct="0">Chloroplast</button>
+  <button class="choice-btn" data-correct="0">Ribosome</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card22">
+  <div class="question">What is the monomer of proteins?</div>
+  <button class="choice-btn" data-correct="1">Amino acids</button>
+  <button class="choice-btn" data-correct="0">Monosaccharides</button>
+  <button class="choice-btn" data-correct="0">Fatty acids</button>
+  <button class="choice-btn" data-correct="0">Nucleotides</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card23">
+  <div class="question">Which biomolecule stores genetic information?</div>
+  <button class="choice-btn" data-correct="0">Lipids</button>
+  <button class="choice-btn" data-correct="0">Proteins</button>
+  <button class="choice-btn" data-correct="1">Nucleic acids</button>
+  <button class="choice-btn" data-correct="0">Carbohydrates</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card24">
+  <div class="question">Which structure controls what enters and leaves the cell?</div>
+  <button class="choice-btn" data-correct="1">Cell membrane</button>
+  <button class="choice-btn" data-correct="0">Nucleus</button>
+  <button class="choice-btn" data-correct="0">Lysosome</button>
+  <button class="choice-btn" data-correct="0">Ribosome</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card25">
+  <div class="question">What is the main function of enzymes?</div>
+  <button class="choice-btn" data-correct="0">Provide energy</button>
+  <button class="choice-btn" data-correct="1">Speed up reactions</button>
+  <button class="choice-btn" data-correct="0">Store DNA</button>
+  <button class="choice-btn" data-correct="0">Build membranes</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card26">
+  <div class="question">Photosynthesis occurs in which organelle?</div>
+  <button class="choice-btn" data-correct="1">Chloroplast</button>
+  <button class="choice-btn" data-correct="0">Mitochondria</button>
+  <button class="choice-btn" data-correct="0">Nucleus</button>
+  <button class="choice-btn" data-correct="0">Ribosome</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card27">
+  <div class="question">Which gas is required for cellular respiration?</div>
+  <button class="choice-btn" data-correct="0">Nitrogen</button>
+  <button class="choice-btn" data-correct="1">Oxygen</button>
+  <button class="choice-btn" data-correct="0">Carbon dioxide</button>
+  <button class="choice-btn" data-correct="0">Hydrogen</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card28">
+  <div class="question">Which molecule is the cell's main energy currency?</div>
+  <button class="choice-btn" data-correct="0">DNA</button>
+  <button class="choice-btn" data-correct="0">Glucose</button>
+  <button class="choice-btn" data-correct="1">ATP</button>
+  <button class="choice-btn" data-correct="0">ADP</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card29">
+  <div class="question">Which macromolecule forms cell membranes?</div>
+  <button class="choice-btn" data-correct="0">Carbohydrates</button>
+  <button class="choice-btn" data-correct="0">Proteins</button>
+  <button class="choice-btn" data-correct="1">Lipids</button>
+  <button class="choice-btn" data-correct="0">Nucleic acids</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card30">
+  <div class="question">What is osmosis?</div>
+  <button class="choice-btn" data-correct="1">Diffusion of water</button>
+  <button class="choice-btn" data-correct="0">Active transport</button>
+  <button class="choice-btn" data-correct="0">Protein synthesis</button>
+  <button class="choice-btn" data-correct="0">Energy production</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card31">
+  <div class="question">Which phase does DNA replicate in?</div>
+  <button class="choice-btn" data-correct="0">G1</button>
+  <button class="choice-btn" data-correct="1">S phase</button>
+  <button class="choice-btn" data-correct="0">G2</button>
+  <button class="choice-btn" data-correct="0">M phase</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card32">
+  <div class="question">What is the powerhouse of the cell?</div>
+  <button class="choice-btn" data-correct="0">Chloroplast</button>
+  <button class="choice-btn" data-correct="1">Mitochondria</button>
+  <button class="choice-btn" data-correct="0">Nucleus</button>
+  <button class="choice-btn" data-correct="0">Ribosome</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card33">
+  <div class="question">Which process makes gametes?</div>
+  <button class="choice-btn" data-correct="0">Mitosis</button>
+  <button class="choice-btn" data-correct="1">Meiosis</button>
+  <button class="choice-btn" data-correct="0">Binary fission</button>
+  <button class="choice-btn" data-correct="0">Budding</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card34">
+  <div class="question">Which blood cells fight infection?</div>
+  <button class="choice-btn" data-correct="0">Platelets</button>
+  <button class="choice-btn" data-correct="0">Red blood cells</button>
+  <button class="choice-btn" data-correct="1">White blood cells</button>
+  <button class="choice-btn" data-correct="0">Plasma</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card35">
+  <div class="question">What carries genetic traits?</div>
+  <button class="choice-btn" data-correct="0">Proteins</button>
+  <button class="choice-btn" data-correct="0">Lipids</button>
+  <button class="choice-btn" data-correct="1">DNA</button>
+  <button class="choice-btn" data-correct="0">Amino acids</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card36">
+  <div class="question">Which process releases energy from glucose?</div>
+  <button class="choice-btn" data-correct="0">Photosynthesis</button>
+  <button class="choice-btn" data-correct="1">Respiration</button>
+  <button class="choice-btn" data-correct="0">Mitosis</button>
+  <button class="choice-btn" data-correct="0">Diffusion</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card37">
+  <div class="question">What pigment traps light in plants?</div>
+  <button class="choice-btn" data-correct="0">Keratin</button>
+  <button class="choice-btn" data-correct="0">Melanin</button>
+  <button class="choice-btn" data-correct="1">Chlorophyll</button>
+  <button class="choice-btn" data-correct="0">Hemoglobin</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card38">
+  <div class="question">Which organ filters blood?</div>
+  <button class="choice-btn" data-correct="0">Liver</button>
+  <button class="choice-btn" data-correct="1">Kidney</button>
+  <button class="choice-btn" data-correct="0">Stomach</button>
+  <button class="choice-btn" data-correct="0">Pancreas</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card39">
+  <div class="question">What do ribosomes make?</div>
+  <button class="choice-btn" data-correct="0">Lipids</button>
+  <button class="choice-btn" data-correct="0">Glucose</button>
+  <button class="choice-btn" data-correct="1">Proteins</button>
+  <button class="choice-btn" data-correct="0">DNA</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card40">
+  <div class="question">Which property of water allows insects to walk on its surface?</div>
+  <button class="choice-btn" data-correct="0">High heat capacity</button>
+  <button class="choice-btn" data-correct="1">Cohesion and surface tension</button>
+  <button class="choice-btn" data-correct="0">Capillary action</button>
+  <button class="choice-btn" data-correct="0">Low density</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card41">
+  <div class="question">What organelle produces ATP in eukaryotic cells?</div>
+  <button class="choice-btn" data-correct="0">Golgi apparatus</button>
+  <button class="choice-btn" data-correct="1">Mitochondria</button>
+  <button class="choice-btn" data-correct="0">Chloroplast</button>
+  <button class="choice-btn" data-correct="0">Ribosome</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card42">
+  <div class="question">What is the monomer of proteins?</div>
+  <button class="choice-btn" data-correct="1">Amino acids</button>
+  <button class="choice-btn" data-correct="0">Monosaccharides</button>
+  <button class="choice-btn" data-correct="0">Fatty acids</button>
+  <button class="choice-btn" data-correct="0">Nucleotides</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card43">
+  <div class="question">Which biomolecule stores genetic information?</div>
+  <button class="choice-btn" data-correct="0">Lipids</button>
+  <button class="choice-btn" data-correct="0">Proteins</button>
+  <button class="choice-btn" data-correct="1">Nucleic acids</button>
+  <button class="choice-btn" data-correct="0">Carbohydrates</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card44">
+  <div class="question">Which structure controls what enters and leaves the cell?</div>
+  <button class="choice-btn" data-correct="1">Cell membrane</button>
+  <button class="choice-btn" data-correct="0">Nucleus</button>
+  <button class="choice-btn" data-correct="0">Lysosome</button>
+  <button class="choice-btn" data-correct="0">Ribosome</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card45">
+  <div class="question">What is the main function of enzymes?</div>
+  <button class="choice-btn" data-correct="0">Provide energy</button>
+  <button class="choice-btn" data-correct="1">Speed up reactions</button>
+  <button class="choice-btn" data-correct="0">Store DNA</button>
+  <button class="choice-btn" data-correct="0">Build membranes</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card46">
+  <div class="question">Photosynthesis occurs in which organelle?</div>
+  <button class="choice-btn" data-correct="1">Chloroplast</button>
+  <button class="choice-btn" data-correct="0">Mitochondria</button>
+  <button class="choice-btn" data-correct="0">Nucleus</button>
+  <button class="choice-btn" data-correct="0">Ribosome</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card47">
+  <div class="question">Which gas is required for cellular respiration?</div>
+  <button class="choice-btn" data-correct="0">Nitrogen</button>
+  <button class="choice-btn" data-correct="1">Oxygen</button>
+  <button class="choice-btn" data-correct="0">Carbon dioxide</button>
+  <button class="choice-btn" data-correct="0">Hydrogen</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card48">
+  <div class="question">Which molecule is the cell's main energy currency?</div>
+  <button class="choice-btn" data-correct="0">DNA</button>
+  <button class="choice-btn" data-correct="0">Glucose</button>
+  <button class="choice-btn" data-correct="1">ATP</button>
+  <button class="choice-btn" data-correct="0">ADP</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card49">
+  <div class="question">Which macromolecule forms cell membranes?</div>
+  <button class="choice-btn" data-correct="0">Carbohydrates</button>
+  <button class="choice-btn" data-correct="0">Proteins</button>
+  <button class="choice-btn" data-correct="1">Lipids</button>
+  <button class="choice-btn" data-correct="0">Nucleic acids</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card50">
+  <div class="question">What is osmosis?</div>
+  <button class="choice-btn" data-correct="1">Diffusion of water</button>
+  <button class="choice-btn" data-correct="0">Active transport</button>
+  <button class="choice-btn" data-correct="0">Protein synthesis</button>
+  <button class="choice-btn" data-correct="0">Energy production</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card51">
+  <div class="question">Which phase does DNA replicate in?</div>
+  <button class="choice-btn" data-correct="0">G1</button>
+  <button class="choice-btn" data-correct="1">S phase</button>
+  <button class="choice-btn" data-correct="0">G2</button>
+  <button class="choice-btn" data-correct="0">M phase</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card52">
+  <div class="question">What is the powerhouse of the cell?</div>
+  <button class="choice-btn" data-correct="0">Chloroplast</button>
+  <button class="choice-btn" data-correct="1">Mitochondria</button>
+  <button class="choice-btn" data-correct="0">Nucleus</button>
+  <button class="choice-btn" data-correct="0">Ribosome</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card53">
+  <div class="question">Which process makes gametes?</div>
+  <button class="choice-btn" data-correct="0">Mitosis</button>
+  <button class="choice-btn" data-correct="1">Meiosis</button>
+  <button class="choice-btn" data-correct="0">Binary fission</button>
+  <button class="choice-btn" data-correct="0">Budding</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card54">
+  <div class="question">Which blood cells fight infection?</div>
+  <button class="choice-btn" data-correct="0">Platelets</button>
+  <button class="choice-btn" data-correct="0">Red blood cells</button>
+  <button class="choice-btn" data-correct="1">White blood cells</button>
+  <button class="choice-btn" data-correct="0">Plasma</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card55">
+  <div class="question">What carries genetic traits?</div>
+  <button class="choice-btn" data-correct="0">Proteins</button>
+  <button class="choice-btn" data-correct="0">Lipids</button>
+  <button class="choice-btn" data-correct="1">DNA</button>
+  <button class="choice-btn" data-correct="0">Amino acids</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card56">
+  <div class="question">Which process releases energy from glucose?</div>
+  <button class="choice-btn" data-correct="0">Photosynthesis</button>
+  <button class="choice-btn" data-correct="1">Respiration</button>
+  <button class="choice-btn" data-correct="0">Mitosis</button>
+  <button class="choice-btn" data-correct="0">Diffusion</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card57">
+  <div class="question">What pigment traps light in plants?</div>
+  <button class="choice-btn" data-correct="0">Keratin</button>
+  <button class="choice-btn" data-correct="0">Melanin</button>
+  <button class="choice-btn" data-correct="1">Chlorophyll</button>
+  <button class="choice-btn" data-correct="0">Hemoglobin</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card58">
+  <div class="question">Which organ filters blood?</div>
+  <button class="choice-btn" data-correct="0">Liver</button>
+  <button class="choice-btn" data-correct="1">Kidney</button>
+  <button class="choice-btn" data-correct="0">Stomach</button>
+  <button class="choice-btn" data-correct="0">Pancreas</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card59">
+  <div class="question">What do ribosomes make?</div>
+  <button class="choice-btn" data-correct="0">Lipids</button>
+  <button class="choice-btn" data-correct="0">Glucose</button>
+  <button class="choice-btn" data-correct="1">Proteins</button>
+  <button class="choice-btn" data-correct="0">DNA</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card60">
+  <div class="question">Which property of water allows insects to walk on its surface?</div>
+  <button class="choice-btn" data-correct="0">High heat capacity</button>
+  <button class="choice-btn" data-correct="1">Cohesion and surface tension</button>
+  <button class="choice-btn" data-correct="0">Capillary action</button>
+  <button class="choice-btn" data-correct="0">Low density</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card61">
+  <div class="question">What organelle produces ATP in eukaryotic cells?</div>
+  <button class="choice-btn" data-correct="0">Golgi apparatus</button>
+  <button class="choice-btn" data-correct="1">Mitochondria</button>
+  <button class="choice-btn" data-correct="0">Chloroplast</button>
+  <button class="choice-btn" data-correct="0">Ribosome</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card62">
+  <div class="question">What is the monomer of proteins?</div>
+  <button class="choice-btn" data-correct="1">Amino acids</button>
+  <button class="choice-btn" data-correct="0">Monosaccharides</button>
+  <button class="choice-btn" data-correct="0">Fatty acids</button>
+  <button class="choice-btn" data-correct="0">Nucleotides</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card63">
+  <div class="question">Which biomolecule stores genetic information?</div>
+  <button class="choice-btn" data-correct="0">Lipids</button>
+  <button class="choice-btn" data-correct="0">Proteins</button>
+  <button class="choice-btn" data-correct="1">Nucleic acids</button>
+  <button class="choice-btn" data-correct="0">Carbohydrates</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card64">
+  <div class="question">Which structure controls what enters and leaves the cell?</div>
+  <button class="choice-btn" data-correct="1">Cell membrane</button>
+  <button class="choice-btn" data-correct="0">Nucleus</button>
+  <button class="choice-btn" data-correct="0">Lysosome</button>
+  <button class="choice-btn" data-correct="0">Ribosome</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card65">
+  <div class="question">What is the main function of enzymes?</div>
+  <button class="choice-btn" data-correct="0">Provide energy</button>
+  <button class="choice-btn" data-correct="1">Speed up reactions</button>
+  <button class="choice-btn" data-correct="0">Store DNA</button>
+  <button class="choice-btn" data-correct="0">Build membranes</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card66">
+  <div class="question">Photosynthesis occurs in which organelle?</div>
+  <button class="choice-btn" data-correct="1">Chloroplast</button>
+  <button class="choice-btn" data-correct="0">Mitochondria</button>
+  <button class="choice-btn" data-correct="0">Nucleus</button>
+  <button class="choice-btn" data-correct="0">Ribosome</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card67">
+  <div class="question">Which gas is required for cellular respiration?</div>
+  <button class="choice-btn" data-correct="0">Nitrogen</button>
+  <button class="choice-btn" data-correct="1">Oxygen</button>
+  <button class="choice-btn" data-correct="0">Carbon dioxide</button>
+  <button class="choice-btn" data-correct="0">Hydrogen</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card68">
+  <div class="question">Which molecule is the cell's main energy currency?</div>
+  <button class="choice-btn" data-correct="0">DNA</button>
+  <button class="choice-btn" data-correct="0">Glucose</button>
+  <button class="choice-btn" data-correct="1">ATP</button>
+  <button class="choice-btn" data-correct="0">ADP</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card69">
+  <div class="question">Which macromolecule forms cell membranes?</div>
+  <button class="choice-btn" data-correct="0">Carbohydrates</button>
+  <button class="choice-btn" data-correct="0">Proteins</button>
+  <button class="choice-btn" data-correct="1">Lipids</button>
+  <button class="choice-btn" data-correct="0">Nucleic acids</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card70">
+  <div class="question">What is osmosis?</div>
+  <button class="choice-btn" data-correct="1">Diffusion of water</button>
+  <button class="choice-btn" data-correct="0">Active transport</button>
+  <button class="choice-btn" data-correct="0">Protein synthesis</button>
+  <button class="choice-btn" data-correct="0">Energy production</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card71">
+  <div class="question">Which phase does DNA replicate in?</div>
+  <button class="choice-btn" data-correct="0">G1</button>
+  <button class="choice-btn" data-correct="1">S phase</button>
+  <button class="choice-btn" data-correct="0">G2</button>
+  <button class="choice-btn" data-correct="0">M phase</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card72">
+  <div class="question">What is the powerhouse of the cell?</div>
+  <button class="choice-btn" data-correct="0">Chloroplast</button>
+  <button class="choice-btn" data-correct="1">Mitochondria</button>
+  <button class="choice-btn" data-correct="0">Nucleus</button>
+  <button class="choice-btn" data-correct="0">Ribosome</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card73">
+  <div class="question">Which process makes gametes?</div>
+  <button class="choice-btn" data-correct="0">Mitosis</button>
+  <button class="choice-btn" data-correct="1">Meiosis</button>
+  <button class="choice-btn" data-correct="0">Binary fission</button>
+  <button class="choice-btn" data-correct="0">Budding</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card74">
+  <div class="question">Which blood cells fight infection?</div>
+  <button class="choice-btn" data-correct="0">Platelets</button>
+  <button class="choice-btn" data-correct="0">Red blood cells</button>
+  <button class="choice-btn" data-correct="1">White blood cells</button>
+  <button class="choice-btn" data-correct="0">Plasma</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card75">
+  <div class="question">What carries genetic traits?</div>
+  <button class="choice-btn" data-correct="0">Proteins</button>
+  <button class="choice-btn" data-correct="0">Lipids</button>
+  <button class="choice-btn" data-correct="1">DNA</button>
+  <button class="choice-btn" data-correct="0">Amino acids</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card76">
+  <div class="question">Which process releases energy from glucose?</div>
+  <button class="choice-btn" data-correct="0">Photosynthesis</button>
+  <button class="choice-btn" data-correct="1">Respiration</button>
+  <button class="choice-btn" data-correct="0">Mitosis</button>
+  <button class="choice-btn" data-correct="0">Diffusion</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card77">
+  <div class="question">What pigment traps light in plants?</div>
+  <button class="choice-btn" data-correct="0">Keratin</button>
+  <button class="choice-btn" data-correct="0">Melanin</button>
+  <button class="choice-btn" data-correct="1">Chlorophyll</button>
+  <button class="choice-btn" data-correct="0">Hemoglobin</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card78">
+  <div class="question">Which organ filters blood?</div>
+  <button class="choice-btn" data-correct="0">Liver</button>
+  <button class="choice-btn" data-correct="1">Kidney</button>
+  <button class="choice-btn" data-correct="0">Stomach</button>
+  <button class="choice-btn" data-correct="0">Pancreas</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card79">
+  <div class="question">What do ribosomes make?</div>
+  <button class="choice-btn" data-correct="0">Lipids</button>
+  <button class="choice-btn" data-correct="0">Glucose</button>
+  <button class="choice-btn" data-correct="1">Proteins</button>
+  <button class="choice-btn" data-correct="0">DNA</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card80">
+  <div class="question">Which property of water allows insects to walk on its surface?</div>
+  <button class="choice-btn" data-correct="0">High heat capacity</button>
+  <button class="choice-btn" data-correct="1">Cohesion and surface tension</button>
+  <button class="choice-btn" data-correct="0">Capillary action</button>
+  <button class="choice-btn" data-correct="0">Low density</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card81">
+  <div class="question">What organelle produces ATP in eukaryotic cells?</div>
+  <button class="choice-btn" data-correct="0">Golgi apparatus</button>
+  <button class="choice-btn" data-correct="1">Mitochondria</button>
+  <button class="choice-btn" data-correct="0">Chloroplast</button>
+  <button class="choice-btn" data-correct="0">Ribosome</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card82">
+  <div class="question">What is the monomer of proteins?</div>
+  <button class="choice-btn" data-correct="1">Amino acids</button>
+  <button class="choice-btn" data-correct="0">Monosaccharides</button>
+  <button class="choice-btn" data-correct="0">Fatty acids</button>
+  <button class="choice-btn" data-correct="0">Nucleotides</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card83">
+  <div class="question">Which biomolecule stores genetic information?</div>
+  <button class="choice-btn" data-correct="0">Lipids</button>
+  <button class="choice-btn" data-correct="0">Proteins</button>
+  <button class="choice-btn" data-correct="1">Nucleic acids</button>
+  <button class="choice-btn" data-correct="0">Carbohydrates</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card84">
+  <div class="question">Which structure controls what enters and leaves the cell?</div>
+  <button class="choice-btn" data-correct="1">Cell membrane</button>
+  <button class="choice-btn" data-correct="0">Nucleus</button>
+  <button class="choice-btn" data-correct="0">Lysosome</button>
+  <button class="choice-btn" data-correct="0">Ribosome</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card85">
+  <div class="question">What is the main function of enzymes?</div>
+  <button class="choice-btn" data-correct="0">Provide energy</button>
+  <button class="choice-btn" data-correct="1">Speed up reactions</button>
+  <button class="choice-btn" data-correct="0">Store DNA</button>
+  <button class="choice-btn" data-correct="0">Build membranes</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card86">
+  <div class="question">Photosynthesis occurs in which organelle?</div>
+  <button class="choice-btn" data-correct="1">Chloroplast</button>
+  <button class="choice-btn" data-correct="0">Mitochondria</button>
+  <button class="choice-btn" data-correct="0">Nucleus</button>
+  <button class="choice-btn" data-correct="0">Ribosome</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card87">
+  <div class="question">Which gas is required for cellular respiration?</div>
+  <button class="choice-btn" data-correct="0">Nitrogen</button>
+  <button class="choice-btn" data-correct="1">Oxygen</button>
+  <button class="choice-btn" data-correct="0">Carbon dioxide</button>
+  <button class="choice-btn" data-correct="0">Hydrogen</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card88">
+  <div class="question">Which molecule is the cell's main energy currency?</div>
+  <button class="choice-btn" data-correct="0">DNA</button>
+  <button class="choice-btn" data-correct="0">Glucose</button>
+  <button class="choice-btn" data-correct="1">ATP</button>
+  <button class="choice-btn" data-correct="0">ADP</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card89">
+  <div class="question">Which macromolecule forms cell membranes?</div>
+  <button class="choice-btn" data-correct="0">Carbohydrates</button>
+  <button class="choice-btn" data-correct="0">Proteins</button>
+  <button class="choice-btn" data-correct="1">Lipids</button>
+  <button class="choice-btn" data-correct="0">Nucleic acids</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card90">
+  <div class="question">What is osmosis?</div>
+  <button class="choice-btn" data-correct="1">Diffusion of water</button>
+  <button class="choice-btn" data-correct="0">Active transport</button>
+  <button class="choice-btn" data-correct="0">Protein synthesis</button>
+  <button class="choice-btn" data-correct="0">Energy production</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card91">
+  <div class="question">Which phase does DNA replicate in?</div>
+  <button class="choice-btn" data-correct="0">G1</button>
+  <button class="choice-btn" data-correct="1">S phase</button>
+  <button class="choice-btn" data-correct="0">G2</button>
+  <button class="choice-btn" data-correct="0">M phase</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card92">
+  <div class="question">What is the powerhouse of the cell?</div>
+  <button class="choice-btn" data-correct="0">Chloroplast</button>
+  <button class="choice-btn" data-correct="1">Mitochondria</button>
+  <button class="choice-btn" data-correct="0">Nucleus</button>
+  <button class="choice-btn" data-correct="0">Ribosome</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card93">
+  <div class="question">Which process makes gametes?</div>
+  <button class="choice-btn" data-correct="0">Mitosis</button>
+  <button class="choice-btn" data-correct="1">Meiosis</button>
+  <button class="choice-btn" data-correct="0">Binary fission</button>
+  <button class="choice-btn" data-correct="0">Budding</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card94">
+  <div class="question">Which blood cells fight infection?</div>
+  <button class="choice-btn" data-correct="0">Platelets</button>
+  <button class="choice-btn" data-correct="0">Red blood cells</button>
+  <button class="choice-btn" data-correct="1">White blood cells</button>
+  <button class="choice-btn" data-correct="0">Plasma</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card95">
+  <div class="question">What carries genetic traits?</div>
+  <button class="choice-btn" data-correct="0">Proteins</button>
+  <button class="choice-btn" data-correct="0">Lipids</button>
+  <button class="choice-btn" data-correct="1">DNA</button>
+  <button class="choice-btn" data-correct="0">Amino acids</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card96">
+  <div class="question">Which process releases energy from glucose?</div>
+  <button class="choice-btn" data-correct="0">Photosynthesis</button>
+  <button class="choice-btn" data-correct="1">Respiration</button>
+  <button class="choice-btn" data-correct="0">Mitosis</button>
+  <button class="choice-btn" data-correct="0">Diffusion</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card97">
+  <div class="question">What pigment traps light in plants?</div>
+  <button class="choice-btn" data-correct="0">Keratin</button>
+  <button class="choice-btn" data-correct="0">Melanin</button>
+  <button class="choice-btn" data-correct="1">Chlorophyll</button>
+  <button class="choice-btn" data-correct="0">Hemoglobin</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card98">
+  <div class="question">Which organ filters blood?</div>
+  <button class="choice-btn" data-correct="0">Liver</button>
+  <button class="choice-btn" data-correct="1">Kidney</button>
+  <button class="choice-btn" data-correct="0">Stomach</button>
+  <button class="choice-btn" data-correct="0">Pancreas</button>
+  <div class="feedback"></div>
+</div>
+
+<div class="card" id="card99">
+  <div class="question">What do ribosomes make?</div>
+  <button class="choice-btn" data-correct="0">Lipids</button>
+  <button class="choice-btn" data-correct="0">Glucose</button>
+  <button class="choice-btn" data-correct="1">Proteins</button>
+  <button class="choice-btn" data-correct="0">DNA</button>
+  <div class="feedback"></div>
+</div>
+
+<div id="menuDish">
+  <button onclick="prevCard()">← Prev</button>
+  <button onclick="flipCard()">Flip</button>
+  <button onclick="nextCard()">Next →</button>
+  <button onclick="shuffleCard()">Shuffle</button>
+  <button onclick="closeMenu()">Close</button>
+</div>
+
+<div class="menuButton" onclick="toggleMenu()">⋮</div>
+
+<script>
+let cards=[...document.querySelectorAll('.card')];
+let index=0;
+let flipped=false;
+
+function showCard(i){
+  cards.forEach(c=>c.classList.remove('active'));
+  cards[i].classList.add('active');
+}
+showCard(index);
+
+function nextCard(){ index=(index+1)%cards.length; flipped=false; showCard(index);}
+function prevCard(){ index=(index-1+cards.length)%cards.length; flipped=false; showCard(index);}
+function shuffleCard(){ index=Math.floor(Math.random()*cards.length); flipped=false; showCard(index);}
+
+function flipCard(){
+  let fb=cards[index].querySelector('.feedback');
+  fb.textContent = flipped ? "" : "(Explanation coming soon)";
+  flipped = !flipped;
+}
+
+function toggleMenu(){
+  let m=document.getElementById('menuDish');
+  m.style.display = m.style.display==='flex' ? 'none' : 'flex';
+}
+function closeMenu(){ document.getElementById('menuDish').style.display='none'; }
+
+cards.forEach(card=>{
+  card.querySelectorAll('.choice-btn').forEach(btn=>{
+    btn.onclick=()=>{
+      let fb=card.querySelector('.feedback');
+      if(btn.dataset.correct==="1"){
+        fb.textContent="Correct!";
+        fb.className="feedback correct";
+      } else {
+        fb.textContent="Incorrect";
+        fb.className="feedback incorrect";
+      }
+    }
+  });
+});
+
+document.addEventListener('keydown',e=>{
+  let key=e.key.toLowerCase();
+  if(key==='arrowright') nextCard();
+  if(key==='arrowleft') prevCard();
+  if(['a','b','c','d'].includes(key)){
+    let btns=[...cards[index].querySelectorAll('.choice-btn')];
+    let mapping={a:0,b:1,c:2,d:3};
+    btns[mapping[key]].click();
+  }
+});
+</script>
+
+</body></html>
