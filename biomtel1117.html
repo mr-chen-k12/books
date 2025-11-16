@@ -25140,20 +25140,6 @@ document.body.addEventListener("touchend", (e) => {
         return;
     }
 });
-// -------------------------
-// MENU TOGGLE (3-dot button)
-// -------------------------
-
-const menuToggleBtn = document.getElementById("menuToggle");  // the 3 dots
-const menuDish = document.getElementById("menuDish");
-let menuOpen = false;
-
-// Toggle menu on click
-menuToggleBtn.onclick = () => {
-    menuOpen = !menuOpen;
-    menuDish.style.display = menuOpen ? "flex" : "none";
-};
-
 
 
 // ---------- INITIALIZE ----------
