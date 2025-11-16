@@ -25142,6 +25142,47 @@ document.body.addEventListener("touchend", (e) => {
 });
 
 
+
+
+
+// -------------------------
+// MENU TOGGLE (3 dots)
+// -------------------------
+
+const menuToggleBtn = document.getElementById("menuToggle");  // 3-dot button
+const menuDish = document.getElementById("menuDish");
+let menuOpen = false;
+
+// Open/close menu when pressing 3 dots
+menuToggleBtn.onclick = (e) => {
+    e.stopPropagation();  
+    menuOpen = !menuOpen;
+    menuDish.style.display = menuOpen ? "flex" : "none";
+};
+
+// Close menu when clicking outside
+document.addEventListener("click", (e) => {
+    // Ignore if clicking the menu or the 3-dot button
+    if (menuDish.contains(e.target) || e.target === menuToggleBtn) return;
+
+    // Close menu
+    if (menuOpen) {
+        menuDish.style.display = "none";
+        menuOpen = false;
+    }
+});
+
+// Close menu on ANY touch outside
+document.addEventListener("touchstart", (e) => {
+    if (menuDish.contains(e.target) || e.target === menuToggleBtn) return;
+
+    if (menuOpen) {
+        menuDish.style.display = "none";
+        menuOpen = false;
+    }
+}, {passive: true});
+
+
 // ---------- INITIALIZE ----------
 window.addEventListener("load", () => {
   // Activate initial topic button if it exists
