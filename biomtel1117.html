@@ -25142,41 +25142,7 @@ document.body.addEventListener("touchend", (e) => {
 });
 
 
-// -------------------------
-// MENU TOGGLE + OUTSIDE CLOSE (iPhone-friendly)
-// -------------------------
 
-const menuToggleBtn = document.getElementById("menuToggle");
-const menuDish = document.getElementById("menuDish");
-let menuOpen = false;
-
-function setMenu(open) {
-  menuOpen = open;
-  menuDish.style.display = open ? "flex" : "none";
-}
-
-// Toggle when pressing the 3 dots
-function handleMenuToggle(e) {
-  // Prevent this tap from also being treated as "outside"
-  e.stopPropagation();
-  e.preventDefault();
-  setMenu(!menuOpen);
-}
-
-// Close menu if tapping/clicking outside
-function handleOutsideClose(e) {
-  // If we tapped inside the menu or on the 3 dots, ignore
-  if (menuDish.contains(e.target) || menuToggleBtn.contains(e.target)) return;
-  if (menuOpen) setMenu(false);
-}
-
-// Attach both click + touchend to the 3-dot button
-menuToggleBtn.addEventListener("click", handleMenuToggle);
-menuToggleBtn.addEventListener("touchend", handleMenuToggle, { passive: false });
-
-// Use capture phase so this fires before other handlers
-document.addEventListener("click", handleOutsideClose, true);
-document.addEventListener("touchend", handleOutsideClose, { passive: true, capture: true });
 
 
 // ---------- INITIALIZE ----------
