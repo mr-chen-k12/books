@@ -25089,6 +25089,80 @@ document.body.addEventListener("touchend", e => {
   touchStartY = null;
 }, {passive:true});
 
+// -----------------------------------------
+// MOBILE SWIPE (up/down flip, left/right nav)
+// -----------------------------------------
+
+let startX = 0;
+let startY = 0;
+let endX = 0;
+let endY = 0;
+const SWIPE_MIN = 45; // minimum pixels required
+
+// Always listen at the top-level body so buttons/menu won't block swipe.
+document.body.addEventListener("touchstart", (e) => {
+    const t = e.changedTouches[0];
+    startX = t.clientX;
+    startY = t.clientY;
+});
+
+document.body.addEventListener("touchend", (e) => {
+    const t = e.changedTouches[0];
+    endX = t.clientX;
+    endY = t.clientY;
+
+    const dx = endX - startX;
+    const dy = endY - startY;
+
+    // Horizontal swipe (LEFT / RIGHT)
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > SWIPE_MIN) {
+        if (dx < 0) {
+            // ← swipe LEFT → next card
+            nextCard();
+        } else {
+            // → swipe RIGHT → previous card
+            prevCard();
+        }
+        return;
+    }
+
+    // Vertical swipe (UP / DOWN)
+    if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > SWIPE_MIN) {
+        if (dy < 0) {
+            // ↑ swipe UP → flip to back
+            frontEl.style.display = "none";
+            backEl.style.display = "block";
+        } else {
+            // ↓ swipe DOWN → flip to front
+            backEl.style.display = "none";
+            frontEl.style.display = "block";
+        }
+        return;
+    }
+});
+// -------------------------
+// MENU TOGGLE (3-dot button)
+// -------------------------
+
+const menuToggleBtn = document.getElementById("menuToggle");  // the 3 dots
+const menuDish = document.getElementById("menuDish");
+let menuOpen = false;
+
+// Toggle menu on click
+menuToggleBtn.onclick = () => {
+    menuOpen = !menuOpen;
+    menuDish.style.display = menuOpen ? "flex" : "none";
+};
+
+// If you want clicking outside menu to close it:
+document.addEventListener("click", (e) => {
+    if (!menuDish.contains(e.target) && e.target !== menuToggleBtn) {
+        menuDish.style.display = "none";
+        menuOpen = false;
+    }
+});
+
+
 // ---------- INITIALIZE ----------
 window.addEventListener("load", () => {
   // Activate initial topic button if it exists
