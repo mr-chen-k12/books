@@ -25154,13 +25154,6 @@ menuToggleBtn.onclick = () => {
     menuDish.style.display = menuOpen ? "flex" : "none";
 };
 
-// If you want clicking outside menu to close it:
-document.addEventListener("click", (e) => {
-    if (!menuDish.contains(e.target) && e.target !== menuToggleBtn) {
-        menuDish.style.display = "none";
-        menuOpen = false;
-    }
-});
 
 
 // ---------- INITIALIZE ----------
