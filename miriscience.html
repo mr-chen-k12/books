@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Life Cycles, Traits, and Variations – Flashcards</title>
+<style>
+  :root {
+    color-scheme: dark;
+  }
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #050509;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+  }
+  .wrapper {
+    width: 90vw;
+    max-width: 600px;
+    text-align: center;
+  }
+  h1 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: #e5e7eb;
+    font-weight: 600;
+  }
+  .card {
+    position: relative;
+    background: #181b23;
+    border-radius: 18px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.7);
+    padding: 24px 20px;
+    min-height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 22px 50px rgba(0,0,0,0.8);
+    background: #1f2330;
+  }
+  .card-front, .card-back {
+    font-size: 1.5rem;
+    line-height: 1.4;
+  }
+  .card-back {
+    font-size: 1.05rem;
+  }
+  .card-label {
+    position: absolute;
+    top: 10px;
+    left: 16px;
+    font-size: 0.7rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+  .controls {
+    margin-top: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+  button {
+    border: none;
+    border-radius: 999px;
+    padding: 10px 18px;
+    background: #272b38;
+    color: #e5e7eb;
+    font-size: 0.9rem;
+    cursor: pointer;
+    min-width: 80px;
+    transition: background 0.2s, transform 0.1s;
+  }
+  button:hover {
+    background: #34394a;
+    transform: translateY(-1px);
+  }
+  button:active {
+    transform: translateY(0);
+  }
+  .meta {
+    margin-top: 10px;
+    font-size: 0.8rem;
+    color: #9ca3af;
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <h1>Life Cycles, Traits, and Variations – Key Terms</h1>
+
+  <div id="card" class="card">
+    <div class="card-label" id="sideLabel">Term</div>
+    <div id="cardText" class="card-front"></div>
+  </div>
+
+  <div class="controls">
+    <button id="prevBtn">Prev</button>
+    <button id="flipBtn">Flip</button>
+    <button id="nextBtn">Next</button>
+    <button id="shuffleBtn">Shuffle</button>
+  </div>
+
+  <div class="meta" id="metaText"></div>
+</div>
+
+<script>
+  // --- Flashcard data: term (front) and definition (back)
+  const cards = [
+    { term: "Life cycle", def: "The set of stages of an organism’s life." },
+    { term: "Organism", def: "Any living thing." },
+    { term: "Adolescent", def: "A stage of the life cycle when a young animal is developing into an adult." },
+    { term: "Metamorphosis", def: "A change of form during the life cycle of some animals." },
+    { term: "Flowering plant", def: "A plant that produces flowers during its life cycle." },
+    { term: "Seed", def: "The part of a plant that protects the material that sprouts into a new plant." },
+    { term: "Germination", def: "The beginning of the growth process when a plant sprout comes out of a seed." },
+    { term: "Pollination", def: "The transfer of pollen that causes flowering plants to produce fruits." },
+    { term: "Spore", def: "A tiny structure on some flowerless plants that can grow into a new plant." },
+    { term: "Physical trait", def: "A feature of a living thing’s body." },
+    { term: "Individual", def: "A single living organism." },
+    { term: "Offspring", def: "A young organism that comes from parents." },
+    { term: "Inherit", def: "To receive traits from parents." },
+    { term: "Siblings", def: "Organisms that come from the same parents." },
+    { term: "Identical", def: "Exactly the same; identical twins inherit the exact same traits, causing them to look alike." },
+    { term: "Vary", def: "To change or differ." },
+    { term: "Species", def: "A group of similar individuals that can reproduce together." },
+    { term: "Variation", def: "A difference between things or in one thing over time." },
+    { term: "Population", def: "A group of a single type of organism living in the same place at the same time." },
+    { term: "Ecosystem", def: "All the living and nonliving things that interact in the same place." },
+    { term: "Environment", def: "A surrounding area that contains living and nonliving things." },
+    { term: "Advantage", def: "A factor that helps an organism." },
+    { term: "Survive", def: "To stay alive." },
+    { term: "Camouflage", def: "A color or pattern that helps an organism blend in with its surroundings." },
+    { term: "Rare", def: "Not found in large numbers." },
+    { term: "Extinct", def: "Having no remaining living members." }
+  ];
+
+  let index = 0;
+  let showingFront = true;
+
+  const cardEl = document.getElementById("card");
+  const cardTextEl = document.getElementById("cardText");
+  const sideLabelEl = document.getElementById("sideLabel");
+  const metaTextEl = document.getElementById("metaText");
+
+  function renderCard() {
+    const card = cards[index];
+    if (showingFront) {
+      cardTextEl.textContent = card.term;
+      sideLabelEl.textContent = "Term";
+    } else {
+      cardTextEl.textContent = card.def;
+      sideLabelEl.textContent = "Definition";
+    }
+    metaTextEl.textContent = `Card ${index + 1} of ${cards.length}`;
+  }
+
+  function flipCard() {
+    showingFront = !showingFront;
+    renderCard();
+  }
+
+  function nextCard() {
+    index = (index + 1) % cards.length;
+    showingFront = true;
+    renderCard();
+  }
+
+  function prevCard() {
+    index = (index - 1 + cards.length) % cards.length;
+    showingFront = true;
+    renderCard();
+  }
+
+  function shuffleCard() {
+    index = Math.floor(Math.random() * cards.length);
+    showingFront = true;
+    renderCard();
+  }
+
+  // Button bindings
+  document.getElementById("flipBtn").onclick = flipCard;
+  document.getElementById("nextBtn").onclick = nextCard;
+  document.getElementById("prevBtn").onclick = prevCard;
+  document.getElementById("shuffleBtn").onclick = shuffleCard;
+
+  // Clicking the card also flips it
+  cardEl.onclick = flipCard;
+
+  // Optional keyboard controls: left/right arrows + space/enter to flip
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight") nextCard();
+    else if (e.key === "ArrowLeft") prevCard();
+    else if (e.key === " " || e.key === "Enter") {
+      e.preventDefault();
+      flipCard();
+    }
+  });
+
+// --- Swipe Support (Mobile Touch Gestures) ---
+let touchStartX = 0;
+let touchEndX = 0;
+let touchStartY = 0;
+let touchEndY = 0;
+
+cardEl.addEventListener("touchstart", (e) => {
+  const touch = e.changedTouches[0];
+  touchStartX = touch.screenX;
+  touchStartY = touch.screenY;
+});
+
+cardEl.addEventListener("touchend", (e) => {
+  const touch = e.changedTouches[0];
+  touchEndX = touch.screenX;
+  touchEndY = touch.screenY;
+  handleSwipe();
+});
+
+function handleSwipe() {
+  const dx = touchEndX - touchStartX;
+  const dy = touchEndY - touchStartY;
+
+  // Ignore tiny accidental movements
+  if (Math.abs(dx) < 30 && Math.abs(dy) < 30) return;
+
+  // Horizontal swipe → next/prev
+  if (Math.abs(dx) > Math.abs(dy)) {
+    if (dx < 0) {
+      // Swipe LEFT → next card
+      nextCard();
+    } else {
+      // Swipe RIGHT → previous card
+      prevCard();
+    }
+  } 
+  // Vertical swipe → flip card
+  else {
+    if (dy < 0) {
+      // Swipe UP → show back
+      showingFront = false;
+      renderCard();
+    } else {
+      // Swipe DOWN → show front
+      showingFront = true;
+      renderCard();
+    }
+  }
+}
+
+  // Initial render
+  renderCard();
+</script>
+</body>
+</html>
