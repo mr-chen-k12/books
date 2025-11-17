@@ -102,7 +102,7 @@
   <h1>Life Cycles, Traits, and Variations – Key Terms</h1>
 
   <div id="card" class="card">
-    <div class="card-label" id="sideLabel">Term</div>
+    <div class="card-label" id="sideLabel">Definition</div>
     <div id="cardText" class="card-front"></div>
   </div>
 
@@ -117,7 +117,6 @@
 </div>
 
 <script>
-  // --- Flashcard data: term (front) and definition (back)
   const cards = [
     { term: "Life cycle", def: "The set of stages of an organism’s life." },
     { term: "Organism", def: "Any living thing." },
@@ -148,7 +147,9 @@
   ];
 
   let index = 0;
-  let showingFront = true;
+
+  // 🔥 Definition is now the FRONT
+  let showingFront = false;
 
   const cardEl = document.getElementById("card");
   const cardTextEl = document.getElementById("cardText");
@@ -158,11 +159,11 @@
   function renderCard() {
     const card = cards[index];
     if (showingFront) {
-      cardTextEl.textContent = card.term;
-      sideLabelEl.textContent = "Term";
-    } else {
       cardTextEl.textContent = card.def;
       sideLabelEl.textContent = "Definition";
+    } else {
+      cardTextEl.textContent = card.term;
+      sideLabelEl.textContent = "Term";
     }
     metaTextEl.textContent = `Card ${index + 1} of ${cards.length}`;
   }
@@ -174,32 +175,29 @@
 
   function nextCard() {
     index = (index + 1) % cards.length;
-    showingFront = true;
+    showingFront = true; // Always show definition first
     renderCard();
   }
 
   function prevCard() {
     index = (index - 1 + cards.length) % cards.length;
-    showingFront = true;
+    showingFront = true; // Always show definition first
     renderCard();
   }
 
   function shuffleCard() {
     index = Math.floor(Math.random() * cards.length);
-    showingFront = true;
+    showingFront = true; // Always show definition first
     renderCard();
   }
 
-  // Button bindings
   document.getElementById("flipBtn").onclick = flipCard;
   document.getElementById("nextBtn").onclick = nextCard;
   document.getElementById("prevBtn").onclick = prevCard;
   document.getElementById("shuffleBtn").onclick = shuffleCard;
 
-  // Clicking the card also flips it
   cardEl.onclick = flipCard;
 
-  // Optional keyboard controls: left/right arrows + space/enter to flip
   document.addEventListener("keydown", (e) => {
     if (e.key === "ArrowRight") nextCard();
     else if (e.key === "ArrowLeft") prevCard();
@@ -209,57 +207,6 @@
     }
   });
 
-// --- Swipe Support (Mobile Touch Gestures) ---
-let touchStartX = 0;
-let touchEndX = 0;
-let touchStartY = 0;
-let touchEndY = 0;
-
-cardEl.addEventListener("touchstart", (e) => {
-  const touch = e.changedTouches[0];
-  touchStartX = touch.screenX;
-  touchStartY = touch.screenY;
-});
-
-cardEl.addEventListener("touchend", (e) => {
-  const touch = e.changedTouches[0];
-  touchEndX = touch.screenX;
-  touchEndY = touch.screenY;
-  handleSwipe();
-});
-
-function handleSwipe() {
-  const dx = touchEndX - touchStartX;
-  const dy = touchEndY - touchStartY;
-
-  // Ignore tiny accidental movements
-  if (Math.abs(dx) < 30 && Math.abs(dy) < 30) return;
-
-  // Horizontal swipe → next/prev
-  if (Math.abs(dx) > Math.abs(dy)) {
-    if (dx < 0) {
-      // Swipe LEFT → next card
-      nextCard();
-    } else {
-      // Swipe RIGHT → previous card
-      prevCard();
-    }
-  } 
-  // Vertical swipe → flip card
-  else {
-    if (dy < 0) {
-      // Swipe UP → show back
-      showingFront = false;
-      renderCard();
-    } else {
-      // Swipe DOWN → show front
-      showingFront = true;
-      renderCard();
-    }
-  }
-}
-
-  // Initial render
   renderCard();
 </script>
 </body>
