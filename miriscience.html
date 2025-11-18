@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
@@ -95,6 +95,12 @@
     font-size: 0.8rem;
     color: #9ca3af;
   }
+  #modeBtn {
+    margin-top: 10px;
+    background: #3a3f50;
+    padding: 8px 18px;
+    font-size: 0.85rem;
+  }
 </style>
 </head>
 <body>
@@ -112,6 +118,8 @@
     <button id="nextBtn">Next</button>
     <button id="shuffleBtn">Shuffle</button>
   </div>
+
+  <button id="modeBtn">Mode: Definition First</button>
 
   <div class="meta" id="metaText"></div>
 </div>
@@ -147,24 +155,26 @@
   ];
 
   let index = 0;
-
-  // 🔥 Definition is now the FRONT
-  let showingFront = false;
+  let definitionFirst = true;
+  let showingFront = true; // Front = definition when definitionFirst = true
 
   const cardEl = document.getElementById("card");
   const cardTextEl = document.getElementById("cardText");
   const sideLabelEl = document.getElementById("sideLabel");
   const metaTextEl = document.getElementById("metaText");
+  const modeBtn = document.getElementById("modeBtn");
 
   function renderCard() {
     const card = cards[index];
+
     if (showingFront) {
-      cardTextEl.textContent = card.def;
-      sideLabelEl.textContent = "Definition";
+      cardTextEl.textContent = definitionFirst ? card.def : card.term;
+      sideLabelEl.textContent = definitionFirst ? "Definition" : "Term";
     } else {
-      cardTextEl.textContent = card.term;
-      sideLabelEl.textContent = "Term";
+      cardTextEl.textContent = definitionFirst ? card.term : card.def;
+      sideLabelEl.textContent = definitionFirst ? "Term" : "Definition";
     }
+
     metaTextEl.textContent = `Card ${index + 1} of ${cards.length}`;
   }
 
@@ -175,19 +185,28 @@
 
   function nextCard() {
     index = (index + 1) % cards.length;
-    showingFront = true; // Always show definition first
+    showingFront = true;
     renderCard();
   }
 
   function prevCard() {
     index = (index - 1 + cards.length) % cards.length;
-    showingFront = true; // Always show definition first
+    showingFront = true;
     renderCard();
   }
 
   function shuffleCard() {
     index = Math.floor(Math.random() * cards.length);
-    showingFront = true; // Always show definition first
+    showingFront = true;
+    renderCard();
+  }
+
+  function toggleMode() {
+    definitionFirst = !definitionFirst;
+    showingFront = true;
+    modeBtn.textContent = definitionFirst
+      ? "Mode: Definition First"
+      : "Mode: Term First";
     renderCard();
   }
 
@@ -195,14 +214,40 @@
   document.getElementById("nextBtn").onclick = nextCard;
   document.getElementById("prevBtn").onclick = prevCard;
   document.getElementById("shuffleBtn").onclick = shuffleCard;
-
+  modeBtn.onclick = toggleMode;
   cardEl.onclick = flipCard;
 
+  // Keyboard
   document.addEventListener("keydown", (e) => {
     if (e.key === "ArrowRight") nextCard();
     else if (e.key === "ArrowLeft") prevCard();
     else if (e.key === " " || e.key === "Enter") {
       e.preventDefault();
+      flipCard();
+    }
+  });
+
+  // Swipe detection
+  let startX = 0, startY = 0;
+
+  cardEl.addEventListener("touchstart", (e) => {
+    const t = e.changedTouches[0];
+    startX = t.clientX;
+    startY = t.clientY;
+  });
+
+  cardEl.addEventListener("touchend", (e) => {
+    const t = e.changedTouches[0];
+    const dx = t.clientX - startX;
+    const dy = t.clientY - startY;
+
+    // Horizontal
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+      if (dx > 0) prevCard();
+      else nextCard();
+    } 
+    // Vertical
+    else if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 40) {
       flipCard();
     }
   });
