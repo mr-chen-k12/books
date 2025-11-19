@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Life Cycles – Fall Theme Flashcards</title>
+
+<style>
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: "Comic Sans MS", "Segoe UI", system-ui, sans-serif;
+    background: #2b1c12;
+    color: #fff8e6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .wrapper {
+    width: 92vw;
+    max-width: 600px;
+    text-align: center;
+  }
+
+  h1 {
+    font-size: 1.35rem;
+    margin-bottom: 1.1rem;
+    color: #ffddb2;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  }
+
+  .card {
+    position: relative;
+    background: linear-gradient(145deg, #633d24, #4d2f1a);
+    border-radius: 22px;
+    border: 3px solid #d49a6a;
+    box-shadow: 
+      0 18px 40px rgba(0,0,0,0.7),
+      0 0 18px rgba(255,170,85,0.4) inset;
+    padding: 26px 20px;
+    min-height: 170px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform .2s ease, box-shadow .25s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 22px 50px rgba(0,0,0,0.8),
+      0 0 22px rgba(255,180,100,0.5) inset;
+  }
+
+  .card-label {
+    position: absolute;
+    top: 10px;
+    left: 16px;
+    font-size: 0.75rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: #ffd5ad;
+    opacity: 0.8;
+  }
+
+  #cardText {
+    font-size: 1.45rem;
+    line-height: 1.45;
+    color: #fff3e1;
+  }
+
+  .controls {
+    margin-top: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  button {
+    border: none;
+    border-radius: 999px;
+    padding: 10px 20px;
+    background: #d68242;
+    color: #fff3de;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    min-width: 90px;
+    box-shadow: 0 3px 0 #9b5720;
+    transition: background .2s, transform .1s;
+  }
+
+  button:hover {
+    background: #e6924f;
+    transform: translateY(-2px);
+  }
+
+  button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 0 #9b5720;
+  }
+
+  #modeBtn {
+    margin-top: 12px;
+    background: #b86c38;
+    box-shadow: 0 3px 0 #7a451f;
+  }
+
+  #dontKnowBtn {
+    background: #a83d32 !important;
+    box-shadow: 0 3px 0 #6d1d18 !important;
+  }
+
+  #dontKnowBtn:hover {
+    background: #bb4b3d !important;
+  }
+
+  .meta {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: #ffe3c9;
+  }
+</style>
+</head>
+
+<body>
+<div class="wrapper">
+  <h1>🍁 Life Cycles, Traits, & Variations 🍂</h1>
+
+  <div id="card" class="card">
+    <div class="card-label" id="sideLabel">Definition</div>
+    <div id="cardText"></div>
+  </div>
+
+  <div class="controls">
+    <button id="prevBtn">Prev</button>
+    <button id="flipBtn">Flip</button>
+    <button id="nextBtn">Next</button>
+    <button id="shuffleBtn">Weighted Shuffle</button>
+    <button id="dontKnowBtn">I Don’t Know</button>
+  </div>
+
+  <button id="modeBtn">Mode: Definition First</button>
+
+  <div class="meta" id="metaText"></div>
+</div>
+
+<script>
+  const cards = [
+    { term: "Life cycle", def: "The set of stages of an organism’s life." },
+    { term: "Organism", def: "Any living thing." },
+    { term: "Adolescent", def: "A stage when a young animal is developing into an adult." },
+    { term: "Metamorphosis", def: "A dramatic change of form during an animal’s life cycle." },
+    { term: "Flowering plant", def: "A plant that produces flowers during its life cycle." },
+    { term: "Seed", def: "The part of a plant that contains the baby plant." },
+    { term: "Germination", def: "When a new sprout begins to grow from a seed." },
+    { term: "Pollination", def: "Transfer of pollen that helps plants make seeds and fruits." },
+    { term: "Spore", def: "A small structure some plants use to reproduce instead of seeds." },
+    { term: "Physical trait", def: "A feature of an organism’s body." },
+    { term: "Individual", def: "One single living organism." },
+    { term: "Offspring", def: "A young organism that comes from parents." },
+    { term: "Inherit", def: "To receive traits from parents." },
+    { term: "Siblings", def: "Organisms that share the same parents." },
+    { term: "Identical", def: "Exactly the same in every way." },
+    { term: "Vary", def: "To be different." },
+    { term: "Species", def: "A group of similar organisms that reproduce together." },
+    { term: "Variation", def: "A difference between individuals of the same species." },
+    { term: "Population", def: "A group of the same organism living together." },
+    { term: "Ecosystem", def: "All living & nonliving things interacting in one place." },
+    { term: "Environment", def: "The surroundings where organisms live." },
+    { term: "Advantage", def: "A helpful trait that improves survival." },
+    { term: "Survive", def: "To stay alive." },
+    { term: "Camouflage", def: "A trait that helps an organism blend in." },
+    { term: "Rare", def: "Not common." },
+    { term: "Extinct", def: "No living members remain." }
+  ];
+
+  /* ---------------------------
+        WEIGHT / MEMORY
+     --------------------------- */
+
+  let weights = JSON.parse(localStorage.getItem("cycleWeights") || "[]");
+
+  if (weights.length !== cards.length) {
+    weights = cards.map(() => 1); // default = weight 1 each
+    localStorage.setItem("cycleWeights", JSON.stringify(weights));
+  }
+
+  function increaseWeight(i) {
+    weights[i] += 2; // heavier = more likely to be picked
+    localStorage.setItem("cycleWeights", JSON.stringify(weights));
+  }
+
+  function weightedRandomIndex() {
+    const total = weights.reduce((a, b) => a + b, 0);
+    let r = Math.random() * total;
+
+    for (let i = 0; i < weights.length; i++) {
+      if (r < weights[i]) return i;
+      r -= weights[i];
+    }
+    return 0;
+  }
+
+  /* ---------------------------
+        FLASHCARD ENGINE
+     --------------------------- */
+
+  let index = 0;
+  let definitionFirst = true;
+  let showingFront = true;
+
+  const cardEl = document.getElementById("card");
+  const cardTextEl = document.getElementById("cardText");
+  const sideLabelEl = document.getElementById("sideLabel");
+  const metaTextEl = document.getElementById("metaText");
+  const modeBtn = document.getElementById("modeBtn");
+
+  function renderCard() {
+    const card = cards[index];
+
+    if (showingFront) {
+      cardTextEl.textContent = definitionFirst ? card.def : card.term;
+      sideLabelEl.textContent = definitionFirst ? "Definition" : "Term";
+    } else {
+      cardTextEl.textContent = definitionFirst ? card.term : card.def;
+      sideLabelEl.textContent = definitionFirst ? "Term" : "Definition";
+    }
+
+    metaTextEl.textContent = `Card ${index + 1} of ${cards.length}`;
+  }
+
+  function flipCard() {
+    showingFront = !showingFront;
+    renderCard();
+  }
+
+  function nextCard() {
+    index = (index + 1) % cards.length;
+    showingFront = true;
+    renderCard();
+  }
+
+  function prevCard() {
+    index = (index - 1 + cards.length) % cards.length;
+    showingFront = true;
+    renderCard();
+  }
+
+  function shuffleCard() {
+    index = weightedRandomIndex();
+    showingFront = true;
+    renderCard();
+  }
+
+  function dontKnow() {
+    increaseWeight(index);
+    nextCard();
+  }
+
+  function toggleMode() {
+    definitionFirst = !definitionFirst;
+    showingFront = true;
+    modeBtn.textContent = definitionFirst
+      ? "Mode: Definition First"
+      : "Mode: Term First";
+    renderCard();
+  }
+
+  document.getElementById("flipBtn").onclick = flipCard;
+  document.getElementById("nextBtn").onclick = nextCard;
+  document.getElementById("prevBtn").onclick = prevCard;
+  document.getElementById("shuffleBtn").onclick = shuffleCard;
+  document.getElementById("dontKnowBtn").onclick = dontKnow;
+  modeBtn.onclick = toggleMode;
+  cardEl.onclick = flipCard;
+
+  /* ---------------------------
+        SWIPE + KEYBOARD
+     --------------------------- */
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight") nextCard();
+    else if (e.key === "ArrowLeft") prevCard();
+    else if (e.key === " " || e.key === "Enter") {
+      e.preventDefault();
+      flipCard();
+    }
+  });
+
+  let sx = 0, sy = 0;
+  cardEl.addEventListener("touchstart", e => {
+    const t = e.changedTouches[0];
+    sx = t.clientX; sy = t.clientY;
+  });
+
+  cardEl.addEventListener("touchend", e => {
+    const t = e.changedTouches[0];
+    const dx = t.clientX - sx;
+    const dy = t.clientY - sy;
+
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+      if (dx > 0) prevCard();
+      else nextCard();
+    } else if (Math.abs(dy) > 40) {
+      flipCard();
+    }
+  });
+
+  renderCard();
+</script>
+</body>
+</html>
