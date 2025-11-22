@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Simple Web Piano</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #111827;
+      --panel: #020617;
+      --accent: #38bdf8;
+      --white-key: #f9fafb;
+      --white-key-border: #e5e7eb;
+      --white-key-active: #bfdbfe;
+      --black-key: #111827;
+      --black-key-active: #1d4ed8;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1e293b, #020617 55%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wrapper {
+      width: 92vw;
+      max-width: 900px;
+      background: linear-gradient(145deg, #020617, #020617, #020617);
+      border-radius: 24px;
+      padding: 18px 18px 24px;
+      box-shadow:
+        0 22px 45px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(148, 163, 184, 0.15);
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+      padding: 2px 2px 8px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+    }
+
+    .title-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      font-size: clamp(1.3rem, 2.4vw, 1.6rem);
+      margin: 0;
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h1 span.logo {
+      font-size: 1.2em;
+    }
+
+    .subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .hint-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 4px 10px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .kbd {
+      font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 6px;
+      border: 1px solid rgba(148, 163, 184, 0.65);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-main);
+    }
+
+    /* Piano */
+
+    .piano-shell {
+      margin-top: 16px;
+      padding: 16px 14px 20px;
+      border-radius: 18px;
+      background: radial-gradient(circle at top, #020617, #020617 60%, #000 100%);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow:
+        inset 0 0 0 1px rgba(15, 23, 42, 0.9),
+        0 16px 32px rgba(0, 0, 0, 0.6);
+    }
+
+    .piano-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: #ef4444;
+      box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.15);
+      margin-right: 6px;
+    }
+
+    .status-dot.on {
+      background: #22c55e;
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+    }
+
+    .status-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .volume-slider {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .volume-slider input[type="range"] {
+      width: 120px;
+    }
+
+    .keys-wrapper {
+      position: relative;
+      margin-top: 10px;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    .white-keys {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 0;
+      background: #000;
+      border-radius: 0 0 14px 14px;
+      overflow: hidden;
+    }
+
+    .white-key {
+      position: relative;
+      height: clamp(130px, 26vw, 190px);
+      background: var(--white-key);
+      border-right: 1px solid var(--white-key-border);
+      border-top: 5px solid #e5e7eb;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 10px;
+      cursor: pointer;
+      transition:
+        transform 0.03s ease-out,
+        background 0.05s ease-out,
+        border-top-color 0.05s ease-out,
+        box-shadow 0.05s ease-out;
+      font-size: 0.75rem;
+      color: #111827;
+    }
+
+    .white-key:first-child {
+      border-radius: 0 0 0 14px;
+    }
+
+    .white-key:last-child {
+      border-radius: 0 0 14px 0;
+      border-right: none;
+    }
+
+    .white-key.active {
+      background: var(--white-key-active);
+      border-top-color: #bfdbfe;
+      transform: translateY(2px);
+      box-shadow: inset 0 1px 3px rgba(15, 23, 42, 0.4);
+    }
+
+    .white-key .note-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .white-key .note-name {
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .white-key .note-keyboard {
+      font-size: 0.65rem;
+      color: #6b7280;
+      padding: 1px 4px;
+      border-radius: 6px;
+      border: 1px solid #e5e7eb;
+      background: rgba(249, 250, 251, 0.9);
+    }
+
+    /* Black keys overlay */
+
+    .black-keys {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60%;
+      pointer-events: none; /* pass events to children only */
+      display: grid;
+      grid-template-columns: repeat(14, 1fr);
+    }
+
+    .black-key {
+      pointer-events: auto;
+      width: 88%;
+      margin: 0 auto;
+      height: 100%;
+      margin-top: 0;
+      border-radius: 0 0 9px 9px;
+      background: linear-gradient(to bottom, #111827, #020617);
+      box-shadow:
+        0 4px 10px rgba(0, 0, 0, 0.65),
+        inset 0 0 0 1px rgba(148, 163, 184, 0.1);
+      border-top: 4px solid #020617;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 6px;
+      cursor: pointer;
+      transform-origin: top;
+      transition:
+        transform 0.04s ease-out,
+        background 0.04s ease-out,
+        box-shadow 0.04s ease-out;
+      color: #e5e7eb;
+      font-size: 0.65rem;
+    }
+
+    .black-key.active {
+      transform: translateY(2px);
+      background: linear-gradient(to bottom, #1e293b, #020617);
+      box-shadow:
+        0 1px 4px rgba(0, 0, 0, 0.8),
+        inset 0 0 0 1px rgba(129, 140, 248, 0.5);
+    }
+
+    .black-key .note-keyboard {
+      font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+      padding: 1px 5px;
+      border-radius: 6px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    /* Place black keys over appropriate gaps (14 cols: W E gap T Y U gap) */
+
+    .black-key.pos-1 { grid-column: 2 / span 2; }
+    .black-key.pos-2 { grid-column: 4 / span 2; }
+    .black-key.pos-3 { grid-column: 8 / span 2; }
+    .black-key.pos-4 { grid-column: 10 / span 2; }
+    .black-key.pos-5 { grid-column: 12 / span 2; }
+
+    /* Responsive tweaks */
+
+    @media (max-width: 600px) {
+      .wrapper {
+        padding: 14px 10px 18px;
+        border-radius: 18px;
+      }
+
+      .piano-shell {
+        padding: 12px 10px 16px;
+      }
+
+      .white-key {
+        height: clamp(120px, 30vw, 160px);
+      }
+
+      header {
+        margin-bottom: 8px;
+      }
+
+      .hint-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .volume-slider input[type="range"] {
+        width: 90px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <header>
+      <div class="title-row">
+        <h1>
+          <span class="logo">🎹</span>
+          Web Piano – One Octave
+        </h1>
+        <div class="subtitle">Click keys or use your keyboard to play.</div>
+      </div>
+      <div class="hint-row">
+        <div class="pill">
+          <span class="status-label">
+            <span class="status-dot" id="audio-status"></span>
+            <span id="status-text">Tap a key to turn sound on</span>
+          </span>
+        </div>
+        <div class="pill">
+          <span>White keys:</span>
+          <span class="kbd">A S D F G H J</span>
+        </div>
+        <div class="pill">
+          <span>Black keys:</span>
+          <span class="kbd">W E T Y U</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="piano-shell">
+      <div class="piano-top-bar">
+        <div class="status-label">
+          <span>Instrument:</span>
+          <strong style="margin-left:4px;">Simple Synth</strong>
+        </div>
+        <div class="volume-slider">
+          <span>Volume</span>
+          <input type="range" min="0" max="100" value="80" id="volume-control" />
+        </div>
+      </div>
+
+      <div class="keys-wrapper">
+        <!-- Black keys overlay (C# D# F# G# A#) -->
+        <div class="black-keys">
+          <div class="black-key pos-1" data-note="C#4" data-key="W">
+            <span class="note-keyboard">W</span>
+          </div>
+          <div class="black-key pos-2" data-note="D#4" data-key="E">
+            <span class="note-keyboard">E</span>
+          </div>
+          <!-- gap for E-F -->
+          <div class="black-key pos-3" data-note="F#4" data-key="T">
+            <span class="note-keyboard">T</span>
+          </div>
+          <div class="black-key pos-4" data-note="G#4" data-key="Y">
+            <span class="note-keyboard">Y</span>
+          </div>
+          <div class="black-key pos-5" data-note="A#4" data-key="U">
+            <span class="note-keyboard">U</span>
+          </div>
+          <!-- gap for B -->
+        </div>
+
+        <!-- White keys (C D E F G A B) -->
+        <div class="white-keys">
+          <button class="white-key" data-note="C4" data-key="A">
+            <div class="note-label">
+              <span class="note-name">C</span>
+              <span class="note-keyboard">A</span>
+            </div>
+          </button>
+          <button class="white-key" data-note="D4" data-key="S">
+            <div class="note-label">
+              <span class="note-name">D</span>
+              <span class="note-keyboard">S</span>
+            </div>
+          </button>
+          <button class="white-key" data-note="E4" data-key="D">
+            <div class="note-label">
+              <span class="note-name">E</span>
+              <span class="note-keyboard">D</span>
+            </div>
+          </button>
+          <button class="white-key" data-note="F4" data-key="F">
+            <div class="note-label">
+              <span class="note-name">F</span>
+              <span class="note-keyboard">F</span>
+            </div>
+          </button>
+          <button class="white-key" data-note="G4" data-key="G">
+            <div class="note-label">
+              <span class="note-name">G</span>
+              <span class="note-keyboard">G</span>
+            </div>
+          </button>
+          <button class="white-key" data-note="A4" data-key="H">
+            <div class="note-label">
+              <span class="note-name">A</span>
+              <span class="note-keyboard">H</span>
+            </div>
+          </button>
+          <button class="white-key" data-note="B4" data-key="J">
+            <div class="note-label">
+              <span class="note-name">B</span>
+              <span class="note-keyboard">J</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // --------- Audio setup ----------
+    let audioCtx = null;
+    let masterGain = null;
+
+    const NOTE_FREQUENCIES = {
+      "C4": 261.63,
+      "C#4": 277.18,
+      "D4": 293.66,
+      "D#4": 311.13,
+      "E4": 329.63,
+      "F4": 349.23,
+      "F#4": 369.99,
+      "G4": 392.00,
+      "G#4": 415.30,
+      "A4": 440.00,
+      "A#4": 466.16,
+      "B4": 493.88
+    };
+
+    const KEY_TO_NOTE = {
+      "a": "C4",
+      "s": "D4",
+      "d": "E4",
+      "f": "F4",
+      "g": "G4",
+      "h": "A4",
+      "j": "B4",
+      "w": "C#4",
+      "e": "D#4",
+      "t": "F#4",
+      "y": "G#4",
+      "u": "A#4"
+    };
+
+    const pressedKeys = new Set();
+
+    const statusDot = document.getElementById("audio-status");
+    const statusText = document.getElementById("status-text");
+    const volumeControl = document.getElementById("volume-control");
+
+    function initAudio() {
+      if (audioCtx) return;
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      masterGain = audioCtx.createGain();
+      const vol = volumeControl ? volumeControl.value / 100 : 0.8;
+      masterGain.gain.value = vol;
+      masterGain.connect(audioCtx.destination);
+      if (statusDot) statusDot.classList.add("on");
+      if (statusText) statusText.textContent = "Sound ready – play!";
+    }
+
+    function setVolume(value) {
+      if (!masterGain) return;
+      const v = Math.max(0, Math.min(1, value / 100));
+      masterGain.gain.setTargetAtTime(v, audioCtx.currentTime, 0.02);
+    }
+
+    if (volumeControl) {
+      volumeControl.addEventListener("input", (e) => {
+        const value = Number(e.target.value);
+        if (!audioCtx) {
+          initAudio();
+        }
+        setVolume(value);
+      });
+    }
+
+    function playNote(note, duration = 0.6) {
+      if (!NOTE_FREQUENCIES[note]) return;
+      if (!audioCtx) {
+        initAudio();
+      }
+
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      osc.type = "sine"; // piano-ish is more complex, but sine is simple and clean
+      osc.frequency.value = NOTE_FREQUENCIES[note];
+
+      // Short attack / decay for a soft percussive feel
+      const peak = 0.9;
+      const attack = 0.01;
+      const release = duration;
+
+      gainNode.gain.setValueAtTime(0, now);
+      gainNode.gain.linearRampToValueAtTime(peak, now + attack);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, now + release);
+
+      osc.connect(gainNode);
+      gainNode.connect(masterGain);
+
+      osc.start(now);
+      osc.stop(now + release + 0.05);
+    }
+
+    // --------- UI helpers ----------
+    function findKeyElementByNote(note) {
+      return document.querySelector(`[data-note="${note}"]`);
+    }
+
+    function activateKey(note) {
+      const el = findKeyElementByNote(note);
+      if (!el) return;
+      el.classList.add("active");
+    }
+
+    function deactivateKey(note) {
+      const el = findKeyElementByNote(note);
+      if (!el) return;
+      el.classList.remove("active");
+    }
+
+    function handleMouseDown(e) {
+      const note = e.currentTarget.getAttribute("data-note");
+      if (!note) return;
+      initAudio();
+      playNote(note);
+      e.currentTarget.classList.add("active");
+    }
+
+    function handleMouseUp(e) {
+      e.currentTarget.classList.remove("active");
+    }
+
+    function handleMouseLeave(e) {
+      e.currentTarget.classList.remove("active");
+    }
+
+    // Attach handlers for all keys
+    const keyElements = document.querySelectorAll(".white-key, .black-key");
+    keyElements.forEach((keyEl) => {
+      keyEl.addEventListener("mousedown", handleMouseDown);
+      keyEl.addEventListener("mouseup", handleMouseUp);
+      keyEl.addEventListener("mouseleave", handleMouseLeave);
+
+      // Touch support
+      keyEl.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        const note = keyEl.getAttribute("data-note");
+        if (!note) return;
+        initAudio();
+        playNote(note);
+        keyEl.classList.add("active");
+      }, { passive: false });
+
+      keyEl.addEventListener("touchend", (e) => {
+        e.preventDefault();
+        keyEl.classList.remove("active");
+      }, { passive: false });
+
+      keyEl.addEventListener("touchcancel", (e) => {
+        e.preventDefault();
+        keyEl.classList.remove("active");
+      }, { passive: false });
+    });
+
+    // --------- Keyboard input ----------
+    window.addEventListener("keydown", (e) => {
+      const key = e.key.toLowerCase();
+      if (!KEY_TO_NOTE[key]) return;
+      if (pressedKeys.has(key)) return; // avoid repeats when holding key
+      pressedKeys.add(key);
+
+      const note = KEY_TO_NOTE[key];
+      initAudio();
+      playNote(note);
+      activateKey(note);
+    });
+
+    window.addEventListener("keyup", (e) => {
+      const key = e.key.toLowerCase();
+      if (!KEY_TO_NOTE[key]) return;
+      pressedKeys.delete(key);
+      const note = KEY_TO_NOTE[key];
+      deactivateKey(note);
+    });
+
+    // In case window loses focus while keys are held down
+    window.addEventListener("blur", () => {
+      pressedKeys.clear();
+      Object.keys(NOTE_FREQUENCIES).forEach(deactivateKey);
+    });
+  </script>
+</body>
+</html>
