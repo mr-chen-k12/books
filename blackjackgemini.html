@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Poker Logic Learning Tool</title>
+    <style>
+        /* CSS - The Visual Styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #2c3e50; /* Dark slate background */
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 { margin-bottom: 10px; }
+
+        /* The Green Felt Table */
+        .poker-table {
+            background-color: #27ae60;
+            border: 10px solid #1e824c;
+            border-radius: 50px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+            margin-bottom: 20px;
+            width: 90%;
+            max-width: 800px;
+        }
+
+        /* Card Container */
+        .hand-display {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            min-height: 140px;
+        }
+
+        /* Individual Card Design (CSS Only) */
+        .card {
+            width: 80px;
+            height: 120px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 10px;
+            font-weight: bold;
+            font-size: 1.5rem;
+            position: relative;
+        }
+
+        .card.red { color: #c0392b; }
+        .card.black { color: #2c3e50; }
+
+        .suit-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.5rem;
+            opacity: 0.3;
+        }
+
+        /* The "Reminder Line" */
+        .reminder-line {
+            background-color: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            margin-top: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        button {
+            background-color: #f1c40f;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.1s;
+            margin-top: 10px;
+        }
+        button:hover { transform: scale(1.05); }
+        button:active { transform: scale(0.95); }
+
+        /* Expandable Rules Section */
+        .rules-section {
+            background-color: white;
+            color: #333;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 10px;
+            padding: 5px 20px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        details {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        summary {
+            font-weight: bold;
+            font-size: 1.2rem;
+            list-style: none; /* Hides default triangle in some browsers */
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Custom Plus Sign */
+        summary::after {
+            content: '+'; 
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #27ae60;
+        }
+
+        details[open] summary::after {
+            content: '-';
+            color: #c0392b;
+        }
+
+        .rules-content {
+            margin-top: 15px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+            line-height: 1.6;
+        }
+
+        .rule-item {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #f0f0f0;
+            padding: 8px 0;
+        }
+        .rule-rank { color: #e67e22; font-weight: bold; }
+
+    </style>
+</head>
+<body>
+
+    <h1>🃏 Poker Hand Simulator</h1>
+    <p>Deal the cards to learn the hand rankings.</p>
+
+    <div class="poker-table">
+        <div class="hand-display" id="handContainer">
+            <div style="color:white; opacity:0.7; align-self:center;">Press Deal to Start</div>
+        </div>
+
+        <div class="reminder-line" id="resultText">
+            Waiting for deal...
+        </div>
+
+        <button onclick="dealHand()">Deal New Hand</button>
+    </div>
+
+    <div class="rules-section">
+        <details>
+            <summary>
+                <span>Rules of Winning (Hand Rankings)</span>
+            </summary>
+            <div class="rules-content">
+                <p><strong>How to read this:</strong> The hands are listed from strongest (top) to weakest (bottom).</p>
+                
+                <div class="rule-item">
+                    <span>1. Royal Flush</span>
+                    <span class="rule-rank">A, K, Q, J, 10 (Same Suit)</span>
+                </div>
+                <div class="rule-item">
+                    <span>2. Straight Flush</span>
+                    <span class="rule-rank">5 sequential cards (Same Suit)</span>
+                </div>
+                <div class="rule-item">
+                    <span>3. Four of a Kind</span>
+                    <span class="rule-rank">4 cards of same rank</span>
+                </div>
+                <div class="rule-item">
+                    <span>4. Full House</span>
+                    <span class="rule-rank">3 of a kind + Pair</span>
+                </div>
+                <div class="rule-item">
+                    <span>5. Flush</span>
+                    <span class="rule-rank">5 cards same suit (any order)</span>
+                </div>
+                <div class="rule-item">
+                    <span>6. Straight</span>
+                    <span class="rule-rank">5 sequential cards (mixed suits)</span>
+                </div>
+                <div class="rule-item">
+                    <span>7. Three of a Kind</span>
+                    <span class="rule-rank">3 cards of same rank</span>
+                </div>
+                <div class="rule-item">
+                    <span>8. Two Pair</span>
+                    <span class="rule-rank">Two different pairs</span>
+                </div>
+                <div class="rule-item">
+                    <span>9. One Pair</span>
+                    <span class="rule-rank">2 cards of same rank</span>
+                </div>
+                <div class="rule-item">
+                    <span>10. High Card</span>
+                    <span class="rule-rank">Highest card plays</span>
+                </div>
+            </div>
+        </details>
+    </div>
+
+    <script>
+        // JAVASCRIPT - The Logic
+        const suits = ['♠', '♥', '♦', '♣'];
+        const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+        
+        function getDeck() {
+            let deck = [];
+            for(let s of suits) {
+                for(let v of values) {
+                    deck.push({value: v, suit: s});
+                }
+            }
+            return deck;
+        }
+
+        function dealHand() {
+            let deck = getDeck();
+            let hand = [];
+            
+            // Draw 5 random cards
+            for(let i=0; i<5; i++) {
+                let randomIndex = Math.floor(Math.random() * deck.length);
+                hand.push(deck[randomIndex]);
+                deck.splice(randomIndex, 1);
+            }
+            
+            renderHand(hand);
+            analyzeHand(hand);
+        }
+
+        function renderHand(hand) {
+            const container = document.getElementById('handContainer');
+            container.innerHTML = ''; // Clear previous
+            
+            hand.forEach(card => {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = `card ${ (card.suit === '♥' || card.suit === '♦') ? 'red' : 'black' }`;
+                
+                cardDiv.innerHTML = `
+                    <div class="top-val">${card.value} ${card.suit}</div>
+                    <div class="suit-center">${card.suit}</div>
+                    <div class="bottom-val" style="transform: rotate(180deg);">${card.value} ${card.suit}</div>
+                `;
+                container.appendChild(cardDiv);
+            });
+        }
+
+        // Simple Hand Analysis Logic (Simplified for Teaching)
+        function analyzeHand(hand) {
+            // Sort by value index for easier analysis
+            let ranks = hand.map(c => values.indexOf(c.value)).sort((a,b) => a-b);
+            let suitsList = hand.map(c => c.suit);
+            
+            // Check counts
+            let counts = {};
+            ranks.forEach(x => { counts[x] = (counts[x] || 0) + 1; });
+            let countValues = Object.values(counts);
+            
+            let isFlush = suitsList.every(s => s === suitsList[0]);
+            let isStraight = true;
+            for(let i=0; i < ranks.length-1; i++) {
+                if(ranks[i+1] !== ranks[i]+1) isStraight = false;
+            }
+            // Special ace low straight (A, 2, 3, 4, 5) logic omitted for simplicity of tutorial code
+
+            let message = "High Card";
+
+            if (isFlush && isStraight) message = "Straight Flush!";
+            else if (countValues.includes(4)) message = "Four of a Kind!";
+            else if (countValues.includes(3) && countValues.includes(2)) message = "Full House!";
+            else if (isFlush) message = "Flush";
+            else if (isStraight) message = "Straight";
+            else if (countValues.includes(3)) message = "Three of a Kind";
+            else if (countValues.filter(x => x === 2).length === 2) message = "Two Pair";
+            else if (countValues.includes(2)) message = "One Pair";
+
+            document.getElementById('resultText').innerHTML = `You have: <strong>${message}</strong>`;
+        }
+    </script>
+</body>
+</html>
