@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Blackjack Strategy Trainer v6.1</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+  :root {
+    --felt-color: #034c2c;
+    --card-bg: white;
+    --text-color: white;
+    --accent: #ffd700; /* Gold */
+    --mistake: #ff4444;
+    --correct: #00C851;
+  }
+
+  body {
+    background: var(--felt-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-color);
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  h1 { margin: 10px 0 20px 0; text-shadow: 2px 2px 4px black; }
+
+  /* STATS BAR */
+  .statsBar {
+    width: 100%;
+    max-width: 800px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    font-size: 0.95rem;
+  }
+
+  .stat-group {
+    display: flex;
+    gap: 15px;
+  }
+
+  .stat-item strong { color: var(--accent); }
+
+  button.download-btn {
+    background: #444;
+    color: white;
+    border: 1px solid #666;
+    font-size: 0.8rem;
+    padding: 5px 10px;
+  }
+
+  /* TABLE AREA */
+  .table {
+    background: radial-gradient(circle, #0a6b40 0%, #023820 100%);
+    margin-top: 20px;
+    padding: 30px;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 800px;
+    box-shadow: inset 0 0 50px rgba(0,0,0,0.6), 0 10px 30px rgba(0,0,0,0.5);
+    border: 8px solid #4a3c2c;
+    position: relative;
+  }
+
+  .hand-container {
+    margin-bottom: 20px;
+    min-height: 130px;
+  }
+
+  .hand {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  /* CARDS */
+  .card {
+    width: 70px;
+    height: 100px;
+    background: var(--card-bg);
+    color: black;
+    border-radius: 8px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 5px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    user-select: none;
+    position: relative;
+  }
+
+  .card.red { color: #d40000; }
+  .card.black { color: #1a1a1a; }
+
+  .card .suit-small { font-size: 1rem; align-self: flex-start; }
+  .card .value-center { font-size: 2rem; align-self: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+  .card .suit-bottom { font-size: 1rem; align-self: flex-end; transform: rotate(180deg); }
+
+  /* HIDDEN CARD */
+  .card.hidden {
+    background: #8b0000;
+    background-image: repeating-linear-gradient(45deg, #8b0000 0, #8b0000 10px, #700000 10px, #700000 20px);
+    border: 2px solid white;
+  }
+  .card.hidden * { display: none; } /* Hide text inside hidden card */
+
+  /* CONTROLS */
+  .controls { margin-top: 20px; }
+
+  button.action-btn {
+    padding: 12px 24px;
+    margin: 5px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s, filter 0.2s;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+  }
+  
+  button.action-btn:active { transform: translateY(4px); box-shadow: none; }
+  button.action-btn:hover:not(:disabled) { filter: brightness(1.1); }
+  button.action-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; filter: grayscale(1); }
+
+  #hitBtn { background: #2196F3; color: white; }
+  #standBtn { background: #f44336; color: white; }
+  #doubleBtn { background: var(--accent); color: black; }
+  #restartBtn { background: #9E9E9E; color: black; margin-left: 20px;}
+
+  /* RESULTS & RULES */
+  #resultMessage {
+    height: 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin: 15px 0;
+    text-shadow: 1px 1px 2px black;
+  }
+
+  .rules-accordion {
+    margin-top: 20px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    text-align: left;
+    overflow: hidden;
+  }
+
+  .rules-header {
+    padding: 15px;
+    background: rgba(0,0,0,0.5);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+  }
+  
+  .rules-header:hover { background: rgba(0,0,0,0.7); }
+
+  #rulesBody {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out;
+    padding: 0 15px;
+  }
+  
+  #rulesBody.open {
+    max-height: 500px; /* Arbitrary large number for slide effect */
+    padding: 15px;
+    overflow-y: auto;
+  }
+
+  .feedback-box {
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  .feedback-correct { background: rgba(0, 200, 81, 0.2); border-left: 4px solid var(--correct); }
+  .feedback-wrong { background: rgba(255, 68, 68, 0.2); border-left: 4px solid var(--mistake); }
+
+</style>
+</head>
+<body>
+
+<h1>Blackjack Trainer v6</h1>
+
+<div class="statsBar">
+  <div class="stat-group">
+    <div class="stat-item">Hands: <strong id="handsCount">0</strong></div>
+    <div class="stat-item" style="color:var(--correct)">Correct: <strong id="correctCount">0</strong></div>
+    <div class="stat-item" style="color:var(--mistake)">Mistakes: <strong id="mistakeCount">0</strong></div>
+    <div class="stat-item">Streak: <strong id="streakCount">0</strong> (Best: <strong id="bestStreak">0</strong>)</div>
+  </div>
+  <div class="stat-group">
+    <div class="stat-item">Win Rate: <strong id="winPercent">0%</strong></div>
+    <button class="download-btn action-btn" onclick="downloadMistakes()">Download Log (JSON)</button>
+  </div>
+</div>
+
+<div class="table">
+  
+  <div class="hand-container">
+    <h3>Dealer</h3>
+    <div class="hand" id="dealerHand"></div>
+    <p id="dealerTotal" style="opacity: 0.8; font-size: 0.9rem;">Total: ?</p>
+  </div>
+
+  <div class="hand-container">
+    <h3>You</h3>
+    <div class="hand" id="playerHand"></div>
+    <p id="playerTotal" style="font-size: 1.1rem; font-weight: bold;"></p>
+    <p id="vsText" style="opacity: 0.7; font-size: 0.9rem; margin-top: -10px;"></p>
+  </div>
+
+  <div id="resultMessage"></div>
+
+  <div class="controls">
+    <button id="hitBtn" class="action-btn" onclick="hit()">Hit</button>
+    <button id="standBtn" class="action-btn" onclick="stand()">Stand</button>
+    <button id="doubleBtn" class="action-btn" onclick="doubleDown()">Double</button>
+    <button id="restartBtn" class="action-btn" onclick="restart()">New Hand</button>
+  </div>
+
+  <div id="rulesContainer" class="rules-accordion" style="display:none;">
+    <div class="rules-header" onclick="toggleRules()">
+      <span>Strategy Analysis</span>
+      <span id="plusSign">+</span>
+    </div>
+    <div id="rulesBody">
+      <div id="rulesText"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // --- CONFIGURATION & DATA ---
+  const suits = ["♠", "♥", "♦", "♣"];
+  const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+  const rankToNum = {
+    "2":2, "3":3, "4":4, "5":5, "6":6, "7":7, "8":8, "9":9, 
+    "10":10, "J":10, "Q":10, "K":10, "A":11
+  };
+
+  let deck = [];
+  let player = [];
+  let dealer = [];
+  let gameOver = false;
+  let playerAction = null;
+  let firstMove = true;
+  let mistakesLog = [];
+
+  // Statistics
+  let stats = {
+    hands: 0,
+    correct: 0,
+    mistakes: 0,
+    streak: 0,
+    bestStreak: 0,
+    wins: 0,
+    losses: 0
+  };
+
+  // --- CORE UTILITIES ---
+
+  function createDeck() {
+    deck = [];
+    suits.forEach(s => values.forEach(v => deck.push({ suit: s, value: v })));
+    // Shuffle (Fisher-Yates)
+    for (let i = deck.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [deck[i], deck[j]] = [deck[j], deck[i]];
+    }
+  }
+
+  function getCardValue(c) { return rankToNum[c.value]; }
+
+  // Returns hard total (Aces treated as 1 if needed to prevent bust)
+  function getHandTotal(hand) {
+    let total = hand.reduce((acc, c) => acc + getCardValue(c), 0);
+    let aces = hand.filter(c => c.value === "A").length;
+    while (total > 21 && aces > 0) {
+      total -= 10;
+      aces--;
+    }
+    return total;
+  }
+
+  // Returns true only if hand is "Soft" (Contains Ace counted as 11)
+  function isSoftHand(hand) {
+    let rawTotal = hand.reduce((acc, c) => acc + getCardValue(c), 0);
+    // If rawTotal matches getHandTotal, and there is an Ace, it might be soft.
+    // However, if rawTotal > 21, the Ace became a 1, so it's Hard.
+    return hand.some(c => c.value === "A") && rawTotal <= 21;
+  }
+
+  function isPair(hand) {
+    return hand.length === 2 && getCardValue(hand[0]) === getCardValue(hand[1]);
+  }
+
+  // --- UI RENDERERS ---
+
+  function renderCard(c) {
+    const el = document.createElement("div");
+    const isRed = c.suit === "♥" || c.suit === "♦";
+    el.className = `card ${isRed ? "red" : "black"}`;
+    el.innerHTML = `
+      <div class="suit-small">${c.suit}</div>
+      <div class="value-center">${c.value}</div>
+      <div class="suit-bottom">${c.suit}</div>
+    `;
+    return el;
+  }
+
+  function renderHiddenCard() {
+    const el = document.createElement("div");
+    el.className = "card hidden";
+    return el;
+  }
+
+  function updateUI() {
+    // 1. Dealer
+    const dContainer = document.getElementById("dealerHand");
+    dContainer.innerHTML = "";
+    if (gameOver) {
+      dealer.forEach(c => dContainer.appendChild(renderCard(c)));
+      document.getElementById("dealerTotal").innerText = `Total: ${getHandTotal(dealer)}`;
+    } else {
+      // Show first card, hide second
+      dContainer.appendChild(renderCard(dealer[0]));
+      dContainer.appendChild(renderHiddenCard());
+      document.getElementById("dealerTotal").innerText = "Total: ?";
+    }
+
+    // 2. Player
+    const pContainer = document.getElementById("playerHand");
+    pContainer.innerHTML = "";
+    player.forEach(c => pContainer.appendChild(renderCard(c)));
+    document.getElementById("playerTotal").innerText = `Count: ${getHandTotal(player)}`;
+
+    // 3. VS Text
+    const pTotal = getHandTotal(player);
+    const dVal = getCardValue(dealer[0]);
+    document.getElementById("vsText").innerText = `${isSoftHand(player) ? "Soft " : ""}${pTotal} vs Dealer ${dVal}`;
+
+    // 4. Buttons
+    document.getElementById("doubleBtn").style.display = (firstMove && player.length === 2) ? "inline-block" : "none";
+    if (gameOver) {
+      document.getElementById("hitBtn").disabled = true;
+      document.getElementById("standBtn").disabled = true;
+      document.getElementById("doubleBtn").disabled = true;
+      document.getElementById("restartBtn").style.display = "inline-block";
+    } else {
+      document.getElementById("hitBtn").disabled = false;
+      document.getElementById("standBtn").disabled = false;
+      document.getElementById("doubleBtn").disabled = false;
+      document.getElementById("restartBtn").style.display = "none";
+    }
+
+    // 5. Stats
+    document.getElementById("handsCount").innerText = stats.hands;
+    document.getElementById("correctCount").innerText = stats.correct;
+    document.getElementById("mistakeCount").innerText = stats.mistakes;
+    document.getElementById("streakCount").innerText = stats.streak;
+    document.getElementById("bestStreak").innerText = stats.bestStreak;
+    
+    const totalGames = stats.wins + stats.losses;
+    document.getElementById("winPercent").innerText = totalGames === 0 ? "0%" : ((stats.wins / totalGames) * 100).toFixed(1) + "%";
+  }
+
+  // --- GAME ACTIONS ---
+
+  function startNewHand() {
+    if (deck.length < 15) createDeck(); // Reshuffle if low
+    
+    player = [deck.pop(), deck.pop()];
+    dealer = [deck.pop(), deck.pop()];
+    gameOver = false;
+    firstMove = true;
+    playerAction = null;
+    
+    document.getElementById("resultMessage").innerText = "";
+    
+    // Reset Rules UI
+    document.getElementById("rulesContainer").style.display = "none";
+    document.getElementById("rulesBody").classList.remove("open");
+    document.getElementById("plusSign").innerText = "+";
+
+    updateUI();
+  }
+
+  function hit() {
+    playerAction = "HIT";
+    firstMove = false;
+    player.push(deck.pop());
+    
+    if (getHandTotal(player) > 21) {
+      endRound("Bust! You went over 21.");
+    } else {
+      updateUI();
+    }
+  }
+
+  function stand() {
+    playerAction = "STAND";
+    firstMove = false;
+    dealerTurn();
+  }
+
+  function doubleDown() {
+    playerAction = "DOUBLE";
+    firstMove = false;
+    player.push(deck.pop()); // Get exactly one card
+    if (getHandTotal(player) > 21) {
+      endRound("Bust! You went over 21.");
+    } else {
+      dealerTurn();
+    }
+  }
+
+  function dealerTurn() {
+    // Dealer hits on 16 or lower, stands on 17 (Soft or Hard)
+    let dTotal = getHandTotal(dealer);
+    while (dTotal < 17) {
+      dealer.push(deck.pop());
+      dTotal = getHandTotal(dealer);
+    }
+    
+    // Determine Winner
+    const pTotal = getHandTotal(player);
+    let msg = "";
+    if (dTotal > 21) {
+      msg = "Dealer Busts! You Win!";
+      stats.wins++;
+    } else if (pTotal > dTotal) {
+      msg = "You Win!";
+      stats.wins++;
+    } else if (dTotal > pTotal) {
+      msg = "Dealer Wins.";
+      stats.losses++;
+    } else {
+      msg = "Push (Tie).";
+    }
+    endRound(msg);
+  }
+
+  function endRound(message) {
+    gameOver = true;
+    document.getElementById("resultMessage").innerText = message;
+    
+    // 1. Evaluate Decision
+    // We pass the *initial* state for evaluation (player's first two cards vs dealer up)
+    // Note: If player Hit and then busted, we are evaluating the decision to Hit.
+    
+    // If user hit multiple times, we really only evaluate the *first* decision of the hand for simplicity in this trainer
+    // or we'd need to snapshot every state. For v6, we evaluate the action that led to the end or the first action taken.
+    // To keep it robust: We evaluate the action the user JUST took vs the hand they had *before* that action.
+    
+    // Limitation: This code evaluates the *first major decision* of the hand. 
+    // (If you Hit on 5 and get a 6 (Total 11) and Hit again, we aren't evaluating the second hit yet).
+    // For simplicity in this version, we will evaluate the FINAL outcome based on Basic Strategy logic for the initial hand.
+    
+    evaluateStrategy(message);
+    updateUI();
+  }
+
+  // --- STRATEGY ENGINE ---
+
+  function getBestMove(hand, dealerUpCard, isFirstMove) {
+    const total = getHandTotal(hand);
+    const soft = isSoftHand(hand);
+    const pair = isFirstMove && isPair(hand);
+    const dVal = getCardValue(dealerUpCard);
+
+    // Return object: { best: "MOVE", fallback: "MOVE" }
+    // Fallback is used if Split/Double is not possible or not chosen
+
+    // 1. PAIRS
+    if (pair) {
+      const val = getCardValue(hand[0]); // 2 through 11
+      // Aces and 8s
+      if (val === 11 || val === 8) return { best: "SPLIT", fallback: "HIT" }; // A,A or 8,8
+      // 10s (Kings, Queens, etc)
+      if (val === 10) return { best: "STAND", fallback: "STAND" };
+      // 9s
+      if (val === 9) {
+        if (dVal === 7 || dVal === 10 || dVal === 11) return { best: "STAND", fallback: "STAND" };
+        return { best: "SPLIT", fallback: "STAND" };
+      }
+      // 5s (Treat as 10 total) -> Double
+      if (val === 5) {
+         if (dVal < 10) return { best: "DOUBLE", fallback: "HIT" };
+         return { best: "HIT", fallback: "HIT" };
+      }
+      // 4s
+      if (val === 4) {
+        if (dVal === 5 || dVal === 6) return { best: "SPLIT", fallback: "HIT" };
+        return { best: "HIT", fallback: "HIT" };
+      }
+      // 6s
+      if (val === 6) {
+        if (dVal >= 2 && dVal <= 6) return { best: "SPLIT", fallback: "HIT" };
+        return { best: "HIT", fallback: "HIT" };
+      }
+      // 2s, 3s, 7s
+      if (val === 2 || val === 3 || val === 7) {
+        if (dVal <= 7) return { best: "SPLIT", fallback: "HIT" };
+        return { best: "HIT", fallback: "HIT" };
+      }
+    }
+
+    // 2. SOFT TOTALS (Ace = 11)
+    if (soft) {
+      if (total >= 19) return { best: "STAND", fallback: "STAND" };
+      if (total === 18) {
+        // Double vs 3-6, Stand vs 2,7,8, Hit vs 9,10,A
+        if (isFirstMove && dVal >= 3 && dVal <= 6) return { best: "DOUBLE", fallback: "STAND" };
+        if (dVal === 2 || dVal === 7 || dVal === 8) return { best: "STAND", fallback: "STAND" };
+        return { best: "HIT", fallback: "HIT" };
+      }
+      // Soft 17 or lower
+      if (isFirstMove && dVal >= 3 && dVal <= 6) return { best: "DOUBLE", fallback: "HIT" };
+      return { best: "HIT", fallback: "HIT" };
+    }
+
+    // 3. HARD TOTALS
+    if (total >= 17) return { best: "STAND", fallback: "STAND" };
+    if (total <= 8) return { best: "HIT", fallback: "HIT" };
+    if (total === 11) {
+      if (isFirstMove) return { best: "DOUBLE", fallback: "HIT" };
+      return { best: "HIT", fallback: "HIT" };
+    }
+    if (total === 10) {
+      if (isFirstMove && dVal < 10) return { best: "DOUBLE", fallback: "HIT" };
+      return { best: "HIT", fallback: "HIT" };
+    }
+    if (total === 9) {
+      if (isFirstMove && dVal >= 3 && dVal <= 6) return { best: "DOUBLE", fallback: "HIT" };
+      return { best: "HIT", fallback: "HIT" };
+    }
+    
+    // STIFF HANDS
+    if (total === 12) {
+      if (dVal >= 4 && dVal <= 6) return { best: "STAND", fallback: "STAND" };
+      return { best: "HIT", fallback: "HIT" };
+    }
+    if (total >= 13 && total <= 16) {
+      if (dVal >= 2 && dVal <= 6) return { best: "STAND", fallback: "STAND" };
+      return { best: "HIT", fallback: "HIT" };
+    }
+
+    return { best: "STAND", fallback: "STAND" };
+  }
+
+
+  function evaluateStrategy(roundResult) {
+    stats.hands++;
+    
+    // Recalculate what the user *should* have done based on initial deal
+    // Note: Since we don't track every sub-move in this simple version, 
+    // we assume the 'playerAction' was the primary decision made.
+    
+    // To evaluate correctly, we need the state BEFORE the last card if they hit/doubled,
+    // but simplified: we assume the user made one decision (Hit, Stand, Double) on the initial cards.
+    // (A full trainer would evaluate every step, but this is a V6 single-hand simulator).
+    
+    // For specific accuracy, we rebuild the "Initial Hand" concept:
+    // If user hit 3 times, we only judge the FIRST hit.
+    // However, player variable now holds ALL cards. 
+    // We will approximate by looking at the first 2 cards only for the strategy lookup.
+    
+    const initialHand = [player[0], player[1]]; 
+    const advice = getBestMove(initialHand, dealer[0], true);
+    
+    let isCorrect = false;
+    let note = "";
+
+    // JUDGEMENT LOGIC
+    if (playerAction === advice.best) {
+      isCorrect = true;
+    } 
+    else if (advice.best === "DOUBLE" && playerAction === advice.fallback) {
+      // You hit instead of double. It's a "mistake" in EV, but safe.
+      isCorrect = false; 
+    }
+    else if (advice.best === "SPLIT") {
+      // We don't have a split button. 
+      // If user chose the fallback (e.g. HIT on 8s), we count it as "Correct" visually, 
+      // but maybe add a note.
+      if (playerAction === advice.fallback) {
+        isCorrect = true;
+        note = "(Optimal was Split, but Hit is accepted fallback)";
+      } else {
+        isCorrect = false; // E.g., Standing on 8s
+      }
+    }
+
+    // UPDATE STATS & LOGS
+    if (isCorrect) {
+      stats.correct++;
+      stats.streak++;
+      if (stats.streak > stats.bestStreak) stats.bestStreak = stats.streak;
+    } else {
+      stats.mistakes++;
+      stats.streak = 0;
+      
+      // Auto Open Rules on Mistake
+      document.getElementById("rulesContainer").style.display = "block";
+      const rb = document.getElementById("rulesBody");
+      if (!rb.classList.contains("open")) {
+        rb.classList.add("open");
+        document.getElementById("plusSign").innerText = "-";
+      }
+
+      mistakesLog.push({
+        timestamp: new Date().toLocaleTimeString(),
+        hand: initialHand.map(c => c.value + c.suit).join(","),
+        dealer: dealer[0].value + dealer[0].suit,
+        yourMove: playerAction,
+        bestMove: advice.best
+      });
+    }
+
+    // DISPLAY EXPLANATION
+    const feedbackClass = isCorrect ? "feedback-correct" : "feedback-wrong";
+    const title = isCorrect ? "Good Move!" : "Strategy Mistake";
+    
+    const html = `
+      <div class="feedback-box ${feedbackClass}">
+        <h3>${title}</h3>
+        <p>You chose: <strong>${playerAction}</strong></p>
+        <p>Basic Strategy: <strong>${advice.best}</strong> ${note}</p>
+        ${advice.best === 'DOUBLE' ? `<small>(If Double unavailable, ${advice.fallback})</small>` : ''}
+      </div>
+      <p><strong>Scenario:</strong> You had ${getHandTotal(initialHand)} (${isSoftHand(initialHand)?'Soft':''}) vs Dealer ${dealer[0].value}.</p>
+      <p style="font-size:0.9em; border-top:1px solid #555; padding-top:10px;">
+        Result: ${roundResult}
+      </p>
+    `;
+
+    document.getElementById("rulesText").innerHTML = html;
+    document.getElementById("rulesContainer").style.display = "block";
+  }
+
+  function toggleRules() {
+    const body = document.getElementById("rulesBody");
+    const plus = document.getElementById("plusSign");
+    body.classList.toggle("open");
+    plus.innerText = body.classList.contains("open") ? "-" : "+";
+  }
+
+  function restart() {
+    startNewHand();
+  }
+
+  function downloadMistakes() {
+    if (mistakesLog.length === 0) {
+      alert("No mistakes recorded yet!");
+      return;
+    }
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(mistakesLog, null, 2));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "blackjack_mistakes.json");
+    document.body.appendChild(downloadAnchorNode); // required for firefox
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+  }
+
+  // Init
+  createDeck();
+  startNewHand();
+
+</script>
+</body>
+</html>
