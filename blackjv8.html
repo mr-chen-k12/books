@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Blackjack Coach v8</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+  :root {
+    --felt-color: #034c2c;
+    --card-bg: white;
+    --text-color: white;
+    --accent: #ffd700; /* Gold */
+    --mistake: #ff4444;
+    --correct: #00C851;
+    --hint-bg: #fff3cd;
+    --hint-text: #856404;
+  }
+
+  body {
+    background: var(--felt-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-color);
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  h1 { margin: 10px 0 20px 0; text-shadow: 2px 2px 4px black; }
+
+  /* STATS BAR */
+  .statsBar {
+    width: 100%;
+    max-width: 800px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    font-size: 0.95rem;
+  }
+
+  .stat-group { display: flex; gap: 15px; align-items: center;}
+  .stat-item strong { color: var(--accent); }
+
+  button.secondary-btn {
+    background: #444;
+    color: white;
+    border: 1px solid #666;
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  button.secondary-btn:hover { background: #555; }
+
+  /* TOGGLE SWITCH STYLE */
+  #hintToggleBtn {
+    background: var(--accent);
+    color: black;
+    font-weight: bold;
+    border: none;
+  }
+  #hintToggleBtn.off {
+    background: #555;
+    color: #ccc;
+  }
+
+  /* TABLE AREA */
+  .table {
+    background: radial-gradient(circle, #0a6b40 0%, #023820 100%);
+    margin-top: 20px;
+    padding: 30px;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 800px;
+    box-shadow: inset 0 0 50px rgba(0,0,0,0.6), 0 10px 30px rgba(0,0,0,0.5);
+    border: 8px solid #4a3c2c;
+    position: relative;
+  }
+
+  .hand-container {
+    margin-bottom: 20px;
+    min-height: 130px;
+  }
+
+  .hand {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  /* CARDS */
+  .card {
+    width: 70px;
+    height: 100px;
+    background: var(--card-bg);
+    color: black;
+    border-radius: 8px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 5px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    user-select: none;
+    position: relative;
+  }
+
+  .card.red { color: #d40000; }
+  .card.black { color: #1a1a1a; }
+  
+  .card .suit-small { font-size: 1rem; align-self: flex-start; }
+  .card .value-center { font-size: 2rem; align-self: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+  .card .suit-bottom { font-size: 1rem; align-self: flex-end; transform: rotate(180deg); }
+
+  .card.hidden {
+    background: #8b0000;
+    background-image: repeating-linear-gradient(45deg, #8b0000 0, #8b0000 10px, #700000 10px, #700000 20px);
+    border: 2px solid white;
+  }
+  .card.hidden * { display: none; }
+
+  /* HINT BOX */
+  #liveHintBox {
+    background: var(--hint-bg);
+    color: var(--hint-text);
+    padding: 10px 20px;
+    border-radius: 25px;
+    display: inline-block;
+    margin-top: 20px; /* Added spacing from buttons */
+    margin-bottom: 10px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    border: 2px solid #ffeeba;
+    animation: popIn 0.3s ease-out;
+    min-width: 220px;
+  }
+  
+  @keyframes popIn {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* CONTROLS */
+  .controls { margin-top: 15px; }
+
+  button.action-btn {
+    padding: 12px 24px;
+    margin: 5px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s, filter 0.2s;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+  }
+  
+  button.action-btn:active { transform: translateY(4px); box-shadow: none; }
+  button.action-btn:hover:not(:disabled) { filter: brightness(1.1); }
+  button.action-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; filter: grayscale(1); }
+
+  #hitBtn { background: #2196F3; color: white; }
+  #standBtn { background: #f44336; color: white; }
+  #doubleBtn { background: var(--accent); color: black; }
+  #restartBtn { background: #9E9E9E; color: black; margin-left: 20px;}
+
+  /* RESULTS & RULES */
+  #resultMessage {
+    height: 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin: 15px 0;
+    text-shadow: 1px 1px 2px black;
+  }
+
+  .rules-accordion {
+    margin-top: 20px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    text-align: left;
+    overflow: hidden;
+  }
+
+  .rules-header {
+    padding: 15px;
+    background: rgba(0,0,0,0.5);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+  }
+  
+  .rules-header:hover { background: rgba(0,0,0,0.7); }
+
+  #rulesBody {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out;
+    padding: 0 15px;
+  }
+  
+  #rulesBody.open { max-height: 500px; padding: 15px; overflow-y: auto; }
+
+  .feedback-box { border-radius: 5px; padding: 10px; margin-bottom: 10px; }
+  .feedback-correct { background: rgba(0, 200, 81, 0.2); border-left: 4px solid var(--correct); }
+  .feedback-wrong { background: rgba(255, 68, 68, 0.2); border-left: 4px solid var(--mistake); }
+
+</style>
+</head>
+<body>
+
+<h1>Blackjack Coach v8</h1>
+
+<div class="statsBar">
+  <div class="stat-group">
+    <div class="stat-item">Correct: <strong id="correctCount" style="color:var(--correct)">0</strong></div>
+    <div class="stat-item">Streak: <strong id="streakCount">0</strong></div>
+    <button id="hintToggleBtn" class="secondary-btn" onclick="toggleHints()">Hints: ON</button>
+  </div>
+  <div class="stat-group">
+    <button class="secondary-btn" onclick="downloadMistakes()">Download JSON</button>
+  </div>
+</div>
+
+<div class="table">
+  
+  <div class="hand-container">
+    <h3>Dealer</h3>
+    <div class="hand" id="dealerHand"></div>
+    <p id="dealerTotal" style="opacity: 0.8; font-size: 0.9rem;">Total: ?</p>
+  </div>
+
+  <div class="hand-container">
+    <h3>You</h3>
+    <div class="hand" id="playerHand"></div>
+    <p id="playerTotal" style="font-size: 1.1rem; font-weight: bold;"></p>
+    <p id="vsText" style="opacity: 0.7; font-size: 0.9rem; margin-top: -10px;"></p>
+  </div>
+
+  <div id="resultMessage"></div>
+
+  <div class="controls">
+    <button id="hitBtn" class="action-btn" onclick="hit()">Hit</button>
+    <button id="standBtn" class="action-btn" onclick="stand()">Stand</button>
+    <button id="doubleBtn" class="action-btn" onclick="doubleDown()">Double</button>
+    <button id="restartBtn" class="action-btn" onclick="restart()">New Hand</button>
+  </div>
+  
+  <div id="liveHintBox">💡 Suggestion: Loading...</div>
+
+  <div id="rulesContainer" class="rules-accordion" style="display:none;">
+    <div class="rules-header" onclick="toggleRules()">
+      <span>Detailed Analysis</span>
+      <span id="plusSign">+</span>
+    </div>
+    <div id="rulesBody">
+      <div id="rulesText"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // --- CONFIGURATION ---
+  const suits = ["♠", "♥", "♦", "♣"];
+  const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+  const rankToNum = {
+    "2":2, "3":3, "4":4, "5":5, "6":6, "7":7, "8":8, "9":9, 
+    "10":10, "J":10, "Q":10, "K":10, "A":11
+  };
+
+  let deck = [];
+  let player = [];
+  let dealer = [];
+  let gameOver = false;
+  let playerAction = null;
+  let firstMove = true;
+  let hintsEnabled = true; // Default ON
+  let mistakesLog = [];
+
+  let stats = { hands: 0, correct: 0, mistakes: 0, streak: 0, bestStreak: 0, wins: 0, losses: 0 };
+
+  // --- CORE UTILITIES ---
+
+  function createDeck() {
+    deck = [];
+    suits.forEach(s => values.forEach(v => deck.push({ suit: s, value: v })));
+    for (let i = deck.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [deck[i], deck[j]] = [deck[j], deck[i]];
+    }
+  }
+
+  function getCardValue(c) { return rankToNum[c.value]; }
+
+  function getHandTotal(hand) {
+    let total = hand.reduce((acc, c) => acc + getCardValue(c), 0);
+    let aces = hand.filter(c => c.value === "A").length;
+    while (total > 21 && aces > 0) { total -= 10; aces--; }
+    return total;
+  }
+
+  function isSoftHand(hand) {
+    let rawTotal = hand.reduce((acc, c) => acc + getCardValue(c), 0);
+    return hand.some(c => c.value === "A") && rawTotal <= 21;
+  }
+
+  function isPair(hand) {
+    return hand.length === 2 && getCardValue(hand[0]) === getCardValue(hand[1]);
+  }
+
+  // --- HINT LOGIC ---
+  
+  function toggleHints() {
+    hintsEnabled = !hintsEnabled;
+    const btn = document.getElementById("hintToggleBtn");
+    const box = document.getElementById("liveHintBox");
+    
+    if (hintsEnabled) {
+      btn.innerText = "Hints: ON";
+      btn.classList.remove("off");
+      box.style.visibility = "visible";
+      updateLiveHint(); 
+    } else {
+      btn.innerText = "Hints: OFF";
+      btn.classList.add("off");
+      box.style.visibility = "hidden";
+    }
+  }
+
+  function updateLiveHint() {
+    if (gameOver) {
+        document.getElementById("liveHintBox").style.display = "none";
+        return;
+    }
+    
+    document.getElementById("liveHintBox").style.display = "inline-block";
+    
+    // Calculate best move based on CURRENT state
+    const advice = getBestMove(player, dealer[0], firstMove);
+    
+    let moveText = advice.best;
+    if (advice.best === "DOUBLE") moveText += " (or Hit)";
+    if (advice.best === "SPLIT") moveText += " (or " + advice.fallback + ")";
+    
+    document.getElementById("liveHintBox").innerHTML = `💡 Suggestion: <strong>${moveText}</strong>`;
+  }
+
+  // --- UI RENDERERS ---
+
+  function renderCard(c) {
+    const el = document.createElement("div");
+    const isRed = c.suit === "♥" || c.suit === "♦";
+    el.className = `card ${isRed ? "red" : "black"}`;
+    el.innerHTML = `<div class="suit-small">${c.suit}</div><div class="value-center">${c.value}</div><div class="suit-bottom">${c.suit}</div>`;
+    return el;
+  }
+
+  function updateUI() {
+    // Dealer
+    const dContainer = document.getElementById("dealerHand");
+    dContainer.innerHTML = "";
+    if (gameOver) {
+      dealer.forEach(c => dContainer.appendChild(renderCard(c)));
+      document.getElementById("dealerTotal").innerText = `Total: ${getHandTotal(dealer)}`;
+    } else {
+      dContainer.appendChild(renderCard(dealer[0]));
+      const hid = document.createElement("div");
+      hid.className = "card hidden";
+      dContainer.appendChild(hid);
+      document.getElementById("dealerTotal").innerText = "Total: ?";
+    }
+
+    // Player
+    const pContainer = document.getElementById("playerHand");
+    pContainer.innerHTML = "";
+    player.forEach(c => pContainer.appendChild(renderCard(c)));
+    document.getElementById("playerTotal").innerText = `Count: ${getHandTotal(player)}`;
+
+    // Text
+    const pTotal = getHandTotal(player);
+    document.getElementById("vsText").innerText = `${isSoftHand(player) ? "Soft " : ""}${pTotal} vs Dealer ${getCardValue(dealer[0])}`;
+
+    // Buttons
+    const canDouble = (firstMove && player.length === 2);
+    document.getElementById("doubleBtn").style.display = canDouble ? "inline-block" : "none";
+    
+    const btns = ["hitBtn", "standBtn", "doubleBtn"];
+    btns.forEach(id => document.getElementById(id).disabled = gameOver);
+    document.getElementById("restartBtn").style.display = gameOver ? "inline-block" : "none";
+
+    // Stats
+    document.getElementById("correctCount").innerText = stats.correct;
+    document.getElementById("streakCount").innerText = stats.streak;
+    
+    // Live Hint
+    updateLiveHint();
+  }
+
+  // --- GAME ACTIONS ---
+
+  function startNewHand() {
+    if (deck.length < 15) createDeck();
+    player = [deck.pop(), deck.pop()];
+    dealer = [deck.pop(), deck.pop()];
+    gameOver = false;
+    firstMove = true;
+    playerAction = null;
+    
+    document.getElementById("resultMessage").innerText = "";
+    document.getElementById("rulesContainer").style.display = "none";
+    document.getElementById("rulesBody").classList.remove("open");
+    document.getElementById("plusSign").innerText = "+";
+
+    updateUI();
+  }
+
+  function hit() {
+    playerAction = "HIT";
+    firstMove = false; 
+    player.push(deck.pop());
+    
+    if (getHandTotal(player) > 21) {
+      endRound("Bust! You went over 21.");
+    } else {
+      updateUI(); 
+    }
+  }
+
+  function stand() {
+    playerAction = "STAND";
+    firstMove = false;
+    dealerTurn();
+  }
+
+  function doubleDown() {
+    playerAction = "DOUBLE";
+    firstMove = false;
+    player.push(deck.pop());
+    if (getHandTotal(player) > 21) {
+      endRound("Bust! You went over 21.");
+    } else {
+      dealerTurn();
+    }
+  }
+
+  function dealerTurn() {
+    let dTotal = getHandTotal(dealer);
+    while (dTotal < 17) {
+      dealer.push(deck.pop());
+      dTotal = getHandTotal(dealer);
+    }
+    
+    const pTotal = getHandTotal(player);
+    let msg = "";
+    if (dTotal > 21) { msg = "Dealer Busts! You Win!"; stats.wins++; }
+    else if (pTotal > dTotal) { msg = "You Win!"; stats.wins++; }
+    else if (dTotal > pTotal) { msg = "Dealer Wins."; stats.losses++; }
+    else { msg = "Push (Tie)."; }
+    endRound(msg);
+  }
+
+  function endRound(message) {
+    gameOver = true;
+    document.getElementById("resultMessage").innerText = message;
+    
+    // Evaluate based on the INITIAL hand
+    const initialHand = [player[0], player[1]];
+    
+    evaluateStrategy(message, initialHand);
+    updateUI();
+  }
+
+  // --- STRATEGY ENGINE ---
+
+  function getBestMove(hand, dealerUpCard, isFirstMove) {
+    const total = getHandTotal(hand);
+    const soft = isSoftHand(hand);
+    const pair = isFirstMove && isPair(hand);
+    const dVal = getCardValue(dealerUpCard);
+
+    // PAIRS
+    if (pair) {
+      const val = getCardValue(hand[0]);
+      if (val === 11 || val === 8) return { best: "SPLIT", fallback: "HIT" };
+      if (val === 10) return { best: "STAND", fallback: "STAND" };
+      if (val === 9) return (dVal === 7 || dVal >= 10) ? { best: "STAND", fallback: "STAND" } : { best: "SPLIT", fallback: "STAND" };
+      if (val === 5) return (dVal < 10) ? { best: "DOUBLE", fallback: "HIT" } : { best: "HIT", fallback: "HIT" };
+      if (val === 4) return (dVal === 5 || dVal === 6) ? { best: "SPLIT", fallback: "HIT" } : { best: "HIT", fallback: "HIT" };
+      if (val === 6) return (dVal >= 2 && dVal <= 6) ? { best: "SPLIT", fallback: "HIT" } : { best: "HIT", fallback: "HIT" };
+      if (val === 2 || val === 3 || val === 7) return (dVal <= 7) ? { best: "SPLIT", fallback: "HIT" } : { best: "HIT", fallback: "HIT" };
+    }
+
+    // SOFT
+    if (soft) {
+      if (total >= 19) return { best: "STAND", fallback: "STAND" };
+      if (total === 18) {
+        if (isFirstMove && dVal >= 3 && dVal <= 6) return { best: "DOUBLE", fallback: "STAND" };
+        if (dVal === 2 || dVal === 7 || dVal === 8) return { best: "STAND", fallback: "STAND" };
+        return { best: "HIT", fallback: "HIT" };
+      }
+      if (isFirstMove && dVal >= 3 && dVal <= 6) return { best: "DOUBLE", fallback: "HIT" };
+      return { best: "HIT", fallback: "HIT" };
+    }
+
+    // HARD
+    if (total >= 17) return { best: "STAND", fallback: "STAND" };
+    if (total <= 8) return { best: "HIT", fallback: "HIT" };
+    if (total === 11) return isFirstMove ? { best: "DOUBLE", fallback: "HIT" } : { best: "HIT", fallback: "HIT" };
+    if (total === 10) return (isFirstMove && dVal < 10) ? { best: "DOUBLE", fallback: "HIT" } : { best: "HIT", fallback: "HIT" };
+    if (total === 9) return (isFirstMove && dVal >= 3 && dVal <= 6) ? { best: "DOUBLE", fallback: "HIT" } : { best: "HIT", fallback: "HIT" };
+    
+    if (total === 12) return (dVal >= 4 && dVal <= 6) ? { best: "STAND", fallback: "STAND" } : { best: "HIT", fallback: "HIT" };
+    if (total >= 13 && total <= 16) return (dVal >= 2 && dVal <= 6) ? { best: "STAND", fallback: "STAND" } : { best: "HIT", fallback: "HIT" };
+
+    return { best: "STAND", fallback: "STAND" };
+  }
+
+  function evaluateStrategy(roundResult, initialHand) {
+    stats.hands++;
+    const advice = getBestMove(initialHand, dealer[0], true);
+    
+    let isCorrect = false;
+    let note = "";
+
+    if (playerAction === advice.best) isCorrect = true;
+    else if (advice.best === "DOUBLE" && playerAction === advice.fallback) isCorrect = false; 
+    else if (advice.best === "SPLIT") {
+      if (playerAction === advice.fallback) { isCorrect = true; note = "(Optimal: Split)"; }
+      else isCorrect = false;
+    }
+
+    if (isCorrect) {
+      stats.correct++;
+      stats.streak++;
+      if (stats.streak > stats.bestStreak) stats.bestStreak = stats.streak;
+    } else {
+      stats.mistakes++;
+      stats.streak = 0;
+      mistakesLog.push({ 
+        timestamp: new Date().toLocaleTimeString(), 
+        hand: initialHand.map(c => c.value + c.suit).join(","), 
+        dealer: dealer[0].value, 
+        yourMove: playerAction, 
+        bestMove: advice.best 
+      });
+      
+      document.getElementById("rulesContainer").style.display = "block";
+      const rb = document.getElementById("rulesBody");
+      if (!rb.classList.contains("open")) {
+        rb.classList.add("open");
+        document.getElementById("plusSign").innerText = "-";
+      }
+    }
+
+    const feedbackClass = isCorrect ? "feedback-correct" : "feedback-wrong";
+    document.getElementById("rulesText").innerHTML = `
+      <div class="feedback-box ${feedbackClass}">
+        <p>You chose: <strong>${playerAction}</strong></p>
+        <p>Math says: <strong>${advice.best}</strong> ${note}</p>
+      </div>
+      <p style="font-size:0.9em; margin-top:10px; border-top:1px solid #555; padding-top:10px">Result: ${roundResult}</p>
+    `;
+    
+    document.getElementById("rulesContainer").style.display = "block";
+  }
+
+  function toggleRules() {
+    document.getElementById("rulesBody").classList.toggle("open");
+    const isOpen = document.getElementById("rulesBody").classList.contains("open");
+    document.getElementById("plusSign").innerText = isOpen ? "-" : "+";
+  }
+
+  function restart() { startNewHand(); }
+
+  function downloadMistakes() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(mistakesLog, null, 2));
+    const el = document.createElement('a');
+    el.href = dataStr;
+    el.download = "blackjack_mistakes.json";
+    el.click();
+  }
+
+  // Init
+  createDeck();
+  startNewHand();
+
+</script>
+</body>
+</html>
