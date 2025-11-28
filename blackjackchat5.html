@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Blackjack Trainer v5</title>
+<title>Blackjack Trainer v6</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -20,18 +20,15 @@
   .statsBar {
     max-width: 750px;
     margin: 8px auto 12px;
-    padding: 8px 10px;
+    padding: 10px;
     background: rgba(0,0,0,0.35);
     border-radius: 10px;
     font-size: 14px;
+    line-height: 1.4em;
     display: flex;
-    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    gap: 6px;
   }
-
-  .statsBar span { margin-right: 10px; }
 
   .table {
     background: #0a5a34;
@@ -42,7 +39,7 @@
     box-shadow: 0 0 20px black;
   }
 
-  .hand { 
+  .hand {
     margin: 10px 0;
     display: flex;
     justify-content: center;
@@ -120,7 +117,6 @@
     font-weight: bold;
     font-size: 22px;
   }
-
 </style>
 </head>
 
@@ -133,7 +129,10 @@
     Hands: <strong id="handsCount">0</strong> &nbsp;
     Correct: <strong id="correctCount">0</strong> &nbsp;
     Mistakes: <strong id="mistakeCount">0</strong> &nbsp;
-    Best streak: <strong id="bestStreak">0</strong>
+    Best streak: <strong id="bestStreak">0</strong> <br>
+    Wins: <strong id="winsCount">0</strong> &nbsp;
+    Losses: <strong id="lossesCount">0</strong> &nbsp;
+    Win %: <strong id="winPercent">0%</strong>
   </div>
   <button onclick="downloadMistakes()">Download Mistakes (JSON)</button>
 </div>
@@ -173,55 +172,88 @@
 </div>
 
 <script>
-  const suits  = ["♠","♥","♦","♣"];
-  const values = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
-  const rankToNum = { "A":11,"2":2,"3":3,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9,"10":10,"J":10,"Q":10,"K":10 };
 
-  let deck = [];
-  let player = [];
-  let dealer = [];
-  let gameOver = false;
-  let playerAction = null;
-  let firstMove = true;
+  const suits=["♠","♥","♦","♣"];
+  const values=["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+  const rankToNum={
+    "A":11,"2":2,"3":3,"4":4,"5":5,"6":6,"7":7,"8":8,
+    "9":9,"10":10,"J":10,"Q":10,"K":10
+  };
 
-  let totalHands=0, correctDecisions=0, mistakeDecisions=0, bestStreak=0, streak=0;
+  let deck=[];
+  let player=[];
+  let dealer=[];
+  let gameOver=false;
+  let playerAction=null;
+  let firstMove=true;
+
+  let totalHands=0;
+  let correctDecisions=0;
+  let mistakeDecisions=0;
+  let bestStreak=0;
+  let streak=0;
+
+  let wins=0;
+  let losses=0;
+
   let mistakesLog=[];
 
-  function disableActionButtons() {
-    document.getElementById("hitBtn").disabled = true;
-    document.getElementById("standBtn").disabled = true;
-    document.getElementById("doubleBtn").disabled = true;
+  function updateStatsDisplay(){
+    document.getElementById("handsCount").innerText=totalHands;
+    document.getElementById("correctCount").innerText=correctDecisions;
+    document.getElementById("mistakeCount").innerText=mistakeDecisions;
+    document.getElementById("bestStreak").innerText=bestStreak;
+
+    updateWinStats();
   }
 
-  function enableActionButtons() {
-    document.getElementById("hitBtn").disabled = false;
-    document.getElementById("standBtn").disabled = false;
-    document.getElementById("doubleBtn").disabled = false;
+  function updateWinStats(){
+    document.getElementById("winsCount").innerText=wins;
+    document.getElementById("lossesCount").innerText=losses;
+
+    const totalWL=wins+losses;
+    if(totalWL===0) document.getElementById("winPercent").innerText="0%";
+    else {
+      const pct=(wins/totalWL*100).toFixed(1);
+      document.getElementById("winPercent").innerText=pct+"%";
+    }
   }
 
-  function createDeck() {
+  function disableBtns(){
+    document.getElementById("hitBtn").disabled=true;
+    document.getElementById("standBtn").disabled=true;
+    document.getElementById("doubleBtn").disabled=true;
+  }
+
+  function enableBtns(){
+    document.getElementById("hitBtn").disabled=false;
+    document.getElementById("standBtn").disabled=false;
+    document.getElementById("doubleBtn").disabled=false;
+  }
+
+  function createDeck(){
     deck=[];
-    suits.forEach(s => values.forEach(v => deck.push({suit:s,value:v})));
+    suits.forEach(s=>values.forEach(v=>deck.push({suit:s,value:v})));
     deck.sort(()=>Math.random()-0.5);
   }
 
   function cardValue(c){ return rankToNum[c.value]; }
 
   function handTotal(hand){
-    let total=hand.reduce((s,c)=>s+cardValue(c),0);
+    let total=hand.reduce((a,c)=>a+cardValue(c),0);
     let aces=hand.filter(c=>c.value==="A").length;
     while(total>21 && aces>0){ total-=10; aces--; }
     return total;
   }
 
   function isSoft(hand){
-    let raw=hand.reduce((s,c)=>s+cardValue(c),0);
+    let raw=hand.reduce((a,c)=>a+cardValue(c),0);
     let aces=hand.filter(c=>c.value==="A").length;
     while(raw>21 && aces>0){ raw-=10; aces--; }
     return hand.some(c=>c.value==="A") && raw<=21 && raw>=13;
   }
 
-  function isPair(h){ return h.length===2 && h[0].value===h[1].value; }
+  function isPair(hand){ return hand.length===2 && hand[0].value===hand[1].value; }
 
   function dealInitial(){
     player=[deck.pop(),deck.pop()];
@@ -229,52 +261,53 @@
     gameOver=false;
     playerAction=null;
     firstMove=true;
-    enableActionButtons();
+    enableBtns();
     updateUI();
     updateDouble();
   }
 
-  function renderCard(card){
-    const c=document.createElement("div");
-    c.className="card "+((card.suit==="♥"||card.suit==="♦")?"red":"");
-    c.innerHTML = `<div>${card.value}</div><div>${card.suit}</div>`;
-    return c;
+  function renderCard(c){
+    const el=document.createElement("div");
+    el.className="card "+((c.suit==="♥"||c.suit==="♦")?"red":"");
+    el.innerHTML=`<div>${c.value}</div><div>${c.suit}</div>`;
+    return el;
   }
 
   function updateDouble(){
-    const db = document.getElementById("doubleBtn");
-    db.style.display = (player.length===2 && !gameOver && firstMove) ? "inline-block":"none";
+    const btn=document.getElementById("doubleBtn");
+    if(player.length===2 && firstMove && !gameOver)
+      btn.style.display="inline-block";
+    else btn.style.display="none";
   }
 
   function updateUI(){
-    const d=document.getElementById("dealerHand");
-    d.innerHTML="";
-    d.appendChild(renderCard(dealer[0]));
+    const dealerEl=document.getElementById("dealerHand");
+    dealerEl.innerHTML="";
+    dealerEl.appendChild(renderCard(dealer[0]));
 
-    const hidden=document.createElement("div");
-    hidden.className="card";
-    hidden.style.background="black";
-    d.appendChild(hidden);
+    const hid=document.createElement("div");
+    hid.className="card";
+    hid.style.background="black";
+    dealerEl.appendChild(hid);
 
     document.getElementById("dealerTotal").innerText="Total: ?";
-    const p=document.getElementById("playerHand"); p.innerHTML="";
+
+    const p=document.getElementById("playerHand");
+    p.innerHTML="";
     player.forEach(c=>p.appendChild(renderCard(c)));
 
     document.getElementById("playerTotal").innerText="Your total: "+handTotal(player);
 
     const up=dealer[0];
     document.getElementById("playerLabelLine").innerText =
-      `For training, compare your first card ${player[0].value}${player[0].suit} `
-      +`and dealer's up-card ${up.value}${up.suit}.`;
+      `Compare your first card ${player[0].value}${player[0].suit} `
+      +`vs dealer's ${up.value}${up.suit}.`;
 
     document.getElementById("rulesContainer").style.display="none";
     document.getElementById("rulesBody").classList.remove("open");
     document.getElementById("plusSign").innerText="+";
 
-    document.getElementById("handsCount").innerText=totalHands;
-    document.getElementById("correctCount").innerText=correctDecisions;
-    document.getElementById("mistakeCount").innerText=mistakeDecisions;
-    document.getElementById("bestStreak").innerText=bestStreak;
+    updateStatsDisplay();
   }
 
   function hit(){
@@ -284,11 +317,11 @@
     player.push(deck.pop());
     updateDouble();
 
-    if(handTotal(player)>=21){ endHand(); }
-    else renderOngoing();
+    if(handTotal(player)>=21) endHand();
+    else renderPlayer();
   }
 
-  function renderOngoing(){
+  function renderPlayer(){
     const p=document.getElementById("playerHand");
     p.innerHTML="";
     player.forEach(c=>p.appendChild(renderCard(c)));
@@ -299,12 +332,11 @@
     if(gameOver) return;
     playerAction="STAND";
     firstMove=false;
-    updateDouble();
     dealerPlay();
   }
 
   function doubleDown(){
-    if(gameOver || !firstMove || player.length!==2) return;
+    if(gameOver||!firstMove||player.length!==2) return;
     playerAction="DOUBLE";
     firstMove=false;
     player.push(deck.pop());
@@ -314,28 +346,29 @@
   }
 
   function dealerPlay(){
-    disableActionButtons();
-    while(handTotal(dealer)<17) dealer.push(deck.pop());
-    setTimeout(endHand,100);
+    disableBtns();
+    while(handTotal(dealer)<17){
+      dealer.push(deck.pop());
+    }
+    setTimeout(endHand,150);
   }
 
   function endHand(){
     gameOver=true;
-    disableActionButtons();
+    disableBtns();
 
-    // Reveal dealer
-    const d=document.getElementById("dealerHand");
-    d.innerHTML="";
-    dealer.forEach(c=>d.appendChild(renderCard(c)));
+    const dealerEl=document.getElementById("dealerHand");
+    dealerEl.innerHTML="";
+    dealer.forEach(c=>dealerEl.appendChild(renderCard(c)));
     document.getElementById("dealerTotal").innerText="Total: "+handTotal(dealer);
 
     const pt=handTotal(player), dt=handTotal(dealer);
     let result="";
-    if(pt>21) result="You Busted!";
-    else if(dt>21) result="Dealer Busts! You Win!";
-    else if(pt>dt) result="You Win!";
-    else if(dt>pt) result="Dealer Wins!";
-    else result="Push (Tie)";
+    if(pt>21){ result="You Busted!"; losses++; }
+    else if(dt>21){ result="Dealer Busts! You Win!"; wins++; }
+    else if(pt>dt){ result="You Win!"; wins++; }
+    else if(dt>pt){ result="Dealer Wins!"; losses++; }
+    else { result="Push (Tie)"; }
 
     document.getElementById("result").innerText=result;
 
@@ -343,8 +376,12 @@
   }
 
   function basicStrategy(hand, up, first){
-    const total=handTotal(hand), upVal=cardValue(up), pair=isPair(hand), soft=isSoft(hand);
-    function R(best, fallback){ return {best,fallback}; }
+    const total=handTotal(hand);
+    const upVal=cardValue(up);
+    const pair=isPair(hand);
+    const soft=isSoft(hand);
+
+    function R(best,fallback){ return {best,fallback}; }
 
     if(first && pair){
       const v=hand[0].value;
@@ -411,15 +448,16 @@
   }
 
   function evaluateStrategy(pt,dt,result){
-    const expected=basicStrategy(player,dealer[0],firstMove=true);
-    const best=expected.best, fallback=expected.fallback;
+    const expected=basicStrategy(player,dealer[0],true);
+    const best=expected.best;
+    const fallback=expected.fallback;
 
     let correct=(playerAction===best)||(best==="DOUBLE"&&playerAction===fallback);
-    if(best==="SPLIT"){
-      correct=true; // don't count splits as mistake
-    }
+
+    if(best==="SPLIT") correct=true;
 
     totalHands++;
+
     if(correct){
       correctDecisions++;
       streak++;
@@ -442,24 +480,20 @@
       });
     }
 
-    document.getElementById("handsCount").innerText=totalHands;
-    document.getElementById("correctCount").innerText=correctDecisions;
-    document.getElementById("mistakeCount").innerText=mistakeDecisions;
-    document.getElementById("bestStreak").innerText=bestStreak;
-
-    showExplanation(best, fallback, pt, dt, result);
+    updateStatsDisplay();
+    showExplanation(best,fallback,pt,dt,result);
   }
 
   function showExplanation(best,fallback,pt,dt,result){
-    let expl =
+    let text =
       `<p><strong>Your move:</strong> ${playerAction}</p>
        <p><strong>Basic Strategy recommends:</strong> ${best}
-       ${best==="DOUBLE" ? `(or ${fallback} if unavailable)` : ""}</p>
+       ${best==="DOUBLE" ? "(or "+fallback+" if unavailable)" : ""}</p>
        <p><strong>Your total:</strong> ${pt} |
        <strong>Dealer total:</strong> ${dt}</p>
        <p>${result}</p>`;
 
-    document.getElementById("rulesText").innerHTML=expl;
+    document.getElementById("rulesText").innerHTML=text;
     document.getElementById("rulesContainer").style.display="block";
   }
 
@@ -486,15 +520,14 @@
   }
 
   function restart(){
-    gameOver=false;
-    playerAction=null;
     document.getElementById("result").innerText="";
-    createDeck(); dealInitial();
-    enableActionButtons();
-    updateDouble();
+    createDeck();
+    dealInitial();
   }
 
-  createDeck(); dealInitial();
+  createDeck();
+  dealInitial();
+
 </script>
 
 </body>
