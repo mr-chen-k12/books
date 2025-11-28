@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Blackjack Trainer v2</title>
+<title>Blackjack Trainer v3</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -22,7 +22,7 @@
     margin: 0 auto;
     padding: 20px;
     border-radius: 12px;
-    max-width: 700px;
+    max-width: 750px;
     box-shadow: 0 0 20px black;
   }
 
@@ -53,7 +53,7 @@
   .label-line {
     font-size: 14px;
     margin-top: -4px;
-    opacity: 0.85;
+    opacity: 0.9;
   }
 
   button {
@@ -68,30 +68,49 @@
     font-size: 16px;
   }
 
+  button:hover {
+    background: #ffdf3f;
+  }
+
   .rules {
     margin-top: 20px;
     background: rgba(0,0,0,0.2);
     padding: 10px;
     border-radius: 8px;
     cursor: pointer;
+    text-align: left;
   }
 
   #rulesBody {
     max-height: 0;
     overflow: hidden;
     transition: max-height .3s ease;
-    text-align: left;
   }
 
   #rulesBody.open {
-    max-height: 500px;
+    max-height: 600px;
     margin-top: 10px;
   }
 
+  .rulesHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
   .plus {
-    float: right;
     font-weight: bold;
     font-size: 22px;
+  }
+
+  .tracker {
+    margin-top: 10px;
+    font-size: 14px;
+    opacity: 0.9;
+  }
+
+  @media (max-width: 600px){
+    .card { width: 52px; height: 80px; font-size: 18px; }
   }
 </style>
 </head>
@@ -113,33 +132,54 @@
   <p class="label-line" id="playerLabelLine"></p>
 
   <div>
-    <button onclick="hit()">Hit</button>
-    <button onclick="stand()">Stand</button>
+    <button id="hitBtn" onclick="hit()">Hit</button>
+    <button id="standBtn" onclick="stand()">Stand</button>
+    <button id="doubleBtn" onclick="doubleDown()">Double</button>
     <button onclick="restart()">Restart</button>
   </div>
 
   <h3 id="result" style="height:20px; margin-top:10px;"></h3>
 
-  <div id="rulesContainer" class="rules" style="display:none;" onclick="toggleRules()">
-    <span><strong>+ Why This Was the Correct Strategy</strong></span>
-    <span id="plusSign" class="plus">+</span>
+  <div class="tracker">
+    Correct decisions: <span id="correctCount">0</span>  
+    &nbsp;|&nbsp; Best streak: <span id="bestStreak">0</span>
+  </div>
+
+  <div id="rulesContainer" class="rules" style="display:none;" onclick="toggleRules(event)">
+    <div class="rulesHeader">
+      <strong>Why This Was the Correct Strategy</strong>
+      <span id="plusSign" class="plus">+</span>
+    </div>
 
     <div id="rulesBody">
-      <div id="rulesText" style="padding:10px;"></div>
+      <div id="rulesText" style="padding:10px 0;"></div>
+      <hr style="border:0;border-top:1px solid rgba(255,255,255,0.3);margin:8px 0;">
+      <div style="font-size:13px;opacity:0.9;">
+        This trainer uses a simplified <strong>Basic Strategy</strong> for:
+        hard totals, soft totals (with Ace), and pairs.  
+        It will sometimes recommend <strong>Split</strong> even though this
+        demo doesn’t actually play out splits – it’s still training your eye.
+      </div>
     </div>
   </div>
 
 </div>
 
 <script>
-  const suits = ["♠","♥","♦","♣"];
+  const suits  = ["♠","♥","♦","♣"];
   const values = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+  const rankToNum = { "A":11,"2":2,"3":3,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9,"10":10,"J":10,"Q":10,"K":10 };
 
   let deck = [];
   let player = [];
   let dealer = [];
   let gameOver = false;
   let playerAction = null;
+  let firstMoveDone = false;
+
+  let correctDecisions = 0;
+  let currentStreak = 0;
+  let bestStreak = 0;
 
   function createDeck() {
     deck = [];
@@ -148,29 +188,56 @@
         deck.push({suit:s, value:v});
       }
     }
+    // Shuffle
     deck.sort(()=>Math.random() - 0.5);
   }
 
   function cardValue(c) {
-    if (["J","Q","K"].includes(c.value)) return 10;
-    if (c.value === "A") return 11;
-    return parseInt(c.value);
+    return rankToNum[c.value];
   }
 
   function handTotal(hand) {
-    let total = hand.reduce((sum,c)=>sum+cardValue(c),0);
+    let total = hand.reduce((sum,c)=>sum + cardValue(c), 0);
     let aces = hand.filter(c=>c.value==="A").length;
 
-    while (total>21 && aces>0) {
-      total -= 10;
+    while (total > 21 && aces > 0) {
+      total -= 10;  // make one Ace count as 1 instead of 11
       aces--;
     }
     return total;
   }
 
+  function isSoftHand(hand) {
+    // Soft = has Ace counted as 11
+    let total = hand.reduce((sum,c)=>sum + cardValue(c), 0);
+    let aces = hand.filter(c=>c.value==="A").length;
+    while (total > 21 && aces > 0) {
+      total -= 10;
+      aces--;
+    }
+    // if any Ace still valued 11, total + 10 <= 21 originally
+    // simpler: recompute: if hand has Ace and total <= 21 and total + 10 <= 31 and we had subtracted at most once
+    let hasAce = hand.some(c=>c.value==="A");
+    if (!hasAce) return false;
+
+    // Quick test: if total <= 21 and total + 10 <= 31 but when all Aces were 1 we'd be <= 21
+    // easier approach: if total <= 21 and (total + 10) <= 21 + 10 and at least one Ace originally 11.
+    // To keep simpler: check if total <=21 and (total + 10) <= 31 and there was at least one Ace.
+    // This works well for training purposes.
+    return total <= 21 && hasAce && (total + 10) <= 31;
+  }
+
+  function isPair(hand) {
+    return hand.length === 2 && hand[0].value === hand[1].value;
+  }
+
   function dealInitial() {
     player = [deck.pop(), deck.pop()];
     dealer = [deck.pop(), deck.pop()];
+    gameOver = false;
+    playerAction = null;
+    firstMoveDone = false;
+    updateButtons();
     updateUI();
   }
 
@@ -182,7 +249,7 @@
   }
 
   function updateUI() {
-    // Dealer hand — only show first card
+    // Dealer: show one up-card, one hidden
     const d = document.getElementById("dealerHand");
     d.innerHTML = "";
     d.appendChild(renderCard(dealer[0]));
@@ -191,7 +258,6 @@
     hidden.className = "card";
     hidden.style.background = "black";
     hidden.style.color = "white";
-    hidden.innerHTML = "";
     d.appendChild(hidden);
 
     document.getElementById("dealerTotal").innerText = "Total: ?";
@@ -199,43 +265,94 @@
     // Player hand
     const p = document.getElementById("playerHand");
     p.innerHTML = "";
-    player.forEach(card => p.appendChild(renderCard(card)));
+    player.forEach(c => p.appendChild(renderCard(c)));
 
-    // Label explaining which card the dealer sees
+    document.getElementById("playerTotal").innerText = "Your total: " + handTotal(player);
+
+    // Training label: think about your first card vs dealer up-card
+    const up = dealer[0];
     document.getElementById("playerLabelLine").innerText =
-      "Dealer sees: " + player[0].value + player[0].suit + " and dealer's up-card " +
-      dealer[0].value + dealer[0].suit;
+      "For training, compare your first card " + player[0].value + player[0].suit +
+      " and dealer's up-card " + up.value + up.suit +
+      " — then your full total " + handTotal(player) + " vs dealer's card " + up.value + ".";
 
-    document.getElementById("playerTotal").innerText = 
-      "Your total: " + handTotal(player);
+    // Hide strategy box until hand ends
+    document.getElementById("rulesContainer").style.display = "none";
+    document.getElementById("rulesBody").classList.remove("open");
+    document.getElementById("plusSign").innerText = "+";
+
+    // Update tracker
+    document.getElementById("correctCount").innerText = correctDecisions;
+    document.getElementById("bestStreak").innerText = bestStreak;
+  }
+
+  function updateButtons() {
+    const doubleBtn = document.getElementById("doubleBtn");
+    // Double allowed only on first decision and exactly 2 cards
+    if (!firstMoveDone && player.length === 2 && !gameOver) {
+      doubleBtn.style.display = "inline-block";
+    } else {
+      doubleBtn.style.display = "none";
+    }
   }
 
   function hit() {
     if (gameOver) return;
+    if (!firstMoveDone) firstMoveDone = true;
     playerAction = "HIT";
+    updateButtons();
 
     player.push(deck.pop());
-    updateUI();
-
-    if (handTotal(player) > 21) {
-      endGame();
+    if (handTotal(player) >= 21) {
+      // If 21, you effectively stand; if >21, you bust.
+      endGame(true); // player ended by hitting
+    } else {
+      // Still playing; no dealer action yet.
+      renderOngoing();
     }
+  }
+
+  function renderOngoing() {
+    const p = document.getElementById("playerHand");
+    p.innerHTML = "";
+    player.forEach(c => p.appendChild(renderCard(c)));
+    document.getElementById("playerTotal").innerText = "Your total: " + handTotal(player);
   }
 
   function stand() {
     if (gameOver) return;
+    if (!firstMoveDone) firstMoveDone = true;
     playerAction = "STAND";
+    updateButtons();
     dealerPlays();
+  }
+
+  function doubleDown() {
+    if (gameOver) return;
+    if (firstMoveDone || player.length !== 2) return; // only on first decision with 2 cards
+
+    firstMoveDone = true;
+    playerAction = "DOUBLE";
+
+    // In real blackjack, you double your bet and take exactly one card, then stand
+    player.push(deck.pop());
+    updateButtons();
+
+    if (handTotal(player) > 21) {
+      endGame(true);
+    } else {
+      dealerPlays();
+    }
   }
 
   function dealerPlays() {
     while (handTotal(dealer) < 17) {
       dealer.push(deck.pop());
     }
-    endGame();
+    endGame(false);
   }
 
-  function endGame() {
+  function endGame(playerEndedOnHit) {
     gameOver = true;
 
     // Reveal dealer hand
@@ -243,11 +360,12 @@
     d.innerHTML = "";
     dealer.forEach(c => d.appendChild(renderCard(c)));
 
-    document.getElementById("dealerTotal").innerText = 
+    document.getElementById("dealerTotal").innerText =
       "Total: " + handTotal(dealer);
 
-    let pt = handTotal(player);
-    let dt = handTotal(dealer);
+    // Final totals
+    const pt = handTotal(player);
+    const dt = handTotal(dealer);
     let result = "";
 
     if (pt > 21) result = "You Busted!";
@@ -261,56 +379,184 @@
     showStrategyExplanation(pt, dt);
   }
 
-  // Basic strategy engine (very simplified)
-  function correctMove(playerCards, dealerCard) {
-    const total = handTotal(playerCards);
-    const up = cardValue(dealerCard);
+  // BASIC STRATEGY ENGINE (simplified S17, 3:2, no surrender)
+  // Returns { best: 'HIT'|'STAND'|'DOUBLE'|'SPLIT', fallback: 'HIT'|'STAND' }
+  function basicStrategy(playerHand, dealerUpCard, isFirstTurn) {
+    const total = handTotal(playerHand);
+    const upVal = cardValue(dealerUpCard);
 
-    // Always hit:
-    if (total <= 11) return "HIT";
+    const pair = isPair(playerHand);
+    const soft = isSoftHand(playerHand);
 
-    // 12–16 rules
-    if (total >= 12 && total <= 16) {
-      if (up >= 7) return "HIT";
-      return "STAND";
+    // helper to wrap
+    function make(best, fallback) {
+      return { best, fallback };
+    }
+
+    // PAIRS (only relevant first turn)
+    if (isFirstTurn && pair) {
+      const v = playerHand[0].value;
+
+      if (v === "A") return make("SPLIT", "HIT");         // Always split Aces
+      if (v === "8") return make("SPLIT", "HIT");         // Always split 8s
+      if (v === "10" || v === "J" || v === "Q" || v === "K") return make("STAND", "STAND");
+      if (v === "5")  return make("DOUBLE", "HIT");
+
+      if (v === "2" || v === "3") {
+        if (upVal >= 2 && upVal <= 7) return make("SPLIT", "HIT");
+        return make("HIT", "HIT");
+      }
+      if (v === "4") {
+        if (upVal === 5 || upVal === 6) return make("SPLIT", "HIT");
+        return make("HIT", "HIT");
+      }
+      if (v === "6") {
+        if (upVal >= 2 && upVal <= 6) return make("SPLIT", "HIT");
+        return make("HIT", "HIT");
+      }
+      if (v === "7") {
+        if (upVal >= 2 && upVal <= 7) return make("SPLIT", "HIT");
+        return make("HIT", "HIT");
+      }
+      if (v === "9") {
+        if ((upVal >= 2 && upVal <= 6) || upVal === 8 || upVal === 9)
+          return make("SPLIT", "STAND");
+        return make("STAND", "STAND");
+      }
+    }
+
+    // SOFT TOTALS
+    if (soft) {
+      if (total <= 17) {
+        // A2-A6 type hands
+        if (isFirstTurn && upVal >= 3 && upVal <= 6) return make("DOUBLE", "HIT");
+        return make("HIT", "HIT");
+      }
+
+      if (total === 18) {
+        if (isFirstTurn && upVal >= 3 && upVal <= 6) return make("DOUBLE", "STAND");
+        if (upVal === 2 || upVal === 7 || upVal === 8) return make("STAND", "STAND");
+        if (upVal >= 9 || dealerUpCard.value === "A") return make("HIT", "HIT");
+      }
+
+      if (total >= 19) {
+        return make("STAND", "STAND");
+      }
+    }
+
+    // HARD TOTALS
+    if (total <= 8) {
+      return make("HIT", "HIT");
+    }
+
+    if (total === 9) {
+      if (isFirstTurn && upVal >= 3 && upVal <= 6) return make("DOUBLE", "HIT");
+      return make("HIT", "HIT");
+    }
+
+    if (total === 10) {
+      if (isFirstTurn && upVal >= 2 && upVal <= 9) return make("DOUBLE", "HIT");
+      return make("HIT", "HIT");
+    }
+
+    if (total === 11) {
+      if (isFirstTurn && dealerUpCard.value !== "A") return make("DOUBLE", "HIT");
+      return make("HIT", "HIT");
+    }
+
+    if (total === 12) {
+      if (upVal >= 4 && upVal <= 6) return make("STAND", "STAND");
+      return make("HIT", "HIT");
+    }
+
+    if (total >= 13 && total <= 16) {
+      if (upVal >= 2 && upVal <= 6) return make("STAND", "STAND");
+      return make("HIT", "HIT");
     }
 
     // 17+
-    if (total >= 17) return "STAND";
-
-    return "STAND";
+    return make("STAND", "STAND");
   }
 
   function showStrategyExplanation(pt, dt) {
-    const expected = correctMove(player, dealer[0]);
-    let wasCorrect = (playerAction === expected);
+    const expected = basicStrategy(player, dealer[0], !firstMoveDone ? true : false);
+    const ideal = expected.best;
+    const fallback = expected.fallback;
 
-    let text =
-      `<p><strong>Your chosen move:</strong> ${playerAction}</p>
-       <p><strong>Correct Basic Strategy:</strong> ${expected}</p>
-       <p><strong>Were you correct?</strong> ${
-         wasCorrect ? "<span style='color:lightgreen'>YES</span>" :
-                       "<span style='color:pink'>NO</span>"
-       }</p>
-       <p>Your final total: ${pt}<br>
-       Dealer final total: ${dt}</p>`;
+    let wasPerfect = (playerAction === ideal);
+    let wasAcceptable = (!wasPerfect && ideal === "DOUBLE" && playerAction === fallback);
+
+    let correctnessLabel;
+    if (ideal === "SPLIT") {
+      correctnessLabel =
+        "<span style='color:#ffeb99'>Best play is to <strong>SPLIT</strong> here. " +
+        "(This trainer doesn’t play splits, but you should recognize them.)</span>";
+    } else if (wasPerfect) {
+      correctnessLabel = "<span style='color:lightgreen'>You followed Basic Strategy exactly.</span>";
+    } else if (wasAcceptable) {
+      correctnessLabel =
+        "<span style='color:#ffeb99'>You chose the safer fallback. Best EV is <strong>DOUBLE</strong>, " +
+        "but <strong>" + fallback + "</strong> is still reasonable.</span>";
+    } else {
+      correctnessLabel = "<span style='color:pink'>This was not the optimal Basic Strategy play.</span>";
+    }
+
+    // Update streaks
+    if (ideal === "SPLIT") {
+      // Don't count split situations in streak (optional choice)
+    } else if (wasPerfect || wasAcceptable) {
+      correctDecisions++;
+      currentStreak++;
+      if (currentStreak > bestStreak) bestStreak = currentStreak;
+    } else {
+      currentStreak = 0;
+    }
+
+    // Strategy narrative
+    const total = handTotal(player);
+    const upVal = cardValue(dealer[0]);
+    const soft = isSoftHand(player);
+    const pair = isPair(player);
+
+    let typeDesc = soft ? "soft hand (contains an Ace counted as 11)" : "hard hand";
+    if (pair && player.length === 2) typeDesc = "pair (" + player[0].value + player[0].value + ")";
+
+    const text =
+      `<p><strong>Your move:</strong> ${playerAction || "–"}</p>
+       <p><strong>Basic Strategy recommends:</strong> ${ideal}` +
+       (ideal === "DOUBLE" ? ` (if allowed; otherwise ${fallback})` : ``) +
+       (ideal === "SPLIT" ? ` (pair play)` : ``) +
+       `</p>
+       <p>${correctnessLabel}</p>
+       <p><strong>Your hand:</strong> ${total} (${typeDesc})<br>
+          <strong>Dealer up-card:</strong> ${dealer[0].value}${dealer[0].suit}</p>
+       <p><strong>Final result:</strong> You: ${pt} &nbsp; | &nbsp; Dealer: ${dt}</p>`;
 
     document.getElementById("rulesText").innerHTML = text;
-
-    // Make box visible
     document.getElementById("rulesContainer").style.display = "block";
+
+    // Refresh tracker display
+    document.getElementById("correctCount").innerText = correctDecisions;
+    document.getElementById("bestStreak").innerText = bestStreak;
   }
 
   function restart() {
+    document.getElementById("result").innerText = "";
     gameOver = false;
     playerAction = null;
-    document.getElementById("result").innerText = "";
+    firstMoveDone = false;
+
     document.getElementById("rulesContainer").style.display = "none";
+    document.getElementById("rulesBody").classList.remove("open");
+    document.getElementById("plusSign").innerText = "+";
+
     createDeck();
     dealInitial();
+    updateButtons();
   }
 
-  function toggleRules() {
+  function toggleRules(event) {
+    // Avoid the click from bubbling out of the header only
     const body = document.getElementById("rulesBody");
     const plus = document.getElementById("plusSign");
 
@@ -326,6 +572,7 @@
   // START GAME
   createDeck();
   dealInitial();
+  updateButtons();
 </script>
 
 </body>
