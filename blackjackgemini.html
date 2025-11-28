@@ -2,302 +2,390 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Poker Logic Learning Tool</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackjack Strategy Simulator</title>
     <style>
-        /* CSS - The Visual Styling */
+        :root {
+            --felt-color: #35654d;
+            --card-width: 70px;
+            --card-height: 100px;
+            --bg-color: #222;
+            --text-color: #eee;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #2c3e50; /* Dark slate background */
-            color: white;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
+        }
+
+        /* --- Game Area Styling --- */
+        #game-container {
+            background-color: var(--felt-color);
+            border: 8px solid #4a3c2c;
+            border-radius: 15px;
             padding: 20px;
-        }
-
-        h1 { margin-bottom: 10px; }
-
-        /* The Green Felt Table */
-        .poker-table {
-            background-color: #27ae60;
-            border: 10px solid #1e824c;
-            border-radius: 50px;
-            padding: 40px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 600px;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
             text-align: center;
-            margin-bottom: 20px;
-            width: 90%;
-            max-width: 800px;
+            margin-bottom: 30px;
         }
 
-        /* Card Container */
-        .hand-display {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
+        h1 { margin-top: 0; text-shadow: 1px 1px 3px black; }
+
+        .hand-area {
             margin: 20px 0;
             min-height: 140px;
         }
 
-        /* Individual Card Design (CSS Only) */
-        .card {
-            width: 80px;
-            height: 120px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 10px;
+        .hand-title {
+            font-size: 1.2em;
+            margin-bottom: 10px;
             font-weight: bold;
-            font-size: 1.5rem;
+        }
+
+        .score-display {
+            background: rgba(0,0,0,0.3);
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 10px;
+        }
+
+        .cards-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* --- Card Styling --- */
+        .card {
+            width: var(--card-width);
+            height: var(--card-height);
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
             position: relative;
+            color: black; /* Default card text color */
         }
 
-        .card.red { color: #c0392b; }
-        .card.black { color: #2c3e50; }
+        /* Suits styling */
+        .suit-hearts, .suit-diamonds { color: #d40000; }
+        .suit-clubs, .suit-spades { color: #222; }
 
-        .suit-center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 2.5rem;
-            opacity: 0.3;
+        /* The face-down card */
+        .card.hidden {
+            background-color: #8b0000;
+            background-image: repeating-linear-gradient(45deg, #8b0000 0px, #7a0000 10px, #8b0000 20px);
+            color: transparent;
+            border: 2px solid white;
+        }
+        .card.hidden::after { content: '?'; color: white; font-size: 30px; opacity: 0.5;}
+
+
+        /* --- Controls Styling --- */
+        #message-area {
+            height: 30px;
+            font-size: 1.1em;
+            color: #ffd700;
+            font-weight: bold;
+            margin-bottom: 10px;
         }
 
-        /* The "Reminder Line" */
-        .reminder-line {
-            background-color: rgba(0,0,0,0.3);
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 1.2rem;
+        .controls {
             margin-top: 20px;
-            border: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            justify-content: center;
+            gap: 15px;
         }
 
         button {
-            background-color: #f1c40f;
+            padding: 10px 25px;
+            font-size: 16px;
             border: none;
-            padding: 15px 30px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #2c3e50;
-            border-radius: 50px;
+            border-radius: 5px;
             cursor: pointer;
-            transition: transform 0.1s;
-            margin-top: 10px;
+            font-weight: bold;
+            transition: background 0.2s;
         }
-        button:hover { transform: scale(1.05); }
-        button:active { transform: scale(0.95); }
 
-        /* Expandable Rules Section */
-        .rules-section {
-            background-color: white;
-            color: #333;
-            width: 90%;
-            max-width: 600px;
+        #btn-deal { background-color: #ffd700; color: #222; }
+        #btn-hit { background-color: #4CAF50; color: white; }
+        #btn-stand { background-color: #f44336; color: white; }
+
+        button:hover:not(:disabled) { filter: brightness(1.1); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+
+        /* --- Strategy Guide Section --- */
+        #strategy-guide {
+            max-width: 700px;
+            background: #333;
+            padding: 25px;
             border-radius: 10px;
-            padding: 5px 20px;
-            margin-top: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border-top: 4px solid #ffd700;
         }
 
-        details {
-            padding: 10px;
-            cursor: pointer;
-        }
-
-        summary {
-            font-weight: bold;
-            font-size: 1.2rem;
-            list-style: none; /* Hides default triangle in some browsers */
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        /* Custom Plus Sign */
-        summary::after {
-            content: '+'; 
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #27ae60;
-        }
-
-        details[open] summary::after {
-            content: '-';
-            color: #c0392b;
-        }
-
-        .rules-content {
-            margin-top: 15px;
-            border-top: 1px solid #eee;
-            padding-top: 10px;
-            line-height: 1.6;
-        }
-
-        .rule-item {
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid #f0f0f0;
-            padding: 8px 0;
-        }
-        .rule-rank { color: #e67e22; font-weight: bold; }
-
+        #strategy-guide h2 { margin-top: 0; color: #ffd700; }
+        #strategy-guide h3 { margin-bottom: 5px; color: #ddd; }
+        #strategy-guide ul { margin-top: 5px; padding-left: 20px; }
+        #strategy-guide li { margin-bottom: 8px; line-height: 1.4; }
+        .highlight { color: #ffd700; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <h1>🃏 Poker Hand Simulator</h1>
-    <p>Deal the cards to learn the hand rankings.</p>
+    <div id="game-container">
+        <h1>Blackjack Simulator</h1>
+        
+        <div id="message-area">Press 'Deal' to begin.</div>
 
-    <div class="poker-table">
-        <div class="hand-display" id="handContainer">
-            <div style="color:white; opacity:0.7; align-self:center;">Press Deal to Start</div>
+        <div class="hand-area">
+            <div class="hand-title">Dealer <span id="dealer-score" class="score-display"></span></div>
+            <div id="dealer-cards" class="cards-container">
+                </div>
         </div>
 
-        <div class="reminder-line" id="resultText">
-            Waiting for deal...
+        <div class="hand-area">
+            <div class="hand-title">Player (You) <span id="player-score" class="score-display"></span></div>
+            <div id="player-cards" class="cards-container">
+                 </div>
         </div>
 
-        <button onclick="dealHand()">Deal New Hand</button>
+        <div class="controls">
+            <button id="btn-deal">Deal Hand</button>
+            <button id="btn-hit" disabled>Hit</button>
+            <button id="btn-stand" disabled>Stand</button>
+        </div>
     </div>
 
-    <div class="rules-section">
-        <details>
-            <summary>
-                <span>Rules of Winning (Hand Rankings)</span>
-            </summary>
-            <div class="rules-content">
-                <p><strong>How to read this:</strong> The hands are listed from strongest (top) to weakest (bottom).</p>
-                
-                <div class="rule-item">
-                    <span>1. Royal Flush</span>
-                    <span class="rule-rank">A, K, Q, J, 10 (Same Suit)</span>
-                </div>
-                <div class="rule-item">
-                    <span>2. Straight Flush</span>
-                    <span class="rule-rank">5 sequential cards (Same Suit)</span>
-                </div>
-                <div class="rule-item">
-                    <span>3. Four of a Kind</span>
-                    <span class="rule-rank">4 cards of same rank</span>
-                </div>
-                <div class="rule-item">
-                    <span>4. Full House</span>
-                    <span class="rule-rank">3 of a kind + Pair</span>
-                </div>
-                <div class="rule-item">
-                    <span>5. Flush</span>
-                    <span class="rule-rank">5 cards same suit (any order)</span>
-                </div>
-                <div class="rule-item">
-                    <span>6. Straight</span>
-                    <span class="rule-rank">5 sequential cards (mixed suits)</span>
-                </div>
-                <div class="rule-item">
-                    <span>7. Three of a Kind</span>
-                    <span class="rule-rank">3 cards of same rank</span>
-                </div>
-                <div class="rule-item">
-                    <span>8. Two Pair</span>
-                    <span class="rule-rank">Two different pairs</span>
-                </div>
-                <div class="rule-item">
-                    <span>9. One Pair</span>
-                    <span class="rule-rank">2 cards of same rank</span>
-                </div>
-                <div class="rule-item">
-                    <span>10. High Card</span>
-                    <span class="rule-rank">Highest card plays</span>
-                </div>
-            </div>
-        </details>
+    <div id="strategy-guide">
+        <h2>Basic Probability Strategy Guide</h2>
+        <p>Use these rules to test if your decisions align with mathematical probability to maximize your chances over time. (Note: This simulation does not include splitting or doubling down).</p>
+
+        <h3>Definitions</h3>
+        <ul>
+            <li><strong>Hard Hand:</strong> A hand without an Ace, or where the Ace must count as 1 to avoid busting (e.g., 10 + 7, or A + 6 + 10).</li>
+            <li><strong>Soft Hand:</strong> A hand containing an Ace counted as 11 (e.g., A + 6 is a "Soft 17"). It's impossible to bust a soft hand with one hit.</li>
+        </ul>
+
+        <h3>Player Strategy - Hard Hands</h3>
+        <ul>
+            <li>If you have <strong>8 or less:</strong> Always Hit.</li>
+            <li>If you have <strong>9 - 11:</strong> Always Hit (in real games, you'd often double down here).</li>
+            <li>If you have <strong>12 - 16:</strong> This is the "Stiff Hand" danger zone.
+                <ul>
+                    <li><span class="highlight">Stand</span> if the Dealer's face-up card is weak (2, 3, 4, 5, or 6). They have a high chance of busting.</li>
+                    <li><span class="highlight">Hit</span> if the Dealer's face-up card is strong (7, 8, 9, 10, J, Q, K, A). You need to improve your hand to win.</li>
+                </ul>
+            </li>
+            <li>If you have <strong>17 or higher:</strong> Always Stand. The risk of busting is too high.</li>
+        </ul>
+
+        <h3>Player Strategy - Soft Hands (Contains an Ace = 11)</h3>
+        <ul>
+            <li>If you have <strong>Soft 13 - 15 (A+2 to A+4):</strong> Hit.</li>
+            <li>If you have <strong>Soft 16 - 17 (A+5 to A+6):</strong> Hit. There is no risk of busting, try to improve.</li>
+            <li>If you have <strong>Soft 18 (A+7):</strong> Stand if dealer shows 2-8. Hit if dealer shows 9, 10, A.</li>
+            <li>If you have <strong>Soft 19 or higher:</strong> Always Stand.</li>
+        </ul>
     </div>
+
 
     <script>
-        // JAVASCRIPT - The Logic
-        const suits = ['♠', '♥', '♦', '♣'];
+        // JAVASCRIPT LOGIC
+
+        // Game State
+        let deck = [];
+        let dealerHand = [];
+        let playerHand = [];
+        let gameOver = true;
+
+        // DOM Elements
+        const dealerCardsEl = document.getElementById('dealer-cards');
+        const playerCardsEl = document.getElementById('player-cards');
+        const dealerScoreEl = document.getElementById('dealer-score');
+        const playerScoreEl = document.getElementById('player-score');
+        const messageArea = document.getElementById('message-area');
+        const btnDeal = document.getElementById('btn-deal');
+        const btnHit = document.getElementById('btn-hit');
+        const btnStand = document.getElementById('btn-stand');
+
+        // Card Configuration
+        const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
         const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
-        
-        function getDeck() {
-            let deck = [];
-            for(let s of suits) {
-                for(let v of values) {
-                    deck.push({value: v, suit: s});
+        const suitSymbols = { hearts: '♥', diamonds: '♦', clubs: '♣', spades: '♠' };
+
+        // Initialize Deck
+        function createDeck() {
+            deck = [];
+            for (let suit of suits) {
+                for (let value of values) {
+                    deck.push({ suit, value });
                 }
             }
-            return deck;
         }
 
-        function dealHand() {
-            let deck = getDeck();
-            let hand = [];
-            
-            // Draw 5 random cards
-            for(let i=0; i<5; i++) {
-                let randomIndex = Math.floor(Math.random() * deck.length);
-                hand.push(deck[randomIndex]);
-                deck.splice(randomIndex, 1);
+        function shuffleDeck() {
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
             }
-            
-            renderHand(hand);
-            analyzeHand(hand);
         }
 
-        function renderHand(hand) {
-            const container = document.getElementById('handContainer');
-            container.innerHTML = ''; // Clear previous
-            
-            hand.forEach(card => {
-                const cardDiv = document.createElement('div');
-                cardDiv.className = `card ${ (card.suit === '♥' || card.suit === '♦') ? 'red' : 'black' }`;
-                
-                cardDiv.innerHTML = `
-                    <div class="top-val">${card.value} ${card.suit}</div>
-                    <div class="suit-center">${card.suit}</div>
-                    <div class="bottom-val" style="transform: rotate(180deg);">${card.value} ${card.suit}</div>
-                `;
-                container.appendChild(cardDiv);
+        function getCardNumericValue(card) {
+            if (['J', 'Q', 'K'].includes(card.value)) return 10;
+            if (card.value === 'A') return 11;
+            return parseInt(card.value);
+        }
+
+        function calculateScore(hand) {
+            let score = 0;
+            let aceCount = 0;
+
+            for (let card of hand) {
+                if (card.value === 'A') aceCount++;
+                score += getCardNumericValue(card);
+            }
+
+            // Adjust for Aces if over 21
+            while (score > 21 && aceCount > 0) {
+                score -= 10;
+                aceCount--;
+            }
+            return score;
+        }
+
+        // UI Rendering Functions
+        function renderCard(card, isHidden) {
+            const cardDiv = document.createElement('div');
+            cardDiv.className = `card suit-${card.suit}`;
+            if (isHidden) {
+                cardDiv.classList.add('hidden');
+            } else {
+                cardDiv.innerText = `${card.value}${suitSymbols[card.suit]}`;
+            }
+            return cardDiv;
+        }
+
+        function renderGame() {
+            dealerCardsEl.innerHTML = '';
+            playerCardsEl.innerHTML = '';
+
+            // Render Dealer Hand
+            dealerHand.forEach((card, index) => {
+                // Crucial: Hide the first card if the game is NOT over
+                const isHidden = (index === 0 && !gameOver);
+                dealerCardsEl.appendChild(renderCard(card, isHidden));
             });
-        }
 
-        // Simple Hand Analysis Logic (Simplified for Teaching)
-        function analyzeHand(hand) {
-            // Sort by value index for easier analysis
-            let ranks = hand.map(c => values.indexOf(c.value)).sort((a,b) => a-b);
-            let suitsList = hand.map(c => c.suit);
+            // Render Player Hand
+            playerHand.forEach(card => {
+                playerCardsEl.appendChild(renderCard(card, false));
+            });
+
+            // Update Scores
+            playerScoreEl.innerText = calculateScore(playerHand);
             
-            // Check counts
-            let counts = {};
-            ranks.forEach(x => { counts[x] = (counts[x] || 0) + 1; });
-            let countValues = Object.values(counts);
-            
-            let isFlush = suitsList.every(s => s === suitsList[0]);
-            let isStraight = true;
-            for(let i=0; i < ranks.length-1; i++) {
-                if(ranks[i+1] !== ranks[i]+1) isStraight = false;
+            // Only show dealer score if game is over, otherwise show '?'
+            if (gameOver && dealerHand.length > 0) {
+                dealerScoreEl.innerText = calculateScore(dealerHand);
+            } else if (dealerHand.length > 0) {
+                 // Show value of visible card only for now
+                 dealerScoreEl.innerText = getCardNumericValue(dealerHand[1]);
+            } else {
+                dealerScoreEl.innerText = '';
             }
-            // Special ace low straight (A, 2, 3, 4, 5) logic omitted for simplicity of tutorial code
-
-            let message = "High Card";
-
-            if (isFlush && isStraight) message = "Straight Flush!";
-            else if (countValues.includes(4)) message = "Four of a Kind!";
-            else if (countValues.includes(3) && countValues.includes(2)) message = "Full House!";
-            else if (isFlush) message = "Flush";
-            else if (isStraight) message = "Straight";
-            else if (countValues.includes(3)) message = "Three of a Kind";
-            else if (countValues.filter(x => x === 2).length === 2) message = "Two Pair";
-            else if (countValues.includes(2)) message = "One Pair";
-
-            document.getElementById('resultText').innerHTML = `You have: <strong>${message}</strong>`;
         }
+
+        function updateControls(is Playing) {
+            btnDeal.disabled = isPlaying;
+            btnHit.disabled = !isPlaying;
+            btnStand.disabled = !isPlaying;
+        }
+
+        function endRound(message) {
+            gameOver = true;
+            messageArea.innerText = message;
+            updateControls(false);
+            renderGame(); // Re-render to show the hidden dealer card
+        }
+
+        // Game Action Functions
+        function startGame() {
+            gameOver = false;
+            messageArea.innerText = "Hit or Stand?";
+            createDeck();
+            shuffleDeck();
+            dealerHand = [deck.pop(), deck.pop()];
+            playerHand = [deck.pop(), deck.pop()];
+            
+            updateControls(true);
+            renderGame();
+
+            // Check for initial Blackjack
+            const pScore = calculateScore(playerHand);
+            const dScore = calculateScore(dealerHand);
+            if (pScore === 21) {
+                 if (dScore === 21) endRound("Push! Both have Blackjack.");
+                 else endRound("Blackjack! You Win!");
+            }
+        }
+
+        function hitBtnClicked() {
+            if (gameOver) return;
+            playerHand.push(deck.pop());
+            renderGame();
+
+            if (calculateScore(playerHand) > 21) {
+                endRound("Bust! You went over 21.");
+            }
+        }
+
+        function standBtnClicked() {
+            if (gameOver) return;
+            
+            // Dealer AI turn
+            // Dealer must hit on 16 or less. Stands on soft 17.
+            while (calculateScore(dealerHand) < 17) {
+                dealerHand.push(deck.pop());
+            }
+
+            // Determine Winner
+            const pScore = calculateScore(playerHand);
+            const dScore = calculateScore(dealerHand);
+
+            if (dScore > 21) {
+                endRound("Dealer Busts! You Win!");
+            } else if (pScore > dScore) {
+                endRound("You Win!");
+            } else if (pScore < dScore) {
+                endRound("Dealer Wins.");
+            } else {
+                endRound("Push (Tie).");
+            }
+        }
+
+        // Event Listeners
+        btnDeal.addEventListener('click', startGame);
+        btnHit.addEventListener('click', hitBtnClicked);
+        btnStand.addEventListener('click', standBtnClicked);
+
+        // Initial Setup
+        renderGame(); // Clears the board initially
+
     </script>
 </body>
 </html>
