@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sensation + Perception — Flashcards</title>
+
+<style>
+body {
+  margin: 0;
+  height: 100vh;
+  background: #0b0b0f;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* Flashcards */
+.card {
+  background: #13151a;
+  border: 1px solid #2a2f3a;
+  border-radius: 14px;
+  padding: 24px;
+  width: 82vw;
+  max-width: 480px;
+  min-height: 200px;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  font-size: clamp(1.1rem, 4vw, 1.7rem);
+  text-align: center;
+  user-select: none;
+  line-height: 1.6em;
+}
+.card.active { display: flex; }
+
+.card[data-side="back"] {
+  flex-direction: column;
+  gap: 0.6em;
+}
+
+/* Menu Dish */
+#menuDish {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  background: rgba(19, 21, 26, 0.95);
+  border: 1px solid #2a2f3a;
+  border-radius: 16px;
+  padding: 16px;
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  transition: .3s ease;
+}
+#menuDish.hidden {
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+button {
+  background: #1a1d24;
+  color: #fff;
+  border: 1px solid #2a2f3a;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+}
+button:hover { background: #242935; }
+
+.status {
+  color: #999;
+  font-size: 14px;
+}
+
+/* Floating dots */
+#menuToggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #1a1d24;
+  border: 1px solid #2a2f3a;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  cursor: pointer;
+  color: #ccc;
+}
+</style>
+</head>
+<body>
+
+<!-- ⭐ ALL FLASHCARDS BELOW -->
+<div class="card active" data-side="front">Sensation</div>
+<div class="card" data-side="back">Detection of stimuli from environment<br>Occurs in the PNS</div>
+
+<div class="card" data-side="front">Perception</div>
+<div class="card" data-side="back">Organization, interpretation, and conscious experience of information<br>Occurs in the CNS</div>
+
+<div class="card" data-side="front">Sensation → detection of external energy</div>
+<div class="card" data-side="back">
+Sensation occurs in receptor cells<br>
+Receptor organs are specialized to detect energy<br>
+Receptor cells act as filters
+</div>
+
+<div class="card" data-side="front">Retina</div>
+<div class="card" data-side="back">The retina contains receptor cells for vision</div>
+
+<div class="card" data-side="front">Different animals hear different frequencies</div>
+<div class="card" data-side="back">
+Elephants hear low frequencies humans can't<br>
+Cats hear high frequencies humans can't
+</div>
+
+<div class="card" data-side="front">Why do cats hear high frequencies?</div>
+<div class="card" data-side="back">Their auditory receptor cells are more sensitive to high frequency sounds</div>
+
+<div class="card" data-side="front">Sensory processing begins at receptor cells</div>
+<div class="card" data-side="back">
+Receptors are entire cells<br>
+Their job is to convert (transduce) external energy into neural signals
+</div>
+
+<div class="card" data-side="front">Signal transduction</div>
+<div class="card" data-side="back">
+Conversion of one energy type into another<br>
+Turning an external energy → neural signal
+</div>
+
+<div class="card" data-side="front">Auditory signal transduction</div>
+<div class="card" data-side="back">
+Hair cells are receptor cells in cochlea<br>
+Hair cells sit on basilar membrane<br>
+Sound makes the membrane vibrate
+</div>
+
+<div class="card" data-side="front">Hair cell displacement</div>
+<div class="card" data-side="back">
+Hair cells are embedded in another membrane<br>
+Vibration bends hair cells<br>
+Ion channels open → positive ions flow in
+</div>
+
+<div class="card" data-side="front">What do sound vibrations do to hair cells?</div>
+<div class="card" data-side="back">They depolarize the hair cells</div>
+
+<div class="card" data-side="front">Membrane potential changes</div>
+<div class="card" data-side="back">
+Affect neurotransmitter release<br>
+Some receptor cells fire APs, some don't
+</div>
+
+<div class="card" data-side="front">Example: hair cells</div>
+<div class="card" data-side="back">Hair cells do not fire action potentials; they depolarize to release neurotransmitter</div>
+
+<div class="card" data-side="front">Cochlear implants</div>
+<div class="card" data-side="back">Cochlear implants mimic signal transduction electronically</div>
+
+<div class="card" data-side="front">Sensory pathways</div>
+<div class="card" data-side="back">
+Relay signal from sensory organs → CNS<br>
+Auditory: nerve → brainstem → thalamus → cortex
+</div>
+
+<div class="card" data-side="front">Somatosensory processing</div>
+<div class="card" data-side="back">
+Touch receptors detect different types of information<br>
+Cutaneous receptors are diverse
+</div>
+
+<div class="card" data-side="front">Sensory pathways relay info → brain</div>
+<div class="card" data-side="back">
+Each touch receptor type has distinct pathway<br>
+This division exists across all sensory systems
+</div>
+
+<div class="card" data-side="front">Perception in brain</div>
+<div class="card" data-side="back">
+Each neuron represents a small area of sensory receptor organ<br>
+The map stays consistent through pathways
+</div>
+
+<div class="card" data-side="front">Size of representation</div>
+<div class="card" data-side="back">Size = sensitivity of area</div>
+
+<div class="card" data-side="front">Somatosensory cortex</div>
+<div class="card" data-side="back">Different body parts have different representation sizes based on receptor density</div>
+
+<div class="card" data-side="front">Hair cell ion channels</div>
+<div class="card" data-side="back">Signal transduction in hair cells relies on mechanically gated ion channels</div>
+
+<div class="card" data-side="front">Receptive fields</div>
+<div class="card" data-side="back">A receptive field is the sensory area connected to a specific neuron</div>
+
+
+<!-- =========== MENU ============ -->
+<div id="menuDish" class="hidden">
+  <h2 style="margin:0; color:#ccc; font-size:1rem;">Sensation + Perception</h2>
+  <div class="controls">
+    <button id="prevBtn">← Prev</button>
+    <button id="flipBtn">Flip</button>
+    <button id="nextBtn">Next →</button>
+    <button id="shuffleBtn">Shuffle</button>
+  </div>
+  <div id="status" class="status">Card 1 / X</div>
+  <button id="hideMenuBtn">Hide Menu</button>
+</div>
+
+<div id="menuToggle">⋮</div>
+
+<script>
+let index = 0;
+let showingFront = true;
+const cards = [...document.querySelectorAll(".card")];
+function total(){ return cards.length/2; }
+
+function showCard(i, side="front"){
+  cards.forEach(c=>c.classList.remove("active"));
+  const group = cards.filter(c=>c.dataset.side===side);
+  group[i].classList.add("active");
+  document.getElementById("status").textContent =
+    `Card ${i+1} / ${total()}`;
+}
+
+function flip(){
+  showingFront = !showingFront;
+  showCard(index, showingFront?"front":"back");
+}
+
+document.getElementById("flipBtn").onclick = flip;
+document.getElementById("nextBtn").onclick = ()=>{
+  index=(index+1)%total(); showingFront=true; showCard(index);
+};
+document.getElementById("prevBtn").onclick = ()=>{
+  index=(index-1+total())%total(); showingFront=true; showCard(index);
+};
+document.getElementById("shuffleBtn").onclick = ()=>{
+  index=Math.floor(Math.random()*total());
+  showingFront=true; showCard(index);
+};
+
+/* swipe */
+let sx=0, sy=0;
+document.body.addEventListener("touchstart", e=>{
+  sx=e.touches[0].clientX;
+  sy=e.touches[0].clientY;
+});
+document.body.addEventListener("touchend", e=>{
+  let dx=e.changedTouches[0].clientX - sx;
+  let dy=e.changedTouches[0].clientY - sy;
+  if(Math.abs(dx)>Math.abs(dy)){
+    if(dx>40) document.getElementById("prevBtn").click();
+    else if(dx<-40) document.getElementById("nextBtn").click();
+  } else {
+    if(dy>40 || dy<-40) flip();
+  }
+});
+
+/* menu */
+const menu=document.getElementById("menuDish");
+document.getElementById("menuToggle").onclick=()=>{
+  menu.classList.remove("hidden");
+  document.getElementById("menuToggle").style.display="none";
+};
+document.getElementById("hideMenuBtn").onclick=()=>{
+  menu.classList.add("hidden");
+  document.getElementById("menuToggle").style.display="flex";
+};
+
+showCard(0);
+</script>
+
+</body>
+</html>
