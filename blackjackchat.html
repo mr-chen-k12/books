@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Blackjack Trainer</title>
+<title>Blackjack Trainer v2</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -15,9 +15,7 @@
     text-align: center;
   }
 
-  h1 {
-    margin-top: 10px;
-  }
+  h1 { margin-top: 10px; }
 
   .table {
     background: #0a5a34;
@@ -28,7 +26,7 @@
     box-shadow: 0 0 20px black;
   }
 
-  .hand {
+  .hand { 
     margin: 10px 0;
     display: flex;
     justify-content: center;
@@ -52,6 +50,12 @@
 
   .red { color: red; }
 
+  .label-line {
+    font-size: 14px;
+    margin-top: -4px;
+    opacity: 0.85;
+  }
+
   button {
     margin: 6px;
     padding: 10px 18px;
@@ -64,13 +68,9 @@
     font-size: 16px;
   }
 
-  button:hover {
-    background: #ffdf3f;
-  }
-
   .rules {
-    margin-top: 15px;
-    background: rgba(0,0,0,0.3);
+    margin-top: 20px;
+    background: rgba(0,0,0,0.2);
     padding: 10px;
     border-radius: 8px;
     cursor: pointer;
@@ -84,17 +84,12 @@
   }
 
   #rulesBody.open {
-    max-height: 400px;
+    max-height: 500px;
     margin-top: 10px;
   }
 
-  .rulesTitle {
-    font-size: 18px;
-    display: flex;
-    justify-content: space-between;
-  }
-
   .plus {
+    float: right;
     font-weight: bold;
     font-size: 22px;
   }
@@ -109,11 +104,13 @@
 
   <h2>Dealer</h2>
   <div class="hand" id="dealerHand"></div>
-  <p id="dealerTotal"></p>
+  <p id="dealerTotal">Total: ?</p>
 
   <h2>You</h2>
   <div class="hand" id="playerHand"></div>
   <p id="playerTotal"></p>
+
+  <p class="label-line" id="playerLabelLine"></p>
 
   <div>
     <button onclick="hit()">Hit</button>
@@ -123,79 +120,51 @@
 
   <h3 id="result" style="height:20px; margin-top:10px;"></h3>
 
-  <div class="rules" onclick="toggleRules()">
-    <div class="rulesTitle">
-      <span>Blackjack Rules & Strategy (tap)</span>
-      <span id="plusSign" class="plus">+</span>
-    </div>
+  <div id="rulesContainer" class="rules" style="display:none;" onclick="toggleRules()">
+    <span><strong>+ Why This Was the Correct Strategy</strong></span>
+    <span id="plusSign" class="plus">+</span>
 
     <div id="rulesBody">
-      <h3 style="margin-bottom:5px;">Basic Rules</h3>
-      <ul>
-        <li>Beat dealer without going over 21</li>
-        <li>Face cards = 10, Aces = 1 or 11</li>
-        <li>Dealer must hit until 17</li>
-        <li>Blackjack (A + 10-card) beats everything</li>
-      </ul>
-
-      <h3 style="margin-bottom:5px;">When You Should Hit</h3>
-      <ul>
-        <li>12–16 when dealer shows 7–A</li>
-        <li>11 or less: ALWAYS hit</li>
-      </ul>
-
-      <h3 style="margin-bottom:5px;">When You Should Stand</h3>
-      <ul>
-        <li>17 or higher</li>
-        <li>12–16 when dealer shows 2–6</li>
-      </ul>
-
-      <h3 style="margin-bottom:5px;">When You Should Double</h3>
-      <ul>
-        <li>10 vs dealer 2–9</li>
-        <li>11 vs dealer anything except Ace</li>
-        <li>Ace+6 vs dealer 3–6</li>
-      </ul>
-
+      <div id="rulesText" style="padding:10px;"></div>
     </div>
   </div>
 
 </div>
 
 <script>
-  const suits = ["♠", "♥", "♦", "♣"];
+  const suits = ["♠","♥","♦","♣"];
   const values = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
 
   let deck = [];
   let player = [];
   let dealer = [];
   let gameOver = false;
+  let playerAction = null;
 
   function createDeck() {
     deck = [];
     for (let s of suits) {
       for (let v of values) {
-        deck.push({suit: s, value: v});
+        deck.push({suit:s, value:v});
       }
     }
-    deck.sort(()=> Math.random() - 0.5);
+    deck.sort(()=>Math.random() - 0.5);
   }
 
-  function cardValue(card) {
-    if (["J","Q","K"].includes(card.value)) return 10;
-    if (card.value === "A") return 11;
-    return parseInt(card.value);
+  function cardValue(c) {
+    if (["J","Q","K"].includes(c.value)) return 10;
+    if (c.value === "A") return 11;
+    return parseInt(c.value);
   }
 
   function handTotal(hand) {
-    let total = hand.reduce((sum, c)=> sum + cardValue(c), 0);
-    let aces = hand.filter(c=> c.value==="A").length;
+    let total = hand.reduce((sum,c)=>sum+cardValue(c),0);
+    let aces = hand.filter(c=>c.value==="A").length;
 
-    while (total > 21 && aces > 0) {
+    while (total>21 && aces>0) {
       total -= 10;
       aces--;
     }
-
     return total;
   }
 
@@ -205,67 +174,138 @@
     updateUI();
   }
 
-  function updateUI() {
-    renderHand(player, "playerHand");
-    renderHand(dealer, "dealerHand");
-
-    document.getElementById("playerTotal").innerText = "Total: " + handTotal(player);
-    document.getElementById("dealerTotal").innerText = gameOver 
-      ? "Total: " + handTotal(dealer) 
-      : "Total: ?";
+  function renderCard(card) {
+    const c = document.createElement("div");
+    c.className = "card " + ((card.suit==="♥"||card.suit==="♦")?"red":"");
+    c.innerHTML = `<div>${card.value}</div><div>${card.suit}</div>`;
+    return c;
   }
 
-  function renderHand(hand, elementId) {
-    const div = document.getElementById(elementId);
-    div.innerHTML = "";
+  function updateUI() {
+    // Dealer hand — only show first card
+    const d = document.getElementById("dealerHand");
+    d.innerHTML = "";
+    d.appendChild(renderCard(dealer[0]));
 
-    hand.forEach(card=>{
-      const c = document.createElement("div");
-      c.className = "card " + ((card.suit==="♥"||card.suit==="♦")?"red":"");
-      c.innerHTML = `<div>${card.value}</div><div>${card.suit}</div>`;
-      div.appendChild(c);
-    });
+    const hidden = document.createElement("div");
+    hidden.className = "card";
+    hidden.style.background = "black";
+    hidden.style.color = "white";
+    hidden.innerHTML = "";
+    d.appendChild(hidden);
+
+    document.getElementById("dealerTotal").innerText = "Total: ?";
+
+    // Player hand
+    const p = document.getElementById("playerHand");
+    p.innerHTML = "";
+    player.forEach(card => p.appendChild(renderCard(card)));
+
+    // Label explaining which card the dealer sees
+    document.getElementById("playerLabelLine").innerText =
+      "Dealer sees: " + player[0].value + player[0].suit + " and dealer's up-card " +
+      dealer[0].value + dealer[0].suit;
+
+    document.getElementById("playerTotal").innerText = 
+      "Your total: " + handTotal(player);
   }
 
   function hit() {
     if (gameOver) return;
+    playerAction = "HIT";
+
     player.push(deck.pop());
     updateUI();
 
-    if (handTotal(player) > 21) endGame();
+    if (handTotal(player) > 21) {
+      endGame();
+    }
   }
 
   function stand() {
     if (gameOver) return;
+    playerAction = "STAND";
+    dealerPlays();
+  }
 
-    // Dealer plays
+  function dealerPlays() {
     while (handTotal(dealer) < 17) {
       dealer.push(deck.pop());
     }
-
-    gameOver = true;
     endGame();
   }
 
   function endGame() {
     gameOver = true;
-    updateUI();
+
+    // Reveal dealer hand
+    const d = document.getElementById("dealerHand");
+    d.innerHTML = "";
+    dealer.forEach(c => d.appendChild(renderCard(c)));
+
+    document.getElementById("dealerTotal").innerText = 
+      "Total: " + handTotal(dealer);
 
     let pt = handTotal(player);
     let dt = handTotal(dealer);
+    let result = "";
 
-    let result = document.getElementById("result");
+    if (pt > 21) result = "You Busted!";
+    else if (dt > 21) result = "Dealer Busts! You Win!";
+    else if (pt > dt) result = "You Win!";
+    else if (dt > pt) result = "Dealer Wins!";
+    else result = "Push (Tie)";
 
-    if (pt > 21) result.innerText = "You Busted!";
-    else if (dt > 21) result.innerText = "Dealer Busts! You Win!";
-    else if (pt > dt) result.innerText = "You Win!";
-    else if (dt > pt) result.innerText = "Dealer Wins!";
-    else result.innerText = "Push (Tie)";
+    document.getElementById("result").innerText = result;
+
+    showStrategyExplanation(pt, dt);
+  }
+
+  // Basic strategy engine (very simplified)
+  function correctMove(playerCards, dealerCard) {
+    const total = handTotal(playerCards);
+    const up = cardValue(dealerCard);
+
+    // Always hit:
+    if (total <= 11) return "HIT";
+
+    // 12–16 rules
+    if (total >= 12 && total <= 16) {
+      if (up >= 7) return "HIT";
+      return "STAND";
+    }
+
+    // 17+
+    if (total >= 17) return "STAND";
+
+    return "STAND";
+  }
+
+  function showStrategyExplanation(pt, dt) {
+    const expected = correctMove(player, dealer[0]);
+    let wasCorrect = (playerAction === expected);
+
+    let text =
+      `<p><strong>Your chosen move:</strong> ${playerAction}</p>
+       <p><strong>Correct Basic Strategy:</strong> ${expected}</p>
+       <p><strong>Were you correct?</strong> ${
+         wasCorrect ? "<span style='color:lightgreen'>YES</span>" :
+                       "<span style='color:pink'>NO</span>"
+       }</p>
+       <p>Your final total: ${pt}<br>
+       Dealer final total: ${dt}</p>`;
+
+    document.getElementById("rulesText").innerHTML = text;
+
+    // Make box visible
+    document.getElementById("rulesContainer").style.display = "block";
   }
 
   function restart() {
     gameOver = false;
+    playerAction = null;
     document.getElementById("result").innerText = "";
+    document.getElementById("rulesContainer").style.display = "none";
     createDeck();
     dealInitial();
   }
@@ -283,7 +323,7 @@
     }
   }
 
-  // Start game
+  // START GAME
   createDeck();
   dealInitial();
 </script>
