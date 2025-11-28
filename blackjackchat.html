@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Blackjack Trainer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+  body {
+    background: #034c2c;
+    font-family: Arial, sans-serif;
+    color: white;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+  }
+
+  h1 {
+    margin-top: 10px;
+  }
+
+  .table {
+    background: #0a5a34;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 12px;
+    max-width: 700px;
+    box-shadow: 0 0 20px black;
+  }
+
+  .hand {
+    margin: 10px 0;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .card {
+    width: 60px;
+    height: 90px;
+    background: white;
+    color: black;
+    border-radius: 8px;
+    border: 2px solid #ddd;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    padding: 5px;
+    font-size: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .red { color: red; }
+
+  button {
+    margin: 6px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    background: gold;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  button:hover {
+    background: #ffdf3f;
+  }
+
+  .rules {
+    margin-top: 15px;
+    background: rgba(0,0,0,0.3);
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  #rulesBody {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .3s ease;
+    text-align: left;
+  }
+
+  #rulesBody.open {
+    max-height: 400px;
+    margin-top: 10px;
+  }
+
+  .rulesTitle {
+    font-size: 18px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .plus {
+    font-weight: bold;
+    font-size: 22px;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>Blackjack Trainer</h1>
+
+<div class="table">
+
+  <h2>Dealer</h2>
+  <div class="hand" id="dealerHand"></div>
+  <p id="dealerTotal"></p>
+
+  <h2>You</h2>
+  <div class="hand" id="playerHand"></div>
+  <p id="playerTotal"></p>
+
+  <div>
+    <button onclick="hit()">Hit</button>
+    <button onclick="stand()">Stand</button>
+    <button onclick="restart()">Restart</button>
+  </div>
+
+  <h3 id="result" style="height:20px; margin-top:10px;"></h3>
+
+  <div class="rules" onclick="toggleRules()">
+    <div class="rulesTitle">
+      <span>Blackjack Rules & Strategy (tap)</span>
+      <span id="plusSign" class="plus">+</span>
+    </div>
+
+    <div id="rulesBody">
+      <h3 style="margin-bottom:5px;">Basic Rules</h3>
+      <ul>
+        <li>Beat dealer without going over 21</li>
+        <li>Face cards = 10, Aces = 1 or 11</li>
+        <li>Dealer must hit until 17</li>
+        <li>Blackjack (A + 10-card) beats everything</li>
+      </ul>
+
+      <h3 style="margin-bottom:5px;">When You Should Hit</h3>
+      <ul>
+        <li>12–16 when dealer shows 7–A</li>
+        <li>11 or less: ALWAYS hit</li>
+      </ul>
+
+      <h3 style="margin-bottom:5px;">When You Should Stand</h3>
+      <ul>
+        <li>17 or higher</li>
+        <li>12–16 when dealer shows 2–6</li>
+      </ul>
+
+      <h3 style="margin-bottom:5px;">When You Should Double</h3>
+      <ul>
+        <li>10 vs dealer 2–9</li>
+        <li>11 vs dealer anything except Ace</li>
+        <li>Ace+6 vs dealer 3–6</li>
+      </ul>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const suits = ["♠", "♥", "♦", "♣"];
+  const values = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+
+  let deck = [];
+  let player = [];
+  let dealer = [];
+  let gameOver = false;
+
+  function createDeck() {
+    deck = [];
+    for (let s of suits) {
+      for (let v of values) {
+        deck.push({suit: s, value: v});
+      }
+    }
+    deck.sort(()=> Math.random() - 0.5);
+  }
+
+  function cardValue(card) {
+    if (["J","Q","K"].includes(card.value)) return 10;
+    if (card.value === "A") return 11;
+    return parseInt(card.value);
+  }
+
+  function handTotal(hand) {
+    let total = hand.reduce((sum, c)=> sum + cardValue(c), 0);
+    let aces = hand.filter(c=> c.value==="A").length;
+
+    while (total > 21 && aces > 0) {
+      total -= 10;
+      aces--;
+    }
+
+    return total;
+  }
+
+  function dealInitial() {
+    player = [deck.pop(), deck.pop()];
+    dealer = [deck.pop(), deck.pop()];
+    updateUI();
+  }
+
+  function updateUI() {
+    renderHand(player, "playerHand");
+    renderHand(dealer, "dealerHand");
+
+    document.getElementById("playerTotal").innerText = "Total: " + handTotal(player);
+    document.getElementById("dealerTotal").innerText = gameOver 
+      ? "Total: " + handTotal(dealer) 
+      : "Total: ?";
+  }
+
+  function renderHand(hand, elementId) {
+    const div = document.getElementById(elementId);
+    div.innerHTML = "";
+
+    hand.forEach(card=>{
+      const c = document.createElement("div");
+      c.className = "card " + ((card.suit==="♥"||card.suit==="♦")?"red":"");
+      c.innerHTML = `<div>${card.value}</div><div>${card.suit}</div>`;
+      div.appendChild(c);
+    });
+  }
+
+  function hit() {
+    if (gameOver) return;
+    player.push(deck.pop());
+    updateUI();
+
+    if (handTotal(player) > 21) endGame();
+  }
+
+  function stand() {
+    if (gameOver) return;
+
+    // Dealer plays
+    while (handTotal(dealer) < 17) {
+      dealer.push(deck.pop());
+    }
+
+    gameOver = true;
+    endGame();
+  }
+
+  function endGame() {
+    gameOver = true;
+    updateUI();
+
+    let pt = handTotal(player);
+    let dt = handTotal(dealer);
+
+    let result = document.getElementById("result");
+
+    if (pt > 21) result.innerText = "You Busted!";
+    else if (dt > 21) result.innerText = "Dealer Busts! You Win!";
+    else if (pt > dt) result.innerText = "You Win!";
+    else if (dt > pt) result.innerText = "Dealer Wins!";
+    else result.innerText = "Push (Tie)";
+  }
+
+  function restart() {
+    gameOver = false;
+    document.getElementById("result").innerText = "";
+    createDeck();
+    dealInitial();
+  }
+
+  function toggleRules() {
+    const body = document.getElementById("rulesBody");
+    const plus = document.getElementById("plusSign");
+
+    if (body.classList.contains("open")) {
+      body.classList.remove("open");
+      plus.innerText = "+";
+    } else {
+      body.classList.add("open");
+      plus.innerText = "-";
+    }
+  }
+
+  // Start game
+  createDeck();
+  dealInitial();
+</script>
+
+</body>
+</html>
