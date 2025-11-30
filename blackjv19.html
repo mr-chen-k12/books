@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Blackjack Coach v19 (Debug Fix)</title>
+<title>Blackjack Coach v20 (Fixed Reset)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -13,8 +13,6 @@
     --accent: #ffd700;
     --mistake: #ff4444;
     --correct: #00C851;
-    --hint-bg: #fff3cd;
-    --hint-text: #856404;
     --dim-opacity: 0.4;
     --bg-dark: #1a1a1a;
     --card-dark: #2d2d2d;
@@ -37,7 +35,7 @@
   /* --- HEADER & TOGGLE --- */
   .top-bar {
     width: 100%;
-    max-width: 800px;
+    max-width: 1000px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -68,7 +66,7 @@
 
   /* --- GAME STYLES --- */
   .statsBar {
-    width: 95%;
+    width: 100%;
     max-width: 800px;
     background: rgba(0,0,0,0.4);
     border-radius: 12px;
@@ -181,7 +179,7 @@
 <body>
 
 <div class="top-bar">
-  <h1>Blackjack Coach v19</h1>
+  <h1>Blackjack Coach v20</h1>
   <button class="nav-btn" id="toggleViewBtn" onclick="toggleView()">
     📊 Analytics
   </button>
@@ -328,7 +326,7 @@ window.onload = function() {
   };
 
   function loadHistory() {
-    const saved = safeStorage.getItem('bj_coach_history_v19');
+    const saved = safeStorage.getItem('bj_coach_history_v18');
     if (saved) {
         try {
             sessionHistory = JSON.parse(saved);
@@ -340,17 +338,23 @@ window.onload = function() {
   }
 
   function saveHistory() {
-    safeStorage.setItem('bj_coach_history_v19', JSON.stringify(sessionHistory));
+    safeStorage.setItem('bj_coach_history_v18', JSON.stringify(sessionHistory));
     safeStorage.setItem('bj_coach_bankroll', bankroll.toString());
   }
 
-  // Make these available globally for onclick events
+  // --- FIX: Ensure Bankroll Storage is Cleared ---
   window.clearHistory = function() {
     if(confirm("Are you sure? This will delete all history and reset your bankroll to 1000.")) {
         sessionHistory = [];
         dealNumber = 0;
-        safeStorage.removeItem('bj_coach_history_v19');
-        window.resetBankroll();
+        
+        // 1. Reset variable
+        window.resetBankroll(); 
+        
+        // 2. Clear from storage & save the new bankroll immediately
+        safeStorage.removeItem('bj_coach_history_v18');
+        safeStorage.setItem('bj_coach_bankroll', '1000'); 
+        
         if(isAnalyticsView) window.toggleView();
     }
   };
