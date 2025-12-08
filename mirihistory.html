@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Ancient Rome – Flashcards</title>
+<title>Ancient Rome – Winter Flashcards</title>
 
 <style>
   :root { color-scheme: dark; }
@@ -12,14 +12,16 @@
     margin: 0;
     padding: 0;
     font-family: "Comic Sans MS", "Segoe UI", system-ui, sans-serif;
-    background: #1b1d29;
-    background: radial-gradient(circle at top, #3b4460 0, #141622 45%, #05060a 100%);
-    color: #fdf5e6;
+    /* Night sky with snowy glow */
+    background:
+      radial-gradient(circle at top, #3f5d9b 0, #11182c 45%, #050712 100%);
+    color: #fdfcff;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
   }
 
   .wrapper {
@@ -30,25 +32,26 @@
 
   h1 {
     font-size: 1.4rem;
-    margin: 0 0 1rem;
-    color: #ffe7b0;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+    margin: 0 0 0.75rem;
+    color: #ffe9c4;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.8);
   }
 
   .subtitle {
     font-size: 0.85rem;
-    margin-bottom: 0.8rem;
-    color: #d7dce9;
-    opacity: 0.9;
+    margin-bottom: 0.9rem;
+    color: #d4dfff;
+    opacity: 0.95;
   }
 
   .card {
     position: relative;
-    background: linear-gradient(145deg, #373f5e, #222639);
+    background: linear-gradient(145deg, #284066, #1a2844);
     border-radius: 22px;
-    border: 3px solid #f5c46b;
-    box-shadow: 0 18px 40px rgba(0,0,0,0.75),
-                0 0 18px rgba(255,210,120,0.45) inset;
+    border: 3px solid #f7e0a5;
+    box-shadow:
+      0 18px 40px rgba(0,0,0,0.8),
+      0 0 26px rgba(180,220,255,0.65) inset;
     padding: 26px 22px 30px;
     min-height: 180px;
     display: flex;
@@ -60,8 +63,9 @@
 
   .card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 22px 50px rgba(0,0,0,0.85),
-                0 0 22px rgba(255,220,140,0.6) inset;
+    box-shadow:
+      0 22px 52px rgba(0,0,0,0.9),
+      0 0 30px rgba(210,240,255,0.8) inset;
   }
 
   .card-label {
@@ -71,14 +75,14 @@
     font-size: 0.75rem;
     letter-spacing: .16em;
     text-transform: uppercase;
-    color: #ffe0aa;
-    opacity: 0.85;
+    color: #fff3c4;
+    opacity: 0.9;
   }
 
   #cardText {
     font-size: 1.25rem;
     line-height: 1.5;
-    color: #fffaf0;
+    color: #ffffff;
   }
 
   .controls {
@@ -93,60 +97,69 @@
     border: none;
     border-radius: 999px;
     padding: 9px 18px;
-    background: #f0b15a;
-    color: #1a1220;
+    background: #8ed2ff;          /* icy blue */
+    color: #021320;
     font-weight: 700;
     font-size: 0.9rem;
     cursor: pointer;
     min-width: 90px;
-    box-shadow: 0 3px 0 #b8752c;
+    box-shadow: 0 3px 0 #3b82b2;
     transition: background .2s, transform .1s, box-shadow .1s;
   }
 
   button:hover {
-    background: #ffc46e;
+    background: #b6e4ff;
     transform: translateY(-2px);
   }
 
   button:active {
     transform: translateY(0);
-    box-shadow: 0 2px 0 #b8752c;
+    box-shadow: 0 2px 0 #3b82b2;
   }
 
   #modeBtn, #dontKnowBtn {
     margin-top: 10px;
-    background: #ffdd8a;
-    box-shadow: 0 3px 0 #c29540;
+  }
+
+  #modeBtn {
+    background: #ffe6a8;          /* warm cookie color */
+    box-shadow: 0 3px 0 #c49739;
+    color: #402512;
+  }
+
+  #modeBtn:hover {
+    background: #ffefc3;
   }
 
   #dontKnowBtn {
-    background: #ff8d7a;
-    box-shadow: 0 3px 0 #b45445;
-    color: #fff7f4;
+    background: #ff7b7b;          /* peppermint red */
+    box-shadow: 0 3px 0 #b33232;
+    color: #fff7f7;
   }
+
   #dontKnowBtn:hover {
-    background: #ff9d8c;
+    background: #ff9898;
   }
 
   .meta {
     margin-top: 8px;
     font-size: 0.8rem;
-    color: #e1e5f5;
-    opacity: 0.9;
+    color: #e3e7ff;
+    opacity: 0.95;
   }
 
   .hint {
     margin-top: 4px;
     font-size: 0.75rem;
-    color: #c0c7e3;
-    opacity: 0.85;
+    color: #c7cff8;
+    opacity: 0.9;
   }
 </style>
 </head>
 
 <body>
 <div class="wrapper">
-  <h1>🏛️ Ancient Rome – Study Flashcards</h1>
+  <h1>🎄 Ancient Rome – Snowy Study Flashcards ❄️</h1>
   <div class="subtitle">Tap / swipe up–down to flip · Swipe left / right for previous & next</div>
 
   <div id="card" class="card">
@@ -199,7 +212,7 @@
     { term: "Forum",
       def: "The central area of Rome where government buildings, temples, and important monuments were built." },
 
-    // people
+    // important people
     { term: "Romulus and Remus",
       def: "Legendary twin brothers of Rome; the city’s name is believed to come from Romulus." },
     { term: "Cleopatra",
@@ -209,11 +222,17 @@
     { term: "Julius Caesar",
       def: "A famous Roman general and strong speaker whose victories and public games made him a hero to the people." },
 
-    // wars / facts
+    // punic wars and facts
     { term: "Punic Wars",
-      def: "Wars where Rome fought against Carthage (the Carthaginians); Rome won all three, and Carthage was in North Africa." },
-    { term: "Second Punic War – key event",
-      def: "Carthage’s army famously marched across the Alps to fight the Romans." },
+      def: "A series of wars where Rome fought against Carthage (the Carthaginians)." },
+    { term: "Rome in the Punic Wars",
+      def: "In the Punic Wars, Rome defeated Carthage and won all three wars." },
+    { term: "Where was Carthage located?",
+      def: "Carthage was located in Northern Africa on the Mediterranean coast." },
+    { term: "Carthage marched...",
+      def: "Across the Alps to fight the Romans in the Second Punic War." },
+    { term: "Second Punic War – famous march",
+      def: "Carthage’s army, led by Hannibal, crossed the Alps to attack Rome." },
     { term: "Civil war",
       def: "A war between groups of people who live in the same country." },
 
@@ -225,7 +244,7 @@
   ];
 
   // --- Weighted practice state (localStorage) -------------------------------
-  const STORAGE_KEY = "rome_flash_weights_v1";
+  const STORAGE_KEY = "rome_flash_weights_winter_v1";
   let weights = {};
 
   try {
@@ -297,7 +316,7 @@
     renderCard();
   }
 
-  // Weighted shuffle: harder cards (more “I don’t know”) appear more often
+  // Weighted shuffle
   function shuffleCard() {
     let total = 0;
     for (let i = 0; i < cards.length; i++) {
@@ -326,7 +345,6 @@
     const id = cardId(index);
     weights[id] = (weights[id] || 0) + 1;
     saveWeights();
-    // quick visual feedback
     dontKnowBtn.textContent = "Saved! 😵‍💫";
     setTimeout(() => { dontKnowBtn.textContent = "I don’t know 😵"; }, 700);
     renderCard();
