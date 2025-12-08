@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Ancient Rome – Flashcards</title>
+
+<style>
+  :root { color-scheme: dark; }
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: "Comic Sans MS", "Segoe UI", system-ui, sans-serif;
+    background: #1b1d29;
+    background: radial-gradient(circle at top, #3b4460 0, #141622 45%, #05060a 100%);
+    color: #fdf5e6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .wrapper {
+    width: 92vw;
+    max-width: 640px;
+    text-align: center;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+    margin: 0 0 1rem;
+    color: #ffe7b0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+  }
+
+  .subtitle {
+    font-size: 0.85rem;
+    margin-bottom: 0.8rem;
+    color: #d7dce9;
+    opacity: 0.9;
+  }
+
+  .card {
+    position: relative;
+    background: linear-gradient(145deg, #373f5e, #222639);
+    border-radius: 22px;
+    border: 3px solid #f5c46b;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.75),
+                0 0 18px rgba(255,210,120,0.45) inset;
+    padding: 26px 22px 30px;
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform .2s ease, box-shadow .25s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 22px 50px rgba(0,0,0,0.85),
+                0 0 22px rgba(255,220,140,0.6) inset;
+  }
+
+  .card-label {
+    position: absolute;
+    top: 10px;
+    left: 16px;
+    font-size: 0.75rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: #ffe0aa;
+    opacity: 0.85;
+  }
+
+  #cardText {
+    font-size: 1.25rem;
+    line-height: 1.5;
+    color: #fffaf0;
+  }
+
+  .controls {
+    margin-top: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  button {
+    border: none;
+    border-radius: 999px;
+    padding: 9px 18px;
+    background: #f0b15a;
+    color: #1a1220;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    min-width: 90px;
+    box-shadow: 0 3px 0 #b8752c;
+    transition: background .2s, transform .1s, box-shadow .1s;
+  }
+
+  button:hover {
+    background: #ffc46e;
+    transform: translateY(-2px);
+  }
+
+  button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 0 #b8752c;
+  }
+
+  #modeBtn, #dontKnowBtn {
+    margin-top: 10px;
+    background: #ffdd8a;
+    box-shadow: 0 3px 0 #c29540;
+  }
+
+  #dontKnowBtn {
+    background: #ff8d7a;
+    box-shadow: 0 3px 0 #b45445;
+    color: #fff7f4;
+  }
+  #dontKnowBtn:hover {
+    background: #ff9d8c;
+  }
+
+  .meta {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    color: #e1e5f5;
+    opacity: 0.9;
+  }
+
+  .hint {
+    margin-top: 4px;
+    font-size: 0.75rem;
+    color: #c0c7e3;
+    opacity: 0.85;
+  }
+</style>
+</head>
+
+<body>
+<div class="wrapper">
+  <h1>🏛️ Ancient Rome – Study Flashcards</h1>
+  <div class="subtitle">Tap / swipe up–down to flip · Swipe left / right for previous & next</div>
+
+  <div id="card" class="card">
+    <div class="card-label" id="sideLabel">Term</div>
+    <div id="cardText"></div>
+  </div>
+
+  <div class="controls">
+    <button id="prevBtn">Prev</button>
+    <button id="flipBtn">Flip</button>
+    <button id="nextBtn">Next</button>
+    <button id="shuffleBtn">Shuffle</button>
+  </div>
+
+  <button id="modeBtn">Mode: Term First</button>
+  <button id="dontKnowBtn">I don’t know 😵</button>
+
+  <div class="meta" id="metaText"></div>
+  <div class="hint">Cards you mark “I don’t know” will appear more often when you shuffle.</div>
+</div>
+
+<script>
+  // --- Card data: term / definition -----------------------------------------
+  const cards = [
+    // key terms
+    { term: "Assembly",
+      def: "A group of people that make laws in Ancient Rome." },
+    { term: "Republic",
+      def: "A kind of government where people elect representatives to rule for them." },
+    { term: "Chariot",
+      def: "A two-wheeled carriage pulled by horses or other animals." },
+    { term: "Citizen",
+      def: "A person who belongs to a country and has protections under that country’s laws." },
+    { term: "Plebeians",
+      def: "Common people in Ancient Rome with little power." },
+    { term: "Patricians",
+      def: "Members of Ancient Rome’s highest social class; wealthy landowners." },
+    { term: "Conquer",
+      def: "To win control of land and its people by attacking an enemy or fighting a war." },
+    { term: "Peninsula",
+      def: "A piece of land that sticks out into a body of water and is almost surrounded by water." },
+    { term: "Senate",
+      def: "The powerful patrician lawmaking group in Ancient Rome’s Republic." },
+    { term: "Senator",
+      def: "A member of the Senate, part of the patrician lawmaking group." },
+    { term: "Dictator",
+      def: "A ruler who has total control over a country." },
+    { term: "Consul",
+      def: "One of the two most important officials in the Roman Republic, elected each year by citizens." },
+    { term: "Forum",
+      def: "The central area of Rome where government buildings, temples, and important monuments were built." },
+
+    // people
+    { term: "Romulus and Remus",
+      def: "Legendary twin brothers of Rome; the city’s name is believed to come from Romulus." },
+    { term: "Cleopatra",
+      def: "Queen of Egypt who helped Marc Antony and interacted with Rome." },
+    { term: "Augustus Caesar",
+      def: "The first emperor of the Roman Empire." },
+    { term: "Julius Caesar",
+      def: "A famous Roman general and strong speaker whose victories and public games made him a hero to the people." },
+
+    // wars / facts
+    { term: "Punic Wars",
+      def: "Wars where Rome fought against Carthage (the Carthaginians); Rome won all three, and Carthage was in North Africa." },
+    { term: "Second Punic War – key event",
+      def: "Carthage’s army famously marched across the Alps to fight the Romans." },
+    { term: "Civil war",
+      def: "A war between groups of people who live in the same country." },
+
+    // patricians vs plebeians details
+    { term: "Patrician lifestyle",
+      def: "Lived in larger homes, hired tutors for children, and wore clothing or jewelry that showed their high rank." },
+    { term: "Plebeian lifestyle",
+      def: "Lived in crowded neighborhoods without plumbing, taught their own children, often had the same jobs as their parents, and wore simpler clothing that showed lower rank." }
+  ];
+
+  // --- Weighted practice state (localStorage) -------------------------------
+  const STORAGE_KEY = "rome_flash_weights_v1";
+  let weights = {};
+
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) weights = JSON.parse(saved);
+  } catch (e) {
+    weights = {};
+  }
+
+  function saveWeights() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(weights));
+    } catch (e) {
+      // ignore storage errors
+    }
+  }
+
+  function cardId(i) {
+    return cards[i].term; // use term as unique id
+  }
+
+  function getWeight(i) {
+    const w = weights[cardId(i)] || 0;
+    return 1 + w; // base weight 1 + extra for “don’t know”
+  }
+
+  // --- UI state -------------------------------------------------------------
+  let index = 0;
+  let termFirst = true;     // mode
+  let showingFront = true;  // front vs back
+
+  const cardEl = document.getElementById("card");
+  const cardTextEl = document.getElementById("cardText");
+  const sideLabelEl = document.getElementById("sideLabel");
+  const metaTextEl = document.getElementById("metaText");
+  const modeBtn = document.getElementById("modeBtn");
+  const dontKnowBtn = document.getElementById("dontKnowBtn");
+
+  function renderCard() {
+    const card = cards[index];
+
+    if (showingFront) {
+      cardTextEl.textContent = termFirst ? card.term : card.def;
+      sideLabelEl.textContent = termFirst ? "Term" : "Definition";
+    } else {
+      cardTextEl.textContent = termFirst ? card.def : card.term;
+      sideLabelEl.textContent = termFirst ? "Definition" : "Term";
+    }
+
+    const w = weights[cardId(index)] || 0;
+    const extra = w ? ` · Marked “don’t know” ${w} time${w === 1 ? "" : "s"}` : "";
+    metaTextEl.textContent = `Card ${index + 1} of ${cards.length}${extra}`;
+  }
+
+  function flipCard() {
+    showingFront = !showingFront;
+    renderCard();
+  }
+
+  function nextCard() {
+    index = (index + 1) % cards.length;
+    showingFront = true;
+    renderCard();
+  }
+
+  function prevCard() {
+    index = (index - 1 + cards.length) % cards.length;
+    showingFront = true;
+    renderCard();
+  }
+
+  // Weighted shuffle: harder cards (more “I don’t know”) appear more often
+  function shuffleCard() {
+    let total = 0;
+    for (let i = 0; i < cards.length; i++) {
+      total += getWeight(i);
+    }
+    let r = Math.random() * total;
+    for (let i = 0; i < cards.length; i++) {
+      r -= getWeight(i);
+      if (r <= 0) {
+        index = i;
+        break;
+      }
+    }
+    showingFront = true;
+    renderCard();
+  }
+
+  function toggleMode() {
+    termFirst = !termFirst;
+    showingFront = true;
+    modeBtn.textContent = termFirst ? "Mode: Term First" : "Mode: Definition First";
+    renderCard();
+  }
+
+  function markDontKnow() {
+    const id = cardId(index);
+    weights[id] = (weights[id] || 0) + 1;
+    saveWeights();
+    // quick visual feedback
+    dontKnowBtn.textContent = "Saved! 😵‍💫";
+    setTimeout(() => { dontKnowBtn.textContent = "I don’t know 😵"; }, 700);
+    renderCard();
+  }
+
+  // --- Event bindings -------------------------------------------------------
+  document.getElementById("flipBtn").onclick = flipCard;
+  document.getElementById("nextBtn").onclick = nextCard;
+  document.getElementById("prevBtn").onclick = prevCard;
+  document.getElementById("shuffleBtn").onclick = shuffleCard;
+  modeBtn.onclick = toggleMode;
+  dontKnowBtn.onclick = markDontKnow;
+  cardEl.onclick = flipCard;
+
+  // keyboard
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight") nextCard();
+    else if (e.key === "ArrowLeft") prevCard();
+    else if (e.key === " " || e.key === "Enter" || e.key === "ArrowUp" || e.key === "ArrowDown") {
+      e.preventDefault();
+      flipCard();
+    }
+  });
+
+  // touch/swipe on card
+  let sx = 0, sy = 0;
+  cardEl.addEventListener("touchstart", e => {
+    const t = e.changedTouches[0];
+    sx = t.clientX; sy = t.clientY;
+  });
+
+  cardEl.addEventListener("touchend", e => {
+    const t = e.changedTouches[0];
+    const dx = t.clientX - sx;
+    const dy = t.clientY - sy;
+
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 35) {
+      if (dx > 0) prevCard(); else nextCard();
+    } else if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 35) {
+      flipCard();
+    }
+  });
+
+  // initial render
+  renderCard();
+</script>
+</body>
+</html>
