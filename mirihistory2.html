@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ancient Rome Vocabulary Quiz</title>
+<style>
+    body {
+        font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+        background-color: #f4e4bc; /* Parchment color */
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    .quiz-container {
+        background-color: white;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        width: 90%;
+        max-width: 600px;
+        text-align: center;
+        border: 5px solid #8B4513;
+    }
+
+    h1 {
+        color: #c0392b;
+        font-size: 2.5em;
+        margin-bottom: 10px;
+    }
+
+    .question-box {
+        background-color: #ecf0f1;
+        padding: 20px;
+        border-radius: 15px;
+        font-size: 1.3em;
+        color: #2c3e50;
+        margin-bottom: 25px;
+        border: 2px dashed #bdc3c7;
+    }
+
+    .options-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .option-btn {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 15px;
+        font-size: 1.1em;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: transform 0.2s, background-color 0.2s;
+        font-family: inherit;
+        box-shadow: 0 4px 0 #2980b9;
+    }
+
+    .option-btn:hover {
+        transform: translateY(-2px);
+        background-color: #5dade2;
+    }
+
+    .option-btn:active {
+        transform: translateY(2px);
+        box-shadow: none;
+    }
+
+    .option-btn.correct {
+        background-color: #2ecc71 !important;
+        box-shadow: 0 4px 0 #27ae60 !important;
+    }
+
+    .option-btn.wrong {
+        background-color: #e74c3c !important;
+        box-shadow: 0 4px 0 #c0392b !important;
+        opacity: 0.6;
+    }
+
+    .score-board {
+        margin-top: 20px;
+        font-size: 1.2em;
+        color: #7f8c8d;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    #result-container h2 {
+        font-size: 2em;
+        color: #27ae60;
+    }
+
+    .restart-btn {
+        background-color: #f1c40f;
+        color: #7f5e00;
+        padding: 15px 30px;
+        font-size: 1.5em;
+        border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        margin-top: 20px;
+        font-weight: bold;
+        box-shadow: 0 5px 0 #d4ac0d;
+    }
+    
+    .restart-btn:hover {
+        background-color: #f4d03f;
+    }
+
+    /* Mobile friendly adjustment */
+    @media (max-width: 500px) {
+        .options-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="quiz-container" id="quiz-box">
+    <h1>🏛️ Roman Quiz</h1>
+    <p>Can you guess the word?</p>
+    
+    <div class="score-board">Question <span id="current-q">1</span> / <span id="total-q">20</span></div>
+
+    <div class="question-box" id="question-text">
+        Loading question...
+    </div>
+
+    <div class="options-grid" id="options-area">
+        </div>
+</div>
+
+<div class="quiz-container hidden" id="result-container">
+    <h1>🎉 Great Job! 🎉</h1>
+    <h2 id="final-score">You got X out of Y correct!</h2>
+    <p>You are a true Roman Historian!</p>
+    <button class="restart-btn" onclick="location.reload()">Play Again</button>
+</div>
+
+<script>
+    // The data extracted from the worksheet image
+    const quizData = [
+        {
+            question: "To buy and sell goods",
+            answer: "Trade",
+            options: ["Trade", "Preserve", "Pollution", "Debris"]
+        },
+        {
+            question: "A building that honors a god or goddess",
+            answer: "Temple",
+            options: ["Temple", "Arena", "Ruins", "Colosseum"]
+        },
+        {
+            question: "What the Romans did to Christians (treated them badly)",
+            answer: "Persecute",
+            options: ["Persecute", "Assassinate", "Preserve", "Trade"]
+        },
+        {
+            question: "The ruler of the Roman Empire",
+            answer: "Emperor",
+            options: ["Gladiator", "Emperor", "Archaeologist", "Goddess"]
+        },
+        {
+            question: "Someone who fought another person or animal for sport",
+            answer: "Gladiator",
+            options: ["Emperor", "Gladiator", "Senator", "Archaeologist"]
+        },
+        {
+            question: "Remains of old buildings, like in the Roman Forum",
+            answer: "Ruins",
+            options: ["Ruins", "Mosaic", "Debris", "Crust"]
+        },
+        {
+            question: "Mount Vesuvius is one of these",
+            answer: "Volcano",
+            options: ["Kingdom", "Volcano", "Earth's Crust", "Arena"]
+        },
+        {
+            question: "To keep or save something",
+            answer: "Preserve",
+            options: ["Persecute", "Trade", "Preserve", "Assassinate"]
+        },
+        {
+            question: "Where gladiator fights were held in Rome",
+            answer: "Colosseum",
+            options: ["Temple", "Colosseum", "Kingdom", "Museum"]
+        },
+        {
+            question: "An expert who studies the ruins at Pompeii",
+            answer: "Archaeologist",
+            options: ["Gladiator", "Emperor", "Archaeologist", "Artist"]
+        },
+        {
+            question: "What the Roman senators did to Julius Caesar",
+            answer: "Assassinate",
+            options: ["Persecute", "Assassinate", "Trade", "Preserve"]
+        },
+        {
+            question: "A horse-pulled carriage used for Roman races",
+            answer: "Chariot",
+            options: ["Chariot", "Arena", "Amphitheater", "Wagon"]
+        },
+        {
+            question: "An open, outdoor building with rising seats",
+            answer: "Amphitheater",
+            options: ["Arena", "Amphitheater", "Temple", "Palace"]
+        },
+        {
+            question: "A country ruled by a king or queen",
+            answer: "Kingdom",
+            options: ["Kingdom", "Republic", "Empire", "City"]
+        },
+        {
+            question: "The rocky outer layer of the planet",
+            answer: "Earth's Crust",
+            options: ["Volcano", "Debris", "Earth's Crust", "Pollution"]
+        },
+        {
+            question: "Something that makes land, water, or air unsafe",
+            answer: "Pollution",
+            options: ["Debris", "Pollution", "Volcano", "Ruins"]
+        },
+        {
+            question: "Vesta, Venus, or Juno",
+            answer: "Goddess",
+            options: ["Emperor", "Gladiator", "Goddess", "Queen"]
+        },
+        {
+            question: "Pompeiians decorated a floor with this (pictures made of tiles)",
+            answer: "Mosaic",
+            options: ["Ruins", "Debris", "Mosaic", "Painting"]
+        },
+        {
+            question: "Pieces of mountain spit into the air during an eruption",
+            answer: "Debris",
+            options: ["Pollution", "Earth's Crust", "Debris", "Rain"]
+        },
+        {
+            question: "An idea about gods or faith",
+            answer: "Religious Belief",
+            options: ["Trade", "Religious Belief", "History", "Science"]
+        },
+        {
+            question: "A stadium like the Colosseum",
+            answer: "Arena",
+            options: ["Chariot", "Arena", "Temple", "House"]
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    const questionText = document.getElementById('question-text');
+    const optionsArea = document.getElementById('options-area');
+    const currentQSpan = document.getElementById('current-q');
+    const totalQSpan = document.getElementById('total-q');
+    const quizBox = document.getElementById('quiz-box');
+    const resultContainer = document.getElementById('result-container');
+    const finalScore = document.getElementById('final-score');
+
+    totalQSpan.innerText = quizData.length;
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function loadQuestion() {
+        const currentData = quizData[currentQuestionIndex];
+        currentQSpan.innerText = currentQuestionIndex + 1;
+        questionText.innerText = currentData.question;
+        
+        optionsArea.innerHTML = ''; // Clear old buttons
+
+        // Create a copy of options to shuffle them so the answer isn't always in the same spot
+        let currentOptions = [...currentData.options];
+        shuffleArray(currentOptions);
+
+        currentOptions.forEach(option => {
+            const btn = document.createElement('button');
+            btn.innerText = option;
+            btn.classList.add('option-btn');
+            btn.onclick = () => checkAnswer(btn, option, currentData.answer);
+            optionsArea.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selectedBtn, selectedOption, correctOption) {
+        // Disable all buttons so they can't click twice
+        const allBtns = document.querySelectorAll('.option-btn');
+        allBtns.forEach(btn => btn.disabled = true);
+
+        if (selectedOption === correctOption) {
+            selectedBtn.classList.add('correct');
+            score++;
+        } else {
+            selectedBtn.classList.add('wrong');
+            // Highlight the correct one so they learn
+            allBtns.forEach(btn => {
+                if (btn.innerText === correctOption) {
+                    btn.classList.add('correct');
+                }
+            });
+        }
+
+        // Wait 1.5 seconds then go to next question
+        setTimeout(() => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }, 1500);
+    }
+
+    function showResults() {
+        quizBox.classList.add('hidden');
+        resultContainer.classList.remove('hidden');
+        finalScore.innerText = `You got ${score} out of ${quizData.length} correct!`;
+    }
+
+    // Start the game
+    loadQuestion();
+
+</script>
+
+</body>
+</html>
