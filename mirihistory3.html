@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ancient Rome Vocabulary Flashcards</title>
+    <style>
+        :root {
+            --primary: #FF6B6B; /* Soft Red */
+            --secondary: #4ECDC4; /* Teal */
+            --accent: #FFE66D; /* Yellow */
+            --dark: #2C3E50;
+            --light: #f7f9fc;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+            background-color: #f0f3f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: var(--dark);
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        /* Card Container */
+        .scene {
+            width: 100%;
+            max-width: 500px;
+            height: 300px;
+            perspective: 600px;
+            margin-bottom: 30px;
+            cursor: pointer;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            border-radius: 20px;
+        }
+
+        .card.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card__face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+            user-select: none;
+        }
+
+        /* Front of Card (The Clue) */
+        .card__face--front {
+            background-color: white;
+            border: 4px solid var(--secondary);
+        }
+
+        .card__face--front h2 {
+            color: var(--dark);
+            font-size: 1.6rem;
+        }
+        
+        .instruction {
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        /* Back of Card (The Answer) */
+        .card__face--back {
+            background-color: var(--secondary);
+            transform: rotateY(180deg);
+            color: white;
+        }
+
+        .card__face--back h2 {
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+        }
+
+        /* Controls */
+        .controls-area {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .study-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s;
+            flex: 1;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+        }
+
+        button:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .btn-nav {
+            background-color: #e0e0e0;
+            color: var(--dark);
+        }
+
+        .btn-shuffle {
+            background-color: var(--accent);
+            color: var(--dark);
+        }
+
+        .btn-know {
+            background-color: #69db7c; /* Green */
+            color: white;
+            flex: 1;
+        }
+
+        .btn-dontknow {
+            background-color: var(--primary); /* Red */
+            color: white;
+            flex: 1;
+        }
+
+        .status-bar {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Badge for difficult words */
+        .hard-badge {
+            display: none;
+            background: var(--accent);
+            color: var(--dark);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>🏛️ Ancient Rome Words</h1>
+
+    <div class="scene" onclick="flipCard()">
+        <div class="card" id="flashcard">
+            <div class="card__face card__face--front">
+                <div class="hard-badge" id="hardBadge">Need to Practice!</div>
+                <h2 id="clueText">Loading...</h2>
+                <div class="instruction">(Tap to see answer)</div>
+            </div>
+            <div class="card__face card__face--back">
+                <h2 id="answerText">...</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls-area">
+        <div class="study-buttons">
+            <button class="btn-dontknow" onclick="markHard(event)">❌ I don't know</button>
+            <button class="btn-know" onclick="markEasy(event)">✅ I know it!</button>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="btn-nav" onclick="prevCard(event)">⬅ Back</button>
+            <button class="btn-shuffle" onclick="smartShuffle(event)">🎲 Smart Shuffle</button>
+            <button class="btn-nav" onclick="nextCard(event)">Next ➡</button>
+        </div>
+    </div>
+
+    <div class="status-bar" id="statusText">Card 1</div>
+
+    <script>
+        // Data extracted from the image
+        const initialData = [
+            { id: 1, answer: "Trade", clue: "To buy and sell goods" },
+            { id: 2, answer: "Temple", clue: "A building that honors a god or goddess" },
+            { id: 3, answer: "Persecute", clue: "What the Romans did to Christians" },
+            { id: 4, answer: "Emperor", clue: "Ruler of the Roman Empire" },
+            { id: 5, answer: "Gladiator", clue: "Someone who fought another person or animal for sport" },
+            { id: 6, answer: "Ruins", clue: "Remains of old buildings, like in the Roman Forum" },
+            { id: 7, answer: "Volcano", clue: "Mount Vesuvius is one" },
+            { id: 8, answer: "Preserve", clue: "To keep or save" },
+            { id: 9, answer: "Colosseum", clue: "Where gladiator fights were held in Rome" },
+            { id: 10, answer: "Archaeologist", clue: "An expert who studies the ruins at Pompeii" },
+            { id: 11, answer: "Assassinate", clue: "What the Roman senators did to Julius Caesar" },
+            { id: 12, answer: "Chariot", clue: "A horse-pulled carriage used for Roman races" },
+            { id: 13, answer: "Amphitheater", clue: "An open, outdoor building with rising seats" },
+            { id: 14, answer: "Kingdom", clue: "A country ruled by a king or queen" },
+            { id: 15, answer: "Earth's Crust", clue: "The rocky outer layer of the planet" },
+            { id: 16, answer: "Pollution", clue: "Something that makes land, water, or air unsafe" },
+            { id: 17, answer: "Goddess", clue: "Vesta, Venus, or Juno" },
+            { id: 18, answer: "Mosaic", clue: "Pompeiians decorated a floor with this" },
+            { id: 19, answer: "Debris", clue: "Pieces of mountain spit into the air during an eruption" },
+            { id: 20, answer: "Religious Belief", clue: "An idea about gods or faith" },
+            { id: 21, answer: "Arena", clue: "A stadium like the Colosseum" }
+        ];
+
+        // Add weights to data (initially all 1)
+        let deck = initialData.map(item => ({ ...item, weight: 1 }));
+        
+        let currentIndex = 0;
+        const cardElement = document.getElementById('flashcard');
+        const clueText = document.getElementById('clueText');
+        const answerText = document.getElementById('answerText');
+        const statusText = document.getElementById('statusText');
+        const hardBadge = document.getElementById('hardBadge');
+
+        function updateCard() {
+            const card = deck[currentIndex];
+            clueText.textContent = card.clue;
+            answerText.textContent = card.answer;
+            statusText.textContent = `Card ${currentIndex + 1} of ${deck.length}`;
+            
+            // Show badge if weight is high (meaning they marked it as hard previously)
+            if(card.weight > 1) {
+                hardBadge.style.display = "block";
+            } else {
+                hardBadge.style.display = "none";
+            }
+
+            // Ensure card is flipped to front when changing
+            cardElement.classList.remove('is-flipped');
+        }
+
+        function flipCard() {
+            cardElement.classList.toggle('is-flipped');
+        }
+
+        function nextCard(e) {
+            if(e) e.stopPropagation();
+            if (currentIndex < deck.length - 1) {
+                currentIndex++;
+                updateCard();
+            } else {
+                // Loop back to start? or stop. Let's loop.
+                currentIndex = 0;
+                updateCard();
+            }
+        }
+
+        function prevCard(e) {
+            if(e) e.stopPropagation();
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateCard();
+            }
+        }
+
+        function markHard(e) {
+            e.stopPropagation();
+            // Increase weight significantly
+            deck[currentIndex].weight = 5; 
+            // Give visual feedback
+            alert(`Okay! We will show "${deck[currentIndex].answer}" more often in the next shuffle.`);
+            nextCard();
+        }
+
+        function markEasy(e) {
+            e.stopPropagation();
+            // Reset weight
+            deck[currentIndex].weight = 1;
+            nextCard();
+        }
+
+        // The Weighted Shuffle Logic
+        function smartShuffle(e) {
+            if(e) e.stopPropagation();
+            
+            // 1. Create a "bag" of cards based on weights
+            let weightedBag = [];
+            deck.forEach(card => {
+                // Add the card to the bag 'weight' number of times
+                for(let i=0; i < card.weight; i++) {
+                    weightedBag.push(card);
+                }
+            });
+
+            // 2. Shuffle the bag
+            for (let i = weightedBag.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [weightedBag[i], weightedBag[j]] = [weightedBag[j], weightedBag[i]];
+            }
+
+            // 3. To avoid the deck becoming huge (duplicates), we remove exact duplicates 
+            // but prioritize the order we just created.
+            // However, for a simple "Weighted" shuffle, we just want to re-order the original deck
+            // such that high-weight items appear earlier or are randomized.
+            
+            // Alternative Logic for "Smart Shuffle":
+            // Just shuffle the original deck, but high weight items have a higher chance of being swapped?
+            // Let's stick to a clean random shuffle of the UNIQUE items for now, 
+            // BUT if the user marked it as "Hard", we can't easily force it to appear multiple times 
+            // without making the deck longer. 
+            
+            // Let's make the deck longer! 
+            // We will rebuild the 'deck' variable to include duplicates of hard words.
+            // But we limit duplicates to max 2 per shuffle to avoid annoyance.
+            
+            let newDeck = [];
+            initialData.forEach(originalItem => {
+                // Find current weight settings
+                let currentItem = deck.find(d => d.id === originalItem.id);
+                let weight = currentItem ? currentItem.weight : 1;
+                
+                // Always add once
+                newDeck.push({...originalItem, weight: weight});
+                
+                // If hard, add a second copy
+                if(weight > 1) {
+                    newDeck.push({...originalItem, weight: weight, isCopy: true});
+                }
+            });
+
+            // Shuffle the new deck
+            for (let i = newDeck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newDeck[i], newDeck[j]] = [newDeck[j], newDeck[i]];
+            }
+
+            deck = newDeck;
+            currentIndex = 0;
+            updateCard();
+            alert("Shuffled! Hard words appear twice now.");
+        }
+
+        // Initialize
+        updateCard();
+
+    </script>
+</body>
+</html>
