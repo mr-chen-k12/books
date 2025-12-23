@@ -10,9 +10,10 @@
         background-color: #f4e4bc; /* Parchment color */
         margin: 0;
         display: flex;
-        justify-content: center;
+        flex-direction: column; /* Stack items vertically */
         align-items: center;
         min-height: 100vh;
+        padding-bottom: 50px;
     }
 
     .quiz-container {
@@ -24,12 +25,14 @@
         max-width: 600px;
         text-align: center;
         border: 5px solid #8B4513;
+        margin-top: 30px;
     }
 
     h1 {
         color: #c0392b;
         font-size: 2.5em;
         margin-bottom: 10px;
+        margin-top: 0;
     }
 
     .question-box {
@@ -114,7 +117,84 @@
         background-color: #f4d03f;
     }
 
-    /* Mobile friendly adjustment */
+    /* --- New Styles for the Review Section --- */
+    .review-container {
+        margin-top: 30px;
+        width: 90%;
+        max-width: 600px;
+        background-color: #fff9c4; /* Sticky note yellow */
+        border: 3px solid #f1c40f;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        display: none; /* Hidden by default until a mistake is made */
+    }
+
+    .review-container h3 {
+        color: #d35400;
+        margin-top: 0;
+        text-align: center;
+        font-size: 1.5em;
+    }
+
+    .mistake-item {
+        background-color: white;
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-left: 5px solid #e74c3c;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .mistake-text {
+        text-align: left;
+        flex-grow: 1;
+        margin-right: 10px;
+    }
+
+    .mistake-text strong {
+        color: #c0392b;
+        font-size: 1.1em;
+        display: block;
+    }
+
+    .delete-btn {
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-weight: bold;
+        flex-shrink: 0;
+    }
+
+    .delete-btn:hover {
+        background-color: #c0392b;
+    }
+
+    .clear-all-btn {
+        background-color: #95a5a6;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 10px;
+        font-size: 0.9em;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .clear-all-btn:hover {
+        background-color: #7f8c8d;
+    }
+
     @media (max-width: 500px) {
         .options-grid {
             grid-template-columns: 1fr;
@@ -143,6 +223,14 @@
     <h2 id="final-score">You got X out of Y correct!</h2>
     <p>You are a true Roman Historian!</p>
     <button class="restart-btn" onclick="location.reload()">Play Again</button>
+</div>
+
+<div class="review-container" id="review-section">
+    <h3>📝 My Study Notes</h3>
+    <p style="text-align: center; font-size: 0.9em; color: #666;">(These are the ones you missed)</p>
+    <div id="mistakes-list">
+        </div>
+    <button class="clear-all-btn" onclick="clearAllMistakes()">Clear All Notes</button>
 </div>
 
 <script>
@@ -257,6 +345,7 @@
 
     let currentQuestionIndex = 0;
     let score = 0;
+    let mistakes = []; // Array to store wrong answers
 
     const questionText = document.getElementById('question-text');
     const optionsArea = document.getElementById('options-area');
@@ -265,6 +354,10 @@
     const quizBox = document.getElementById('quiz-box');
     const resultContainer = document.getElementById('result-container');
     const finalScore = document.getElementById('final-score');
+    
+    // New Elements for Review Section
+    const reviewSection = document.getElementById('review-section');
+    const mistakesListEl = document.getElementById('mistakes-list');
 
     totalQSpan.innerText = quizData.length;
 
@@ -282,7 +375,6 @@
         
         optionsArea.innerHTML = ''; // Clear old buttons
 
-        // Create a copy of options to shuffle them so the answer isn't always in the same spot
         let currentOptions = [...currentData.options];
         shuffleArray(currentOptions);
 
@@ -290,13 +382,13 @@
             const btn = document.createElement('button');
             btn.innerText = option;
             btn.classList.add('option-btn');
-            btn.onclick = () => checkAnswer(btn, option, currentData.answer);
+            btn.onclick = () => checkAnswer(btn, option, currentData.answer, currentData);
             optionsArea.appendChild(btn);
         });
     }
 
-    function checkAnswer(selectedBtn, selectedOption, correctOption) {
-        // Disable all buttons so they can't click twice
+    function checkAnswer(selectedBtn, selectedOption, correctOption, questionObj) {
+        // Disable all buttons
         const allBtns = document.querySelectorAll('.option-btn');
         allBtns.forEach(btn => btn.disabled = true);
 
@@ -305,12 +397,15 @@
             score++;
         } else {
             selectedBtn.classList.add('wrong');
-            // Highlight the correct one so they learn
+            // Highlight the correct one
             allBtns.forEach(btn => {
                 if (btn.innerText === correctOption) {
                     btn.classList.add('correct');
                 }
             });
+            
+            // Add to mistakes list!
+            addMistake(questionObj);
         }
 
         // Wait 1.5 seconds then go to next question
@@ -322,6 +417,50 @@
                 showResults();
             }
         }, 1500);
+    }
+
+    function addMistake(questionObj) {
+        // Only add if it's not already in the list to prevent duplicates (in case of weird bugs)
+        // Using a simple check based on the answer word
+        const alreadyExists = mistakes.some(m => m.answer === questionObj.answer);
+        
+        if (!alreadyExists) {
+            mistakes.push(questionObj);
+            renderMistakes();
+        }
+    }
+
+    function renderMistakes() {
+        if (mistakes.length > 0) {
+            reviewSection.style.display = 'block'; // Show the section
+        } else {
+            reviewSection.style.display = 'none'; // Hide if empty
+        }
+
+        mistakesListEl.innerHTML = ''; // Clear list HTML
+
+        mistakes.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'mistake-item';
+            div.innerHTML = `
+                <div class="mistake-text">
+                    <strong>${item.answer}</strong>
+                    ${item.question}
+                </div>
+                <button class="delete-btn" onclick="removeMistake(${index})">X</button>
+            `;
+            mistakesListEl.appendChild(div);
+        });
+    }
+
+    function removeMistake(index) {
+        mistakes.splice(index, 1); // Remove from array
+        renderMistakes(); // Re-draw the list
+    }
+
+    function clearAllMistakes() {
+        mistakes = [];
+        renderMistakes();
     }
 
     function showResults() {
