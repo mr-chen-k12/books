@@ -1545,12 +1545,13 @@
         background-color: #fff;
         position: relative;
         font-size: 16px;
+        /* improved touch response */
+        touch-action: manipulation; 
     }
     .ABC li:hover {
         background-color: #f8f9fa;
         border-color: #b0b0b0;
     }
-    /* Visual hint for shortcuts */
     .ABC li::after {
         content: attr(data-shortcut-key);
         position: absolute;
@@ -1583,7 +1584,7 @@
     /* --- 2. SINGLE QUESTION UI STYLES --- */
     .row_border {
         display: none; 
-        padding-bottom: 40px;
+        padding-bottom: 60px; /* Extra space for swipe comfort */
     }
     .row_border.active-question {
         display: block; 
@@ -1599,6 +1600,8 @@
         padding-bottom: 250px; 
         padding-top: 60px;
         transition: padding 0.3s;
+        /* Prevent horizontal scroll on mobile */
+        overflow-x: hidden; 
     }
 
     /* Floating Scoreboard */
@@ -1767,22 +1770,20 @@
         display: none !important;
     }
     
-    /* Fade out the bottom panel in focus mode... */
     body.focus-mode #bottom-control-panel {
         opacity: 0;
         transition: opacity 0.3s ease-in-out;
-        border-top: none; /* remove border to make it truly invisible */
+        border-top: none;
         background: rgba(255,255,255,0.95);
     }
     
-    /* ...until you hover over it */
     body.focus-mode #bottom-control-panel:hover {
         opacity: 1;
         border-top: 1px solid #ddd;
     }
     
     body.focus-mode {
-        padding-bottom: 50px; /* Minimal padding in focus mode */
+        padding-bottom: 50px; 
     }
 </style>
 
@@ -1823,7 +1824,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (questionsDOM.length === 0) return;
 
-    // Pre-processing: Tag original keys
+    // Pre-processing
     questionsDOM.forEach(row => {
         const choices = row.querySelectorAll('.ABC li');
         choices.forEach((li, idx) => {
@@ -1887,11 +1888,11 @@ document.addEventListener('DOMContentLoaded', function() {
             userAnswers, showScore, showWrongList,
             shuffleQuestions, shuffleAnswers, focusMode
         };
-        localStorage.setItem('bioQuizState_v3', JSON.stringify(state));
+        localStorage.setItem('bioQuizState_v4', JSON.stringify(state));
     }
 
     function loadProgress() {
-        const saved = localStorage.getItem('bioQuizState_v3');
+        const saved = localStorage.getItem('bioQuizState_v4');
         if (saved) {
             try {
                 const state = JSON.parse(saved);
@@ -1924,7 +1925,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (shuffleQuestions) {
              shuffleArray(questionsDOM);
         } else {
-            // Sort back by ID
             questionsDOM.sort((a, b) => {
                 const getNum = (row) => {
                     const txt = row.querySelector('.itemHeader').textContent;
@@ -1966,16 +1966,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- UPDATE UI ---
     function restoreVisuals() {
-        // Score
         scoreDiv.style.display = showScore ? 'block' : 'none';
         btnToggleScore.innerText = showScore ? 'Hide Score' : 'Show Score';
         btnToggleScore.style.backgroundColor = showScore ? '#28a745' : '#6c757d';
 
-        // Wrong List
         wrongListContainer.style.display = showWrongList ? 'block' : 'none';
         btnToggleWrong.innerText = showWrongList ? 'Hide Review List' : 'Show Review List';
 
-        // Focus Mode
         if (focusMode) {
             document.body.classList.add('focus-mode');
             btnFocusMode.innerText = "Exit Focus";
@@ -2002,7 +1999,6 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.className = 'wrong-q-link';
             btn.innerText = `Q${qID}`;
             btn.onclick = () => {
-                // Find index of this question ID in current DOM
                 const newIndex = questionsDOM.findIndex(row => {
                    const h = row.querySelector('.itemHeader').textContent;
                    return h.includes(`Question ${qID}.`) || h.includes(`${qID}.`);
@@ -2050,7 +2046,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     btnReset.addEventListener('click', () => {
         if(confirm("Are you sure? This will wipe your score and reset everything.")) {
-            localStorage.removeItem('bioQuizState_v3');
+            localStorage.removeItem('bioQuizState_v4');
             location.reload();
         }
     });
@@ -2058,14 +2054,12 @@ document.addEventListener('DOMContentLoaded', function() {
     btnShuffleQ.addEventListener('click', () => { shuffleQuestions = !shuffleQuestions; applyQuestionShuffle(); updateUI(); saveProgress(); });
     btnShuffleA.addEventListener('click', () => { shuffleAnswers = !shuffleAnswers; applyAnswerShuffle(); saveProgress(); });
 
+    // Keyboard Shortcuts
     document.addEventListener('keydown', (e) => {
         if (e.ctrlKey || e.altKey || e.metaKey) return;
         const key = e.key.toLowerCase();
         if (key === 'j') { btnNext.click(); return; }
         if (key === 'k') { btnPrev.click(); return; }
-	if (key === 'e') { btnNext.click(); return; }
-        if (key === 'w') { btnPrev.click(); return; }
-
         
         const keyMap = { 'a': 0, 'b': 1, 'c': 2, 'd': 3 };
         if (keyMap.hasOwnProperty(key)) {
@@ -2075,6 +2069,42 @@ document.addEventListener('DOMContentLoaded', function() {
             if (choices[choiceIndex]) choices[choiceIndex].click();
         }
     });
+
+    // --- MOBILE SWIPE LOGIC ---
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+
+    document.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+    }, false);
+
+    document.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        touchEndY = e.changedTouches[0].screenY;
+        handleSwipe();
+    }, false);
+
+    function handleSwipe() {
+        const threshold = 50; // Minimum distance to consider a swipe
+        const diffX = touchStartX - touchEndX;
+        const diffY = touchStartY - touchEndY;
+
+        // Ensure vertical scroll is not dominant (if user is scrolling down, don't swipe next)
+        if (Math.abs(diffX) > Math.abs(diffY)) {
+            if (Math.abs(diffX) > threshold) {
+                if (diffX > 0) {
+                    // Swipe Left -> Next
+                    btnNext.click();
+                } else {
+                    // Swipe Right -> Prev
+                    btnPrev.click();
+                }
+            }
+        }
+    }
 
     // --- ANSWER LOGIC ---
     questionsDOM.forEach((row) => {
@@ -2096,7 +2126,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         const myOriginalKey = this.getAttribute('data-original-key');
                         const isCorrect = (myOriginalKey === correctLetter);
                         
-                        // Clear visual siblings
                         row.querySelectorAll('.ABC li').forEach(c => c.classList.remove('correct-answer', 'wrong-answer'));
 
                         if (isCorrect) {
@@ -2111,7 +2140,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             if (!wrongQuestions.has(parseInt(qNum))) {
                                 wrongQuestions.add(parseInt(qNum));
                                 updateWrongListUI();
-                                // Auto-show list only if NOT in focus mode
                                 if(!showWrongList && !focusMode) {
                                      showWrongList = true;
                                      restoreVisuals();
@@ -2130,7 +2158,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- INIT ---
     loadProgress();
     
-    // Set shortcuts initially
     questionsDOM.forEach(row => {
         const choices = row.querySelectorAll('.ABC li');
         choices.forEach((li, idx) => li.setAttribute('data-shortcut-key', letterMap[idx]));
@@ -2143,4 +2170,9 @@ document.addEventListener('DOMContentLoaded', function() {
     updateWrongListUI();
     restoreVisuals();
 });
-</script></body></html>
+</script>
+
+
+
+
+</body></html>
