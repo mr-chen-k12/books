@@ -1858,13 +1858,13 @@ document.addEventListener('DOMContentLoaded', function() {
             <button id="btn-toggle-wrong" class="toggle-btn">Hide Review List</button>
             <button id="btn-reset" class="toggle-btn reset-btn">Reset All</button>
             <div style="flex-grow:1;"></div>
-            <button id="btn-prev" class="nav-btn" title="Key: K">Previous</button>
+            <button id="btn-prev" class="nav-btn" title="Key: K or W">Previous</button>
             <span id="q-counter">Q 1</span>
-            <button id="btn-next" class="nav-btn" title="Key: J">Next</button>
+            <button id="btn-next" class="nav-btn" title="Key: J or E">Next</button>
             <div style="flex-grow:1;"></div>
         </div>
         <div id="shortcut-hints">
-            Shortcuts: <kbd>J</kbd> Next &nbsp;|&nbsp; <kbd>K</kbd> Prev &nbsp;|&nbsp; <kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> <kbd>D</kbd> Select Answer
+            Shortcuts: <kbd>J</kbd>/<kbd>E</kbd>/<kbd>&rarr;</kbd> Next &nbsp;|&nbsp; <kbd>K</kbd>/<kbd>W</kbd>/<kbd>&larr;</kbd> Prev &nbsp;|&nbsp; <kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> <kbd>D</kbd> Select Answer
         </div>
     `;
     document.body.appendChild(controlPanel);
@@ -2060,8 +2060,17 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('keydown', (e) => {
         if (e.ctrlKey || e.altKey || e.metaKey) return;
         const key = e.key.toLowerCase();
-        if (key === 'j') { btnNext.click(); return; }
-        if (key === 'k') { btnPrev.click(); return; }
+        
+        // Next: J, E, or Right Arrow
+        if (key === 'j' || key === 'e' || key === 'arrowright') { 
+            btnNext.click(); 
+            return; 
+        }
+        // Prev: K, W, or Left Arrow
+        if (key === 'k' || key === 'w' || key === 'arrowleft') { 
+            btnPrev.click(); 
+            return; 
+        }
         
         const keyMap = { 'a': 0, 'b': 1, 'c': 2, 'd': 3 };
         if (keyMap.hasOwnProperty(key)) {
