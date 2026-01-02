@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Epistatic Cross: BbCc x BbCc</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 { margin-bottom: 10px; }
+        p.subtitle { max-width: 600px; text-align: center; color: #555; margin-bottom: 30px; }
+
+        /* Punnett Square Grid Styles */
+        .punnett-container {
+            display: grid;
+            grid-template-columns: 60px repeat(4, 1fr);
+            grid-template-rows: 60px repeat(4, 1fr);
+            gap: 5px;
+            margin-bottom: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .header-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            background-color: #e0e0e0;
+            border-radius: 8px;
+            font-size: 1.2em;
+        }
+
+        .empty-cell { background: transparent; }
+
+        /* Genotype Cells */
+        .cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .cell:hover { transform: scale(1.05); z-index: 10; }
+
+        .genotype { font-weight: bold; font-size: 1.1em; margin-bottom: 5px; }
+        .phenotype { font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Phenotype Color Classes */
+        .black-coat {
+            background-color: #2c2c2c;
+            color: #fff;
+            border-color: #000;
+        }
+
+        .brown-coat {
+            background-color: #8B4513; /* SaddleBrown */
+            color: #fff;
+            border-color: #5e2f0d;
+        }
+
+        .albino-coat {
+            background-color: #ffffff;
+            color: #aaa;
+            border-color: #ccc;
+        }
+        
+        /* Stats Section */
+        .stats-container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .stat-row:last-child { border-bottom: none; font-weight: bold; font-size: 1.1em; margin-top: 10px;}
+
+        .color-indicator {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .highlight-answer {
+            background-color: #fff3cd;
+            border: 2px solid #ffecb5;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Epistasis in Mice</h1>
+    <p class="subtitle">
+        Cross between two heterozygotes: <strong>BbCc &times; BbCc</strong><br>
+        <em>B = Black, b = Brown | C = Color, c = No Color (Albino)</em>
+    </p>
+
+    <div class="punnett-container">
+        <div class="empty-cell"></div>
+        <div class="header-cell">BC</div>
+        <div class="header-cell">Bc</div>
+        <div class="header-cell">bC</div>
+        <div class="header-cell">bc</div>
+
+        <div class="header-cell">BC</div>
+        <div class="cell black-coat"><div class="genotype">BBCC</div><div class="phenotype">Black</div></div>
+        <div class="cell black-coat"><div class="genotype">BBCc</div><div class="phenotype">Black</div></div>
+        <div class="cell black-coat"><div class="genotype">BbCC</div><div class="phenotype">Black</div></div>
+        <div class="cell black-coat"><div class="genotype">BbCc</div><div class="phenotype">Black</div></div>
+
+        <div class="header-cell">Bc</div>
+        <div class="cell black-coat"><div class="genotype">BBCc</div><div class="phenotype">Black</div></div>
+        <div class="cell albino-coat"><div class="genotype">BBcc</div><div class="phenotype">Albino</div></div>
+        <div class="cell black-coat"><div class="genotype">BbCc</div><div class="phenotype">Black</div></div>
+        <div class="cell albino-coat"><div class="genotype">Bbcc</div><div class="phenotype">Albino</div></div>
+
+        <div class="header-cell">bC</div>
+        <div class="cell black-coat"><div class="genotype">BbCC</div><div class="phenotype">Black</div></div>
+        <div class="cell black-coat"><div class="genotype">BbCc</div><div class="phenotype">Black</div></div>
+        <div class="cell brown-coat"><div class="genotype">bbCC</div><div class="phenotype">Brown</div></div>
+        <div class="cell brown-coat"><div class="genotype">bbCc</div><div class="phenotype">Brown</div></div>
+
+        <div class="header-cell">bc</div>
+        <div class="cell black-coat"><div class="genotype">BbCc</div><div class="phenotype">Black</div></div>
+        <div class="cell albino-coat"><div class="genotype">Bbcc</div><div class="phenotype">Albino</div></div>
+        <div class="cell brown-coat"><div class="genotype">bbCc</div><div class="phenotype">Brown</div></div>
+        <div class="cell albino-coat"><div class="genotype">bbcc</div><div class="phenotype">Albino</div></div>
+    </div>
+
+    <div class="stats-container">
+        <h3>Probability Breakdown</h3>
+        
+        <div class="stat-row">
+            <span><span class="color-indicator" style="background: #2c2c2c;"></span>Black (B_C_)</span>
+            <span>9 / 16</span>
+        </div>
+
+        <div class="stat-row highlight-answer">
+            <span><span class="color-indicator" style="background: #8B4513;"></span><strong>Brown (bbC_)</strong></span>
+            <span><strong>3 / 16</strong></span>
+        </div>
+
+        <div class="stat-row">
+            <span><span class="color-indicator" style="background: #ddd; border:1px solid #999;"></span>Albino (__cc)</span>
+            <span>4 / 16</span>
+        </div>
+        
+        <div class="stat-row" style="border-top: 2px solid #333;">
+            <span>Total Combinations</span>
+            <span>16</span>
+        </div>
+        
+        <p style="margin-top: 20px; font-size: 0.9em; color: #666; line-height: 1.5;">
+            <strong>Note:</strong> This variation of the 9:3:3:1 ratio (becoming 9:3:4) is typical of <em>Recessive Epistasis</em>. The presence of two recessive alleles at the second locus (cc) masks the expression of the first gene.
+        </p>
+    </div>
+
+</body>
+</html>

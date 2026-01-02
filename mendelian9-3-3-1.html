@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classic Mendelian Dihybrid Cross (9:3:3:1)</title>
+    <style>
+        :root {
+            --yellow-color: #ffd700;
+            --green-color: #9acd32;
+            --border-color: #ccc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 { margin-bottom: 5px; }
+        p.subtitle { max-width: 700px; text-align: center; color: #555; margin-bottom: 30px; line-height: 1.4; }
+
+        /* --- Punnett Square Grid Styles --- */
+        .punnett-wrapper {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .punnett-container {
+            display: grid;
+            grid-template-columns: 70px repeat(4, 100px);
+            grid-template-rows: 70px repeat(4, 100px);
+            gap: 10px;
+        }
+
+        .header-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            font-size: 1.3em;
+            color: #495057;
+        }
+        .empty-cell { background: transparent; }
+
+        /* --- Individual Cell Styles --- */
+        .cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            border: 3px solid rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cell:hover { transform: scale(1.03); z-index: 5; border-color: rgba(0,0,0,0.3); }
+
+        .genotype { font-weight: 700; font-size: 1.2em; margin-bottom: 4px; text-shadow: 0 1px 2px rgba(255,255,255,0.5);}
+        .phenotype { font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;}
+
+        /* --- Visualizing Phenotypes (Shape and Color) --- */
+        
+        /* Base shapes */
+        .shape-round { border-radius: 50%; }
+        /* CSS trick for a wobbly "wrinkled" shape */
+        .shape-wrinkled { border-radius: 63% 37% 30% 70% / 50% 45% 55% 50%; }
+
+        /* Colors */
+        .color-yellow {
+            background: radial-gradient(circle at 30% 30%, #fffbea, var(--yellow-color));
+            color: #5a4a00;
+        }
+        .color-green {
+            background: radial-gradient(circle at 30% 30%, #eaffea, var(--green-color));
+            color: #2a4400;
+        }
+
+        /* --- Stats Section --- */
+        .stats-container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .stat-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 1.1em;
+        }
+        .stat-row:last-child { border-bottom: none; margin-top: 15px; padding-top: 15px; border-top: 2px solid #eee;}
+
+        .pheno-label { display: flex; align-items: center; }
+        .count-box { font-weight: bold; font-size: 1.3em; color: #444; }
+        
+        .ratio-summary {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #007bff;
+            margin-top: 20px;
+            letter-spacing: 2px;
+        }
+
+        .mini-icon {
+            width: 20px; height: 20px; display: inline-block; margin-right: 10px; border: 1px solid rgba(0,0,0,0.1);
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Classic Mendelian Dihybrid Cross</h1>
+    <p class="subtitle">
+        Cross between two double heterozygotes (Mendel's Peas): <strong>RrYy &times; RrYy</strong><br>
+        <em>R = Round, r = wrinkled | Y = Yellow, y = green</em><br>
+        <small>Independent Assortment: No gene interaction.</small>
+    </p>
+
+    <div class="punnett-wrapper">
+        <div class="punnett-container">
+            <div class="empty-cell"></div>
+            <div class="header-cell">RY</div>
+            <div class="header-cell">Ry</div>
+            <div class="header-cell">rY</div>
+            <div class="header-cell">ry</div>
+
+            <div class="header-cell">RY</div>
+            <div class="cell shape-round color-yellow"><div class="genotype">RRYY</div><div class="phenotype">Round Yellow</div></div>
+            <div class="cell shape-round color-yellow"><div class="genotype">RRYy</div><div class="phenotype">Round Yellow</div></div>
+            <div class="cell shape-round color-yellow"><div class="genotype">RrYY</div><div class="phenotype">Round Yellow</div></div>
+            <div class="cell shape-round color-yellow"><div class="genotype">RrYy</div><div class="phenotype">Round Yellow</div></div>
+
+            <div class="header-cell">Ry</div>
+            <div class="cell shape-round color-yellow"><div class="genotype">RRYy</div><div class="phenotype">Round Yellow</div></div>
+            <div class="cell shape-round color-green"><div class="genotype">RRyy</div><div class="phenotype">Round Green</div></div>
+            <div class="cell shape-round color-yellow"><div class="genotype">RrYy</div><div class="phenotype">Round Yellow</div></div>
+            <div class="cell shape-round color-green"><div class="genotype">Rryy</div><div class="phenotype">Round Green</div></div>
+
+            <div class="header-cell">rY</div>
+            <div class="cell shape-round color-yellow"><div class="genotype">RrYY</div><div class="phenotype">Round Yellow</div></div>
+            <div class="cell shape-round color-yellow"><div class="genotype">RrYy</div><div class="phenotype">Round Yellow</div></div>
+            <div class="cell shape-wrinkled color-yellow"><div class="genotype">rrYY</div><div class="phenotype">Wrinkled Yellow</div></div>
+            <div class="cell shape-wrinkled color-yellow"><div class="genotype">rrYy</div><div class="phenotype">Wrinkled Yellow</div></div>
+
+            <div class="header-cell">ry</div>
+            <div class="cell shape-round color-yellow"><div class="genotype">RrYy</div><div class="phenotype">Round Yellow</div></div>
+            <div class="cell shape-round color-green"><div class="genotype">Rryy</div><div class="phenotype">Round Green</div></div>
+            <div class="cell shape-wrinkled color-yellow"><div class="genotype">rrYy</div><div class="phenotype">Wrinkled Yellow</div></div>
+            <div class="cell shape-wrinkled color-green"><div class="genotype">rryy</div><div class="phenotype">Wrinkled Green</div></div>
+        </div>
+    </div>
+
+    <div class="stats-container">
+        <h3 style="text-align: center; margin-top: 0;">Phenotypic Count</h3>
+        
+        <div class="stat-row">
+            <div class="pheno-label">
+                <span class="mini-icon shape-round color-yellow"></span> Both Dominant (R_Y_)
+            </div>
+            <div class="count-box">9</div>
+        </div>
+
+        <div class="stat-row">
+            <div class="pheno-label">
+                <span class="mini-icon shape-round color-green"></span> Dom Shape, Rec Color (R_yy)
+            </div>
+            <div class="count-box">3</div>
+        </div>
+
+        <div class="stat-row">
+            <div class="pheno-label">
+                <span class="mini-icon shape-wrinkled color-yellow"></span> Rec Shape, Dom Color (rrY_)
+            </div>
+            <div class="count-box">3</div>
+        </div>
+
+        <div class="stat-row">
+            <div class="pheno-label">
+                <span class="mini-icon shape-wrinkled color-green"></span> Both Recessive (rryy)
+            </div>
+            <div class="count-box">1</div>
+        </div>
+        
+        <div class="ratio-summary">
+            Ratio: 9 : 3 : 3 : 1
+        </div>
+    </div>
+
+</body>
+</html>

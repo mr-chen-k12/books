@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mendel's Master: Genetics Challenge</title>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --secondary: #50e3c2;
+            --background: #f4f7f6;
+            --text: #333;
+            --card-bg: #ffffff;
+            --lit-color: #ff0055;
+            --good-color: #ffa500;
+            --try-color: #888;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 { margin-bottom: 10px; color: var(--primary); }
+        
+        /* --- Scoreboard / Gauge --- */
+        .scoreboard-container {
+            background: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+            width: 300px;
+        }
+
+        .gauge-labels {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .gauge-bar {
+            height: 10px;
+            background: linear-gradient(to right, var(--try-color) 0%, var(--good-color) 50%, var(--lit-color) 100%);
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .triangle-pointer {
+            width: 0; 
+            height: 0; 
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 15px solid #333;
+            position: absolute;
+            top: -10px; /* Position strictly relative to the bar */
+            left: 0%; /* Dynamic */
+            transform: translateX(-50%);
+            transition: left 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .score-text { font-size: 1.2em; margin-top: 5px; font-weight: bold; }
+
+        /* --- Game Area --- */
+        .game-card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 700px;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            text-align: center;
+            display: none; /* Hidden until start */
+        }
+        
+        .active { display: block; }
+
+        .question-text { font-size: 1.3em; margin-bottom: 20px; line-height: 1.5; }
+        .sub-text { font-size: 0.95em; color: #666; margin-bottom: 25px; font-style: italic; }
+
+        /* --- Visual Punnett Helpers --- */
+        .visual-helper {
+            margin: 20px auto;
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            display: inline-block;
+            border: 1px dashed #ccc;
+        }
+        .punnett-grid-2x2 {
+            display: grid;
+            grid-template-columns: 40px 40px;
+            gap: 2px;
+        }
+        .punnett-grid-4x4 {
+            display: grid;
+            grid-template-columns: repeat(4, 30px);
+            gap: 2px;
+        }
+        .p-cell {
+            background: #e0e0e0;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        .p-cell-4 { height: 30px; font-size: 0.7em; }
+
+        /* --- Answers --- */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn-option {
+            background: white;
+            border: 2px solid #ddd;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-option:hover {
+            border-color: var(--primary);
+            background-color: #f0f7ff;
+            transform: translateY(-2px);
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: none;
+        }
+        .correct { background-color: #d4edda; color: #155724; }
+        .incorrect { background-color: #f8d7da; color: #721c24; }
+
+        .next-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            border-radius: 25px;
+            margin-top: 20px;
+            cursor: pointer;
+            display: none;
+        }
+
+        /* --- Start Screen --- */
+        #start-screen { display: block; }
+        .start-btn {
+            background-color: var(--secondary);
+            color: #004d40;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.5em;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(80, 227, 194, 0.4);
+            transition: transform 0.2s;
+        }
+        .start-btn:hover { transform: scale(1.05); }
+
+    </style>
+</head>
+<body>
+
+    <div class="scoreboard-container">
+        <div class="gauge-labels">
+            <span style="color:var(--try-color)">TRYING</span>
+            <span style="color:var(--good-color)">GOOD JOB</span>
+            <span style="color:var(--lit-color)">LIT 🔥</span>
+        </div>
+        <div class="gauge-bar">
+            <div class="triangle-pointer" id="pointer"></div>
+        </div>
+        <div class="score-text" id="score-text">Current Score: 0</div>
+    </div>
+
+    <div id="start-screen" class="game-card active">
+        <h2>Ready to Master Genetics?</h2>
+        <p>From simple peas to complex crosses. Can you reach "LIT" status?</p>
+        <button class="start-btn" onclick="startGame()">PLAY NOW</button>
+    </div>
+
+    <div id="game-screen" class="game-card">
+        <div style="display:flex; justify-content:space-between; color:#999; font-size:0.9em;">
+            <span id="level-indicator">Level: Easy</span>
+            <span id="q-number">Question 1/5</span>
+        </div>
+
+        <h3 id="q-text" class="question-text">Question goes here...</h3>
+        <p id="q-sub" class="sub-text">Helper text goes here...</p>
+
+        <div id="visual-helper" class="visual-helper" style="display:none;">
+            </div>
+
+        <div id="options-container" class="options-grid">
+            </div>
+
+        <div id="feedback-area" class="feedback"></div>
+        <button id="next-btn" class="next-btn" onclick="nextQuestion()">Next Question ➜</button>
+    </div>
+
+    <div id="end-screen" class="game-card">
+        <h2>Game Over!</h2>
+        <p id="final-message" style="font-size: 1.2em; margin: 20px 0;"></p>
+        <button class="start-btn" onclick="location.reload()">Play Again</button>
+    </div>
+
+    <script>
+        const questions = [
+            // LEVEL 1: EASY (Monohybrid Basic)
+            {
+                text: "In pea plants, Tall (T) is dominant over short (t). If you cross two heterozygous plants (Tt x Tt), what is the probability of a short offspring?",
+                sub: "Think of a simple 2x2 Punnett Square.",
+                options: ["0% (0/4)", "25% (1/4)", "50% (2/4)", "75% (3/4)"],
+                correct: 1,
+                gridType: "2x2",
+                gridData: ["TT", "Tt", "Tt", "tt"] // Simplified for visual
+            },
+            // LEVEL 2: EASY (Genotype vs Phenotype)
+            {
+                text: "A mouse has the genotype Bb. Black (B) is dominant to White (b). What is the phenotype?",
+                sub: "Does the dominant allele hide the recessive one?",
+                options: ["White", "Gray", "Black", "Spotted"],
+                correct: 2,
+                gridType: "none"
+            },
+            // LEVEL 3: MEDIUM (Test Cross logic)
+            {
+                text: "You have a Purple flower (P_) but don't know if it's PP or Pp. You cross it with a white flower (pp). If half the offspring are white, what was the parent?",
+                sub: "This is called a Test Cross.",
+                options: ["Homozygous Dominant (PP)", "Heterozygous (Pp)", "Homozygous Recessive (pp)", "Codominant"],
+                correct: 1,
+                gridType: "2x2",
+                gridData: ["Pp", "pp", "Pp", "pp"]
+            },
+            // LEVEL 4: HARD (Dihybrid Ratio)
+            {
+                text: "Dihybrid Cross: RrYy x RrYy. (Round/Wrinkled, Yellow/Green). What fraction of offspring are Round and Yellow (Both Dominant traits)?",
+                sub: "Recall the classic Mendel ratio for dihybrids.",
+                options: ["1/16", "3/16", "9/16", "12/16"],
+                correct: 2,
+                gridType: "4x4", // Just a visual cue that it's big
+                gridData: []
+            },
+            // LEVEL 5: EXPERT (Epistasis - Like your uploaded image)
+            {
+                text: "Epistasis: Mice need a color gene (C) to show pigment. If they are cc, they are Albino regardless of the Black(B)/Brown(b) gene. In a BbCc x BbCc cross, what is the chance of an Albino mouse?",
+                sub: "Look for any genotype ending in cc.",
+                options: ["1/16", "3/16", "4/16 (1/4)", "9/16"],
+                correct: 2,
+                gridType: "4x4",
+                gridData: []
+            }
+        ];
+
+        let currentQ = 0;
+        let score = 0;
+        const maxScore = questions.length * 100; // 500 points total
+        
+        // DOM Elements
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const endScreen = document.getElementById('end-screen');
+        const pointer = document.getElementById('pointer');
+        const scoreText = document.getElementById('score-text');
+
+        function startGame() {
+            startScreen.style.display = 'none';
+            gameScreen.style.display = 'block';
+            endScreen.style.display = 'none';
+            currentQ = 0;
+            score = 0;
+            updateScoreboard();
+            loadQuestion();
+        }
+
+        function updateScoreboard() {
+            // Calculate percentage for pointer position (0 to 100%)
+            // We want 0 pts = 0%, Max pts = 100%
+            let percentage = (score / maxScore) * 100;
+            if (percentage > 100) percentage = 100;
+            
+            pointer.style.left = percentage + "%";
+            scoreText.textContent = `Score: ${score}`;
+
+            // Add 'lit' effect if score is high
+            if(percentage > 80) {
+                document.body.style.backgroundColor = "#fff0f5"; // Slight pink tint
+            }
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQ];
+            document.getElementById('q-number').textContent = `Question ${currentQ + 1}/${questions.length}`;
+            document.getElementById('level-indicator').textContent = currentQ < 2 ? "Level: Easy" : (currentQ < 4 ? "Level: Medium" : "Level: Expert");
+            
+            document.getElementById('q-text').textContent = q.text;
+            document.getElementById('q-sub').textContent = q.sub;
+            
+            // Reset UI
+            const feedback = document.getElementById('feedback-area');
+            feedback.style.display = 'none';
+            feedback.className = 'feedback';
+            document.getElementById('next-btn').style.display = 'none';
+
+            // Generate Visual Helper (Grids)
+            const helperBox = document.getElementById('visual-helper');
+            helperBox.innerHTML = '';
+            
+            if (q.gridType === '2x2') {
+                helperBox.style.display = 'block';
+                let html = '<div class="punnett-grid-2x2">';
+                q.gridData.forEach(g => {
+                    html += `<div class="p-cell">${g}</div>`;
+                });
+                html += '</div><div style="font-size:0.8em; margin-top:5px; color:#777;">Hint: Visualize the square</div>';
+                helperBox.innerHTML = html;
+            } else if (q.gridType === '4x4') {
+                helperBox.style.display = 'block';
+                // Just a static grid representation for flavor
+                let html = '<div class="punnett-grid-4x4">';
+                for(let i=0; i<16; i++) {
+                     html += `<div class="p-cell p-cell-4">?</div>`;
+                }
+                html += '</div><div style="font-size:0.8em; margin-top:5px; color:#777;">Complex 16-Square Cross</div>';
+                helperBox.innerHTML = html;
+            } else {
+                helperBox.style.display = 'none';
+            }
+
+            // Generate Options
+            const optsContainer = document.getElementById('options-container');
+            optsContainer.innerHTML = '';
+            
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-option';
+                btn.textContent = opt;
+                btn.onclick = () => checkAnswer(index, btn);
+                optsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIndex, btnElement) {
+            // Disable all buttons
+            const buttons = document.querySelectorAll('.btn-option');
+            buttons.forEach(b => b.disabled = true);
+
+            const q = questions[currentQ];
+            const feedback = document.getElementById('feedback-area');
+            const nextBtn = document.getElementById('next-btn');
+
+            feedback.style.display = 'block';
+
+            if (selectedIndex === q.correct) {
+                // Correct
+                btnElement.style.backgroundColor = "#d4edda";
+                btnElement.style.borderColor = "#28a745";
+                feedback.textContent = "Correct! +100 Points";
+                feedback.classList.add('correct');
+                score += 100;
+                updateScoreboard();
+            } else {
+                // Incorrect
+                btnElement.style.backgroundColor = "#f8d7da";
+                btnElement.style.borderColor = "#dc3545";
+                feedback.textContent = `Whoops! The correct answer was: ${q.options[q.correct]}`;
+                feedback.classList.add('incorrect');
+                // Highlight the correct one
+                buttons[q.correct].style.backgroundColor = "#d4edda";
+                buttons[q.correct].style.borderColor = "#28a745";
+            }
+
+            nextBtn.style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQ++;
+            if (currentQ < questions.length) {
+                loadQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            gameScreen.style.display = 'none';
+            endScreen.style.display = 'block';
+            
+            const msg = document.getElementById('final-message');
+            if (score >= 400) {
+                msg.textContent = `Score: ${score}/500. You are absolutely LIT! 🔥 Genetics Master!`;
+            } else if (score >= 200) {
+                msg.textContent = `Score: ${score}/500. Good Job! You're getting the hang of it.`;
+            } else {
+                msg.textContent = `Score: ${score}/500. Nice try! Keep practicing those squares.`;
+            }
+        }
+
+    </script>
+</body>
+</html>

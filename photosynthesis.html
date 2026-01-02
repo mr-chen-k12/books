@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Photosynthesis Index Cards</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont;
+    background: #0f172a;
+    color: #e5e7eb;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .card {
+    width: 90%;
+    max-width: 420px;
+    min-height: 360px;
+    background: #020617;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 1.4rem;
+    margin: 0;
+    color: #38bdf8;
+  }
+
+  .content {
+    margin-top: 16px;
+    line-height: 1.5;
+  }
+
+  .hint {
+    color: #facc15;
+    margin-top: 10px;
+    display: none;
+  }
+
+  .details {
+    margin-top: 12px;
+    display: none;
+    color: #a5f3fc;
+  }
+
+  .highlight {
+    color: #34d399;
+    font-weight: bold;
+  }
+
+  button {
+    background: #1e293b;
+    border: none;
+    color: #e5e7eb;
+    padding: 10px;
+    margin: 6px 0;
+    border-radius: 8px;
+    font-size: 1rem;
+  }
+
+  button:active {
+    background: #334155;
+  }
+
+  .controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .footer {
+    text-align: center;
+    font-size: 0.8rem;
+    opacity: .7;
+  }
+</style>
+</head>
+
+<body>
+<div class="card">
+  <h1 id="title"></h1>
+
+  <div class="content">
+    <div id="front"></div>
+    <div class="hint" id="hint"></div>
+    <div class="details" id="details"></div>
+  </div>
+
+  <div>
+    <div class="controls">
+      <button onclick="toggleHint()">💡 Hint</button>
+      <button onclick="toggleDetails()">🔍 Reveal</button>
+      <button onclick="fullRun()">🔁 Full Run</button>
+    </div>
+    <div class="footer">Swipe • ← → • j / k</div>
+  </div>
+</div>
+
+<script>
+const cards = [
+  {
+    title: "Step 1 — Light Absorption",
+    front: "Light energy hits the chlorophyll.",
+    hint: "Think: sunlight + green pigment",
+    details: `
+Occurs in the <span class="highlight">thylakoid membrane</span>.
+<span class="highlight">Chlorophyll</span> absorbs photons.
+Electrons become <span class="highlight">excited</span>.
+`
+  },
+  {
+    title: "Step 2 — Water Splitting",
+    front: "Water molecules are split.",
+    hint: "Where does oxygen come from?",
+    details: `
+<span class="highlight">Photosystem II</span> splits H₂O.
+Produces:
+• <span class="highlight">O₂</span> (released)
+• <span class="highlight">H⁺</span> ions
+• <span class="highlight">electrons</span>
+`
+  },
+  {
+    title: "Step 3 — Electron Transport Chain",
+    front: "Electrons move through proteins.",
+    hint: "Like cellular respiration — but in plants",
+    details: `
+Electrons pass through the <span class="highlight">ETC</span>.
+Energy pumps <span class="highlight">H⁺</span> into thylakoid space.
+Creates a <span class="highlight">proton gradient</span>.
+`
+  },
+  {
+    title: "Step 4 — ATP Formation",
+    front: "ATP is made using a gradient.",
+    hint: "Chemiosmosis!",
+    details: `
+<span class="highlight">ATP synthase</span> uses H⁺ flow.
+Produces <span class="highlight">ATP</span>.
+Process called <span class="highlight">photophosphorylation</span>.
+`
+  },
+  {
+    title: "Step 5 — NADPH Formation",
+    front: "Electrons reduce NADP⁺.",
+    hint: "Electron carrier",
+    details: `
+Electrons + H⁺ reduce <span class="highlight">NADP⁺ → NADPH</span>.
+Occurs at <span class="highlight">Photosystem I</span>.
+`
+  },
+  {
+    title: "Step 6 — Calvin Cycle (Carbon Fixation)",
+    front: "CO₂ is attached to RuBP.",
+    hint: "Enzyme does the work",
+    details: `
+Occurs in the <span class="highlight">stroma</span>.
+Enzyme <span class="highlight">RuBisCO</span>.
+CO₂ is fixed into organic molecules.
+`
+  },
+  {
+    title: "Step 7 — Sugar Formation",
+    front: "Energy builds glucose.",
+    hint: "ATP + NADPH used",
+    details: `
+<span class="highlight">ATP</span> and <span class="highlight">NADPH</span> power reactions.
+Produces <span class="highlight">G3P</span>.
+Two G3P → <span class="highlight">glucose</span>.
+`
+  },
+  {
+    title: "Net Gains",
+    front: "What do we gain?",
+    hint: "Big picture",
+    details: `
+Light reactions:
+• Produce <span class="highlight">ATP</span>
+• Produce <span class="highlight">NADPH</span>
+• Release <span class="highlight">O₂</span>
+
+Calvin Cycle:
+• Produces <span class="highlight">glucose</span>
+• Uses ATP + NADPH
+`
+  }
+];
+
+let index = 0;
+
+function render() {
+  document.getElementById("title").innerHTML = cards[index].title;
+  document.getElementById("front").innerHTML = cards[index].front;
+  document.getElementById("hint").innerHTML = cards[index].hint;
+  document.getElementById("details").innerHTML = cards[index].details;
+  document.getElementById("hint").style.display = "none";
+  document.getElementById("details").style.display = "none";
+}
+
+function toggleHint() {
+  const h = document.getElementById("hint");
+  h.style.display = h.style.display === "none" ? "block" : "none";
+}
+
+function toggleDetails() {
+  const d = document.getElementById("details");
+  d.style.display = d.style.display === "none" ? "block" : "none";
+}
+
+function next() {
+  index = (index + 1) % cards.length;
+  render();
+}
+
+function prev() {
+  index = (index - 1 + cards.length) % cards.length;
+  render();
+}
+
+function fullRun() {
+  document.getElementById("hint").style.display = "block";
+  document.getElementById("details").style.display = "block";
+}
+
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowRight" || e.key === "j") next();
+  if (e.key === "ArrowLeft" || e.key === "k") prev();
+});
+
+let startX = null;
+document.addEventListener("touchstart", e => startX = e.touches[0].clientX);
+document.addEventListener("touchend", e => {
+  if (!startX) return;
+  let endX = e.changedTouches[0].clientX;
+  if (endX - startX > 50) prev();
+  if (startX - endX > 50) next();
+  startX = null;
+});
+
+render();
+</script>
+</body>
+</html>
