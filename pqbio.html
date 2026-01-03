@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hardy-Weinberg Quiz</title>
+<style>
+    :root {
+        --bg-color: #121212;
+        --card-bg: #1e1e1e;
+        --text-primary: #e0e0e0;
+        --text-secondary: #a0a0a0;
+        --accent-green: #4caf50;
+        --accent-red: #f44336;
+        --accent-blue: #7cacf8;
+        --border-radius: 12px;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-primary);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0;
+        padding: 20px;
+        min-height: 100vh;
+    }
+
+    .container {
+        max-width: 600px;
+        width: 100%;
+    }
+
+    /* Status Bar / Lit-o-Meter */
+    .status-container {
+        background: var(--card-bg);
+        padding: 20px;
+        border-radius: var(--border-radius);
+        margin-bottom: 20px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+
+    .status-title {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .bar-wrapper {
+        position: relative;
+        height: 40px;
+        margin-top: 10px;
+    }
+
+    .status-bar {
+        height: 12px;
+        width: 100%;
+        background: linear-gradient(90deg, #ff6b6b 0%, #feca57 50%, #48dbfb 100%);
+        border-radius: 10px;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .status-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 25px;
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        font-weight: bold;
+    }
+
+    .triangle-pointer {
+        width: 0; 
+        height: 0; 
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-bottom: 15px solid var(--text-primary);
+        position: absolute;
+        top: 15px; /* Just below the bar */
+        left: 0%; /* Dynamic */
+        transform: translateX(-50%);
+        transition: left 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* Quiz Card */
+    .quiz-card {
+        background-color: transparent;
+    }
+
+    .progress-dots {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    .dot {
+        height: 4px;
+        flex-grow: 1;
+        background-color: #333;
+        border-radius: 2px;
+    }
+    .dot.active { background-color: var(--accent-blue); }
+    .dot.completed { background-color: var(--accent-green); }
+
+    .question-text {
+        font-size: 1.1rem;
+        line-height: 1.5;
+        margin-bottom: 25px;
+    }
+
+    .code-snippet {
+        background: #2d2d2d;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: monospace;
+        color: #ff9e80;
+    }
+
+    .options {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .option-btn {
+        background-color: #2c2c2c;
+        border: 2px solid transparent;
+        border-radius: var(--border-radius);
+        padding: 15px;
+        text-align: left;
+        color: var(--text-primary);
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+
+    .option-btn:hover:not(:disabled) {
+        background-color: #383838;
+    }
+
+    .option-btn:disabled {
+        cursor: default;
+        opacity: 0.7;
+    }
+
+    /* Feedback States */
+    .option-btn.correct {
+        border-color: var(--accent-green);
+        background-color: rgba(76, 175, 80, 0.1);
+    }
+
+    .option-btn.wrong {
+        border-color: var(--accent-red);
+        background-color: rgba(244, 67, 54, 0.1);
+    }
+
+    .feedback {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        font-size: 0.9rem;
+        display: none; /* Hidden by default */
+    }
+
+    .feedback-title {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .correct .feedback-title { color: var(--accent-green); }
+    .wrong .feedback-title { color: var(--accent-red); }
+
+    .correct .feedback { display: block; }
+    .wrong .feedback { display: block; }
+
+    /* Next Button */
+    .next-btn {
+        background-color: var(--accent-blue);
+        color: #121212;
+        border: none;
+        width: 100%;
+        padding: 16px;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: bold;
+        margin-top: 30px;
+        cursor: pointer;
+        display: none; /* Hidden until answer selected */
+    }
+    
+    .math-sub {
+        vertical-align: sub;
+        font-size: smaller;
+    }
+    .math-sup {
+        vertical-align: super;
+        font-size: smaller;
+    }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="status-container">
+        <div class="status-title">Current Status</div>
+        <div class="bar-wrapper">
+            <div class="status-bar"></div>
+            <div class="triangle-pointer" id="statusPointer"></div>
+        </div>
+        <div class="status-labels">
+            <span>STARTING</span>
+            <span>TRYING</span>
+            <span>LIT 🔥</span>
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <div class="progress-dots" id="progressDots">
+            </div>
+
+        <div id="quizContent">
+            </div>
+
+        <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question</button>
+    </div>
+
+</div>
+
+<script>
+    // Quiz Data
+    const questions = [
+        {
+            text: "In a population in Hardy-Weinberg equilibrium, the frequency of a recessive condition (genotype <span class='code-snippet'>aa</span>) is 1 in 3,600 births. What is the percentage of individuals who are carriers?",
+            options: [
+                { 
+                    text: "0.028%", 
+                    correct: false, 
+                    feedback: "Not quite. This is the frequency of the recessive genotype (0.00028), not the carriers." 
+                },
+                { 
+                    text: "1.6%", 
+                    correct: false, 
+                    feedback: "Close, but this calculation likely missed the factor of 2 in the 2pq formula." 
+                },
+                { 
+                    text: "3.27% (approx 3.3%)", 
+                    correct: true, 
+                    feedback: "Right answer! <br>Logic: q² = 1/3600 = 0.000277. <br>So q = √0.000277 ≈ 0.0166. <br>p = 1 - 0.0166 = 0.9834. <br>Carriers = 2pq = 2(0.9834)(0.0166) ≈ 0.0327 (3.27%)." 
+                },
+                { 
+                    text: "0.05%", 
+                    correct: false, 
+                    feedback: "Incorrect. Make sure to calculate q first by taking the square root of the recessive frequency." 
+                }
+            ]
+        },
+        {
+            text: "Albinism is a recessive trait. If 1 in 10,000 individuals have this condition, what is the frequency of the carrier genotype?",
+            options: [
+                { 
+                    text: "1.98% (approx 2%)", 
+                    correct: true, 
+                    feedback: "Correct! <br>q² = 0.0001 → q = 0.01. <br>p = 0.99. <br>Carriers (2pq) = 2(0.99)(0.01) = 0.0198." 
+                },
+                { 
+                    text: "10%", 
+                    correct: false, 
+                    feedback: "Not quite. That would be the square root of 0.01, but 1/10,000 is 0.0001." 
+                },
+                { 
+                    text: "0.99%", 
+                    correct: false, 
+                    feedback: "Incorrect. This is roughly the value of 1pq, but carriers are 2pq." 
+                },
+                { 
+                    text: "0.01%", 
+                    correct: false, 
+                    feedback: "Incorrect. This is the allele frequency (q), not the carrier frequency." 
+                }
+            ]
+        },
+        {
+            text: "If the frequency of a dominant allele (p) in a population is 0.6, what is the frequency of the heterozygous genotype?",
+            options: [
+                { 
+                    text: "0.36", 
+                    correct: false, 
+                    feedback: "Incorrect. This is p² (homozygous dominant)." 
+                },
+                { 
+                    text: "0.48", 
+                    correct: true, 
+                    feedback: "Right answer! <br>If p = 0.6, then q = 0.4. <br>Heterozygotes = 2pq = 2(0.6)(0.4) = 0.48." 
+                },
+                { 
+                    text: "0.16", 
+                    correct: false, 
+                    feedback: "Incorrect. This is q² (homozygous recessive)." 
+                },
+                { 
+                    text: "0.24", 
+                    correct: false, 
+                    feedback: "Not quite. You likely forgot to multiply by 2." 
+                }
+            ]
+        },
+        {
+            text: "In a population, 9% of individuals show the recessive phenotype. What is the frequency of the dominant allele?",
+            options: [
+                { 
+                    text: "0.7", 
+                    correct: true, 
+                    feedback: "Correct! <br>Recessive frequency (q²) = 0.09. <br>q = √0.09 = 0.3. <br>Therefore, p = 1 - 0.3 = 0.7." 
+                },
+                { 
+                    text: "0.3", 
+                    correct: false, 
+                    feedback: "Incorrect. This is the frequency of the recessive allele (q), not the dominant one (p)." 
+                },
+                { 
+                    text: "0.91", 
+                    correct: false, 
+                    feedback: "Incorrect. This is the frequency of the dominant phenotype (p² + 2pq), not the allele." 
+                },
+                { 
+                    text: "0.81", 
+                    correct: false, 
+                    feedback: "Incorrect. This would be p² if p=0.9, but p is 0.7." 
+                }
+            ]
+        },
+        {
+            text: "Which of the following equations represents the frequency of the carrier genotype?",
+            options: [
+                { 
+                    text: "p²", 
+                    correct: false, 
+                    feedback: "Incorrect. This is Homozygous Dominant." 
+                },
+                { 
+                    text: "q²", 
+                    correct: false, 
+                    feedback: "Incorrect. This is Homozygous Recessive." 
+                },
+                { 
+                    text: "p + q", 
+                    correct: false, 
+                    feedback: "Incorrect. This equals 1." 
+                },
+                { 
+                    text: "2pq", 
+                    correct: true, 
+                    feedback: "Correct! 2pq represents the Heterozygous (carrier) genotype." 
+                }
+            ]
+        }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0; // Each correct answer adds to score to move the triangle
+
+    // Initialize
+    function init() {
+        renderDots();
+        loadQuestion(currentQuestion);
+        updateLitMeter();
+    }
+
+    function renderDots() {
+        const container = document.getElementById('progressDots');
+        container.innerHTML = '';
+        questions.forEach((_, index) => {
+            const dot = document.createElement('div');
+            dot.className = `dot ${index === 0 ? 'active' : ''}`;
+            container.appendChild(dot);
+        });
+    }
+
+    function updateDots() {
+        const dots = document.querySelectorAll('.dot');
+        dots.forEach((dot, index) => {
+            if (index < currentQuestion) {
+                dot.className = 'dot completed';
+            } else if (index === currentQuestion) {
+                dot.className = 'dot active';
+            } else {
+                dot.className = 'dot';
+            }
+        });
+    }
+
+    function loadQuestion(index) {
+        if (index >= questions.length) {
+            showSummary();
+            return;
+        }
+
+        const q = questions[index];
+        const contentDiv = document.getElementById('quizContent');
+        
+        let html = `<div class="question-text">${q.text}</div><div class="options">`;
+        
+        q.options.forEach((opt, i) => {
+            html += `
+                <button class="option-btn" onclick="checkAnswer(this, ${i})">
+                    ${opt.text}
+                    <div class="feedback">
+                        <span class="feedback-title"></span>
+                        ${opt.feedback}
+                    </div>
+                </button>
+            `;
+        });
+
+        html += `</div>`;
+        contentDiv.innerHTML = html;
+        document.getElementById('nextBtn').style.display = 'none';
+        updateDots();
+    }
+
+    function checkAnswer(btn, optionIndex) {
+        // Disable all buttons to prevent double clicking
+        const allBtns = document.querySelectorAll('.option-btn');
+        allBtns.forEach(b => b.disabled = true);
+
+        const q = questions[currentQuestion];
+        const isCorrect = q.options[optionIndex].correct;
+
+        // Show Next Button
+        document.getElementById('nextBtn').style.display = 'block';
+
+        const titleSpan = btn.querySelector('.feedback-title');
+
+        if (isCorrect) {
+            btn.classList.add('correct');
+            titleSpan.innerText = "Right answer";
+            score++;
+        } else {
+            btn.classList.add('wrong');
+            titleSpan.innerText = "Not quite";
+            
+            // Highlight the correct one too so they learn
+            q.options.forEach((opt, i) => {
+                if (opt.correct) {
+                    allBtns[i].classList.add('correct');
+                    allBtns[i].querySelector('.feedback-title').innerText = "Correct Answer";
+                }
+            });
+        }
+        updateLitMeter();
+    }
+
+    function nextQuestion() {
+        currentQuestion++;
+        loadQuestion(currentQuestion);
+    }
+
+    function updateLitMeter() {
+        const pointer = document.getElementById('statusPointer');
+        
+        // Calculate percentage based on (Correct Answers / Total Questions So Far) 
+        // Or simply progress based on total correct answers possible
+        // Let's make it fun: It moves forward for every correct answer.
+        
+        // Logic: 
+        // 0 correct = 0% (Starting)
+        // 50% correct = 50% (Trying)
+        // 100% correct = 100% (Lit)
+        
+        // We calculate max score possible (questions.length)
+        const percentage = (score / questions.length) * 100;
+        
+        // Clamp it between 5% and 95% for visual padding
+        let visualPos = percentage;
+        if (visualPos < 2) visualPos = 2;
+        if (visualPos > 98) visualPos = 98;
+
+        pointer.style.left = `${visualPos}%`;
+    }
+
+    function showSummary() {
+        const contentDiv = document.getElementById('quizContent');
+        let msg = "";
+        if (score === questions.length) msg = "You are fully LIT! 🔥 Perfect Score.";
+        else if (score > questions.length / 2) msg = "Good job! You're getting there.";
+        else msg = "Keep practicing, you're just starting!";
+
+        contentDiv.innerHTML = `
+            <div style="text-align: center; padding: 40px;">
+                <h2>Quiz Complete!</h2>
+                <p style="font-size: 1.2rem;">${score} / ${questions.length} Correct</p>
+                <p>${msg}</p>
+                <button class="next-btn" onclick="location.reload()" style="display:block">Try Again</button>
+            </div>
+        `;
+        document.getElementById('nextBtn').style.display = 'none';
+    }
+
+    // Start
+    init();
+
+</script>
+
+</body>
+</html>
