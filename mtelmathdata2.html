@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTEL Race & Ethnicity Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f9; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 5px; }
+        h2 { border-bottom: 2px solid #eaeaea; padding-bottom: 10px; margin-top: 40px; color: #444; }
+        p.subtitle { text-align: center; color: #666; font-style: italic; margin-bottom: 40px; }
+        
+        .chart-box { background: #fafafa; padding: 20px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 30px; }
+        
+        .insight-box { background-color: #ffeaa7; border-left: 5px solid #fdcb6e; padding: 15px; margin-bottom: 30px; border-radius: 4px; }
+        .insight-box strong { color: #d35400; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        th { background-color: #2c3e50; color: white; }
+        td:first-child { text-align: left; font-weight: bold; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>MTEL Disparities by Race</h1>
+    <p class="subtitle">Comparing Passing Rates: Literacy vs. Math</p>
+
+    <div class="insight-box">
+        <strong>The "Math Gap":</strong> While all groups see a drop in pass rates for Math, the impact is disproportionate. 
+        For <strong>Black/African American</strong> candidates, the passing rate for the Elementary Math requirement drops to roughly <strong>27%</strong>.
+    </div>
+
+    <h2>Literacy (2024) vs. General Math (2022)</h2>
+    <div class="chart-box">
+        <canvas id="raceComparisonChart"></canvas>
+    </div>
+
+    <h2>Detailed Breakdown</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Demographic Group</th>
+                <th>Literacy Pass Rate (2024)</th>
+                <th>Math Pass Rate (Gen Curric 2022)*</th>
+                <th>Drop in Pass Rate</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>White</td>
+                <td style="background-color: #d5f5e3; color: #196f3d;">78.3%</td>
+                <td style="background-color: #fcf3cf; color: #9a7d0a;">49.1%</td>
+                <td>-29.2%</td>
+            </tr>
+            <tr>
+                <td>Hispanic / Latino</td>
+                <td style="background-color: #fcf3cf; color: #9a7d0a;">51.1%</td>
+                <td style="background-color: #fadbd8; color: #922b21;">42.6%</td>
+                <td>-8.5%</td>
+            </tr>
+            <tr>
+                <td>Black / African American</td>
+                <td style="background-color: #fadbd8; color: #922b21;">43.8%</td>
+                <td style="background-color: #f5b7b1; color: #922b21; font-weight:bold;">27.4%</td>
+                <td>-16.4%</td>
+            </tr>
+            <tr>
+                <td>Asian / Pacific Islander</td>
+                <td style="background-color: #d5f5e3; color: #196f3d;">73.4%</td>
+                <td style="background-color: #d5f5e3; color: #196f3d;">69.9%</td>
+                <td>-3.5%</td>
+            </tr>
+        </tbody>
+    </table>
+    <p style="font-size: 0.85em; color: #777; margin-top: 10px;">
+        <em>*Note: 2024 specific racial breakdown for Math was not fully extracted; 2022 General Curriculum Math data is used here as a representative proxy for ongoing structural trends.</em>
+    </p>
+</div>
+
+<script>
+    const ctx = document.getElementById('raceComparisonChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['White', 'Hispanic/Latino', 'Black/African Amer.', 'Asian/Pacific Isl.'],
+            datasets: [
+                {
+                    label: 'Communication & Literacy (2024)',
+                    data: [78.3, 51.1, 43.8, 73.4],
+                    backgroundColor: '#3498db'
+                },
+                {
+                    label: 'General Curriculum Math (2022)',
+                    data: [49.1, 42.6, 27.4, 69.9],
+                    backgroundColor: '#e74c3c'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    title: { display: true, text: 'Passing Rate (%)' }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + context.parsed.y + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
