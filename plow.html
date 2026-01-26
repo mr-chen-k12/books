@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snow Removal Gear Checklist</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-top: 5px solid #007bff;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #007bff;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-top: 30px;
+            font-size: 1.2rem;
+        }
+        .checklist-group {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist-item {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            transition: background 0.2s;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        .checklist-item:hover {
+            background-color: #f9f9f9;
+        }
+        /* Custom Checkbox Styling */
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            cursor: pointer;
+            accent-color: #007bff;
+        }
+        label {
+            cursor: pointer;
+            font-size: 1.1rem;
+            width: 100%;
+        }
+        /* Strikethrough when checked */
+        input[type="checkbox"]:checked + label {
+            text-decoration: line-through;
+            color: #888;
+        }
+        .btn-container {
+            text-align: center;
+            margin-top: 40px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        @media print {
+            body { background: white; }
+            .container { box-shadow: none; border: none; width: 100%; }
+            button { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>❄️ Snow Removal Gear Prep</h1>
+
+    <h2>Personal Protective Equipment (PPE)</h2>
+    <ul class="checklist-group">
+        <li class="checklist-item">
+            <input type="checkbox" id="gloves">
+            <label for="gloves">Heavy-duty Insulated Gloves</label>
+        </li>
+        <li class="checklist-item">
+            <input type="checkbox" id="glasses">
+            <label for="glasses">Safety Glasses / Tinted Goggles (Glare protection)</label>
+        </li>
+        <li class="checklist-item">
+            <input type="checkbox" id="jacket">
+            <label for="jacket">High-Visibility Insulated Jacket</label>
+        </li>
+        <li class="checklist-item">
+            <input type="checkbox" id="boots">
+            <label for="boots">Waterproof Non-Slip Boots</label>
+        </li>
+        <li class="checklist-item">
+            <input type="checkbox" id="hat">
+            <label for="hat">Thermal Hat or Balaclava</label>
+        </li>
+        <li class="checklist-item">
+            <input type="checkbox" id="vest">
+            <label for="vest">Reflective Safety Vest (if jacket is not high-vis)</label>
+        </li>
+    </ul>
+
+    <h2>Manual Tools & Supplies</h2>
+    <ul class="checklist-group">
+        <li class="checklist-item">
+            <input type="checkbox" id="shovel-push">
+            <label for="shovel-push">Snow Pusher Shovel</label>
+        </li>
+        <li class="checklist-item">
+            <input type="checkbox" id="shovel-scoop">
+            <label for="shovel-scoop">Scoop Shovel (for lifting)</label>
+        </li>
+        <li class="checklist-item">
+            <input type="checkbox" id="ice-chipper">
+            <label for="ice-chipper">Ice Chipper / Scraper</label>
+        </li>
+        <li class="checklist-item">
+            <input type="checkbox" id="salt">
+            <label for="salt">Rock Salt or Ice Melt (Calcium Chloride)</label>
+        </li>
+        <li class="checklist-item">
+            <input type="checkbox" id="spreader">
+            <label for="spreader">Handheld or Walk-behind Salt Spreader</label>
+        </li>
+    </ul>
+
+    <h2>Machinery (Plower/Blower) Setup</h2>
+    <ul class="checklist-group">
+        <li class="checklist-item">
+            <input type="checkbox" id="plower-check">
+            <label for="plower-check">Plow Blade Inspection (Bolts tight, edge good)</label>
+        </li>
+        <li class="checklist-item">
+            <input type="checkbox" id="hydraulics">
+            <label for="hydraulics">Hydraulic Fluid Check</label>
+        </li>
+        <li class="checklist-item">
+            <input type="checkbox" id="lights">
+            <label for="lights">Auxiliary/Warning Lights Check</label>
+        </li>
+        <li class="checklist-item">
+            <input type="checkbox" id="fuel">
+            <label for="fuel">Full Tank of Gas/Diesel</label>
+        </li>
+        <li class="checklist-item">
+            <input type="checkbox" id="chains">
+            <label for="chains">Tire Chains (if required)</label>
+        </li>
+    </ul>
+
+    <div class="btn-container">
+        <button onclick="window.print()">Print Checklist</button>
+    </div>
+</div>
+
+</body>
+</html>
