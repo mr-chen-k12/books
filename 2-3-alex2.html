@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 76 Master Quiz</title>
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']], 
+                displayMath: [['$$', '$$']]
+            },
+            startup: {
+                typeset: false // We will trigger it manually to be safe
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .header-container {
+            max-width: 800px;
+            margin: 0 auto 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border-bottom: 5px solid #3b82f6;
+        }
+
+        h1 { margin: 0; color: #111827; font-size: 2rem; }
+        .subtitle { color: #6b7280; margin-top: 8px; font-size: 1.1rem; }
+
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .question-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .q-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topic-badge {
+            background-color: #dbeafe;
+            color: #1e40af;
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .q-text { margin-bottom: 20px; font-size: 1.05rem; }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background-color: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+            color: #374151;
+        }
+
+        .option-btn:hover {
+            background-color: #f3f4f6;
+            border-color: #d1d5db;
+        }
+
+        .option-btn.selected {
+            background-color: #eff6ff;
+            border-color: #3b82f6;
+            color: #1d4ed8;
+            font-weight: 600;
+        }
+
+        /* Results Styles */
+        .option-btn.correct {
+            background-color: #dcfce7;
+            border-color: #16a34a;
+            color: #166534;
+        }
+        
+        .option-btn.incorrect {
+            background-color: #fee2e2;
+            border-color: #dc2626;
+            color: #991b1b;
+            opacity: 0.7;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #94a3b8;
+            display: none;
+        }
+        .feedback.show { display: block; }
+
+        .controls {
+            max-width: 800px;
+            margin: 30px auto;
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 -4px 6px -1px rgba(0,0,0,0.1);
+            position: sticky;
+            bottom: 20px;
+        }
+
+        .submit-btn {
+            background-color: #3b82f6;
+            color: white;
+            font-weight: 700;
+            padding: 15px 40px;
+            border-radius: 8px;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.4);
+            transition: transform 0.1s;
+        }
+        .submit-btn:hover { background-color: #2563eb; }
+        .submit-btn:active { transform: scale(0.97); }
+
+        #score-display {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #111827;
+            margin-top: 15px;
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: 1fr; }
+            body { padding: 10px; }
+            .header-container { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <h1>Lesson 76 Review</h1>
+        <p class="subtitle">30 Questions • Sales Tax, Geometry, & Algebra</p>
+    </div>
+
+    <div class="quiz-container" id="quiz-content">
+        </div>
+
+    <div class="controls">
+        <button class="submit-btn" id="check-btn" onclick="checkAnswers()">Check All Answers</button>
+        <div id="score-display"></div>
+    </div>
+
+    <script>
+        /* NOTE: 
+           - Money is written as &#36; (HTML Entity) to strictly avoid MathJax conflicts.
+           - Math is written inside \\( ... \\).
+        */
+        const questions = [
+            // --- SALES TAX ---
+            {
+                topic: "Sales Tax",
+                q: "A video game costs &#36;40.00. If the sales tax rate is 6%, what is the tax amount?",
+                opts: ["&#36;2.40", "&#36;4.00", "&#36;0.24", "&#36;6.00"],
+                ans: 0,
+                exp: "Convert 6% to 0.06. Multiply: \\( 40 \\times 0.06 = 2.40 \\)."
+            },
+            {
+                topic: "Sales Tax",
+                q: "A skateboard costs &#36;50.00. The tax is 8%. What is the <strong>total</strong> price?",
+                opts: ["&#36;58.00", "&#36;54.00", "&#36;50.80", "&#36;4.00"],
+                ans: 1,
+                exp: "Tax = \\( 50 \\times 0.08 = 4 \\). Total = \\( 50 + 4 = 54 \\)."
+            },
+            {
+                topic: "Sales Tax",
+                q: "If the tax on a &#36;10 item is &#36;0.70, what is the tax rate?",
+                opts: ["5%", "6%", "7%", "0.7%"],
+                ans: 2,
+                exp: "Rate = \\( \\frac{\\text{Tax}}{\\text{Price}} \\). \\( \\frac{0.70}{10} = 0.07 = 7\\% \\)."
+            },
+            {
+                topic: "Money",
+                q: "Which amount is equivalent to 5 cents?",
+                opts: ["&#36;0.50", "&#36;0.05", "&#36;0.005", "&#36;5.00"],
+                ans: 1,
+                exp: "5 cents is 5 hundredths of a dollar: &#36;0.05."
+            },
+
+            // --- GEOMETRY: AREA ---
+            {
+                topic: "Area",
+                q: "Find the area of a parallelogram with base = 15 cm and height = 4 cm.",
+                opts: ["19 sq cm", "30 sq cm", "60 sq cm", "50 sq cm"],
+                ans: 2,
+                exp: "Area = base × height. \\( 15 \\times 4 = 60 \\)."
+            },
+            {
+                topic: "Area",
+                q: "A parallelogram has Area = 40 sq ft and base = 8 ft. What is the height?",
+                opts: ["5 ft", "320 ft", "4 ft", "10 ft"],
+                ans: 0,
+                exp: "Divide Area by base: \\( 40 \\div 8 = 5 \\)."
+            },
+            {
+                topic: "Area",
+                q: "The area of a parallelogram is 200 sq cm. If it is cut into two congruent triangles, what is the area of one triangle?",
+                opts: ["200 sq cm", "100 sq cm", "50 sq cm", "400 sq cm"],
+                ans: 1,
+                exp: "Congruent means equal. Half of 200 is 100."
+            },
+
+            // --- COORDINATES ---
+            {
+                topic: "Coordinates",
+                q: "Identify coordinates for a point 2 units left and 4 units down from the origin.",
+                opts: ["(2, 4)", "(-2, 4)", "(-2, -4)", "(2, -4)"],
+                ans: 2,
+                exp: "Left is negative x (-2). Down is negative y (-4)."
+            },
+            {
+                topic: "Coordinates",
+                q: "In which quadrant is the point (3, -5)?",
+                opts: ["Quadrant I", "Quadrant II", "Quadrant III", "Quadrant IV"],
+                ans: 3,
+                exp: "Positive x (right) and Negative y (down) is Quadrant IV."
+            },
+            {
+                topic: "Coordinates",
+                q: "Find the distance between (2, 5) and (2, 1).",
+                opts: ["6 units", "4 units", "3 units", "5 units"],
+                ans: 1,
+                exp: "Subtract the y-values: \\( 5 - 1 = 4 \\)."
+            },
+            {
+                topic: "Geometry",
+                q: "Connecting (0,0), (0,3), and (4,0) forms what shape?",
+                opts: ["Square", "Rectangle", "Right Triangle", "Obtuse Triangle"],
+                ans: 2,
+                exp: "The x and y axes meet at 90°, creating a Right Triangle."
+            },
+
+            // --- FRACTIONS ---
+            {
+                topic: "Conversion",
+                q: "Convert \\( 2\\frac{1}{2} \\) to a decimal.",
+                opts: ["2.2", "2.5", "2.12", "2.05"],
+                ans: 1,
+                exp: "\\( \\frac{1}{2} = 0.5 \\), so the answer is 2.5."
+            },
+            {
+                topic: "Conversion",
+                q: "Write 0.04 as a reduced fraction.",
+                opts: ["\\( \\frac{1}{25} \\)", "\\( \\frac{4}{10} \\)", "\\( \\frac{1}{4} \\)", "\\( \\frac{1}{50} \\)"],
+                ans: 0,
+                exp: "0.04 is \\( \\frac{4}{100} \\). Simplify by dividing by 4: \\( \\frac{1}{25} \\)."
+            },
+            {
+                topic: "Compare",
+                q: "Compare: \\( \\frac{3}{4} \\bigcirc 0.7 \\)",
+                opts: ["<", ">", "="],
+                ans: 1,
+                exp: "\\( \\frac{3}{4} = 0.75 \\). Since 0.75 is greater than 0.70, use >."
+            },
+            {
+                topic: "Compare",
+                q: "Which is smaller: \\( \\frac{3}{5} \\) or \\( \\frac{5}{8} \\)?",
+                opts: ["\\( \\frac{3}{5} \\)", "\\( \\frac{5}{8} \\)"],
+                ans: 0,
+                exp: "\\( \\frac{3}{5} = 0.60 \\) and \\( \\frac{5}{8} = 0.625 \\). 0.60 is smaller."
+            },
+            {
+                topic: "Percents",
+                q: "Write 0.04 as a percent.",
+                opts: ["40%", "4%", "0.4%", "0.04%"],
+                ans: 1,
+                exp: "Move decimal 2 places right: 4%."
+            },
+            {
+                topic: "Percents",
+                q: "12 out of 25 students got an A. What percent is that?",
+                opts: ["12%", "25%", "48%", "50%"],
+                ans: 2,
+                exp: "\\( \\frac{12}{25} = \\frac{48}{100} = 48\\% \\)."
+            },
+
+            // --- ALGEBRA ---
+            {
+                topic: "Division",
+                q: "Calculate \\( 200 \\div 18 \\) (write remainder as fraction).",
+                opts: ["\\( 10 \\frac{1}{9} \\)", "\\( 11 \\frac{1}{9} \\)", "\\( 11 \\frac{2}{9} \\)", "\\( 11 \\frac{1}{2} \\)"],
+                ans: 1,
+                exp: "200 divided by 18 is 11 r2. Fraction is \\( \\frac{2}{18} \\) which simplifies to \\( \\frac{1}{9} \\)."
+            },
+            {
+                topic: "Algebra",
+                q: "Solve for n: \\( 6.7 + 0.48 + n = 8 \\).",
+                opts: ["0.82", "1.18", "1.82", "0.92"],
+                ans: 0,
+                exp: "Add knowns: \\( 6.7 + 0.48 = 7.18 \\). Subtract from 8: \\( 8.00 - 7.18 = 0.82 \\)."
+            },
+            {
+                topic: "Algebra",
+                q: "If \\( b = 12 \\) and \\( h = 9 \\), evaluate \\( \\frac{bh}{2} \\).",
+                opts: ["108", "54", "21", "42"],
+                ans: 1,
+                exp: "\\( 12 \\times 9 = 108 \\). \\( 108 \\div 2 = 54 \\)."
+            },
+            {
+                topic: "Exponents",
+                q: "Calculate \\( 10^2 - 4^3 \\).",
+                opts: ["36", "60", "14", "20"],
+                ans: 0,
+                exp: "\\( 100 - 64 = 36 \\)."
+            },
+            {
+                topic: "Exponents",
+                q: "Product of ten squared and two cubed.",
+                opts: ["200", "800", "600", "1600"],
+                ans: 1,
+                exp: "Ten squared (100) × Two cubed (8) = 800."
+            },
+            {
+                topic: "Algebra",
+                q: "Solve: \\( 12 - d = 4.75 \\).",
+                opts: ["8.25", "7.25", "7.75", "16.75"],
+                ans: 1,
+                exp: "\\( 12.00 - 4.75 = 7.25 \\)."
+            },
+
+            // --- MISC ---
+            {
+                topic: "Perimeter",
+                q: "Triangle sides: 20 mm, 16 mm, 12 mm. Find perimeter.",
+                opts: ["240 mm", "48 mm", "38 mm", "50 mm"],
+                ans: 1,
+                exp: "Add all sides: \\( 20 + 16 + 12 = 48 \\)."
+            },
+            {
+                topic: "Angles",
+                q: "Angles T and R are complementary. If R = 53°, what is T?",
+                opts: ["37°", "127°", "47°", "43°"],
+                ans: 0,
+                exp: "Complementary means they add to 90°. \\( 90 - 53 = 37 \\)."
+            },
+            {
+                topic: "Units",
+                q: "Appropriate unit for circumference of a juice glass?",
+                opts: ["Meters", "Kilometers", "Centimeters", "Milligrams"],
+                ans: 2,
+                exp: "Centimeters (cm) is best for small objects like a glass."
+            },
+            {
+                topic: "Volume",
+                q: "Prism dimensions: 3 long, 2 wide, 2 high. How many cubes?",
+                opts: ["7", "10", "12", "16"],
+                ans: 2,
+                exp: "Volume = \\( 3 \\times 2 \\times 2 = 12 \\)."
+            },
+            {
+                topic: "Geometry",
+                q: "Lines that intersect at 90° are called...",
+                opts: ["Parallel", "Perpendicular", "Skew", "Oblique"],
+                ans: 1,
+                exp: "Perpendicular lines form right angles."
+            },
+            {
+                topic: "Stats",
+                q: "Median of: 0.3, 0.25, 0.2, 0.27, 0.313",
+                opts: ["0.2", "0.27", "0.3", "0.25"],
+                ans: 1,
+                exp: "Order: 0.2, 0.25, 0.27, 0.3, 0.313. Middle is 0.27."
+            },
+            {
+                topic: "Word Problem",
+                q: "1 dog year = 7 human years. How many human years is a 13-year-old dog?",
+                opts: ["20", "84", "91", "100"],
+                ans: 2,
+                exp: "\\( 13 \\times 7 = 91 \\)."
+            }
+        ];
+
+        const quizContainer = document.getElementById('quiz-content');
+        let userAnswers = new Array(questions.length).fill(null);
+
+        // 1. Render Quiz Function
+        function renderQuiz() {
+            questions.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+                card.innerHTML = `
+                    <div class="q-title">
+                        <span>${index + 1}.</span>
+                        <span class="topic-badge">${item.topic}</span>
+                    </div>
+                    <div class="q-text">${item.q}</div>
+                    <div class="options-grid" id="options-${index}">
+                        ${item.opts.map((opt, i) => `
+                            <button class="option-btn" onclick="selectOption(${index}, ${i})">${opt}</button>
+                        `).join('')}
+                    </div>
+                    <div class="feedback" id="feedback-${index}"></div>
+                `;
+                quizContainer.appendChild(card);
+            });
+
+            // 2. CRITICAL: Trigger MathJax manually after content is injected
+            if (window.MathJax) {
+                MathJax.typesetPromise().then(() => {
+                    console.log("Math rendered successfully");
+                }).catch((err) => console.log("MathJax error: " + err.message));
+            }
+        }
+
+        // 3. Selection Logic
+        window.selectOption = function(qIndex, optIndex) {
+            userAnswers[qIndex] = optIndex;
+            const btnContainer = document.getElementById(`options-${qIndex}`);
+            const buttons = btnContainer.getElementsByClassName('option-btn');
+            
+            for (let btn of buttons) btn.classList.remove('selected');
+            buttons[optIndex].classList.add('selected');
+        };
+
+        // 4. Grading Logic
+        window.checkAnswers = function() {
+            let score = 0;
+            let unanswered = 0;
+
+            questions.forEach((item, index) => {
+                const feedbackDiv = document.getElementById(`feedback-${index}`);
+                const optionsDiv = document.getElementById(`options-${index}`);
+                const buttons = optionsDiv.getElementsByClassName('option-btn');
+                
+                // Disable buttons
+                for (let btn of buttons) {
+                    btn.onclick = null;
+                    btn.style.cursor = 'default';
+                }
+
+                if (userAnswers[index] === null) {
+                    unanswered++;
+                    feedbackDiv.innerHTML = `<span style="color:#dc2626; font-weight:bold">Not Answered.</span> ${item.exp}`;
+                    feedbackDiv.classList.add('show');
+                    buttons[item.ans].classList.add('correct'); // Show correct anyway
+                } else if (userAnswers[index] === item.ans) {
+                    score++;
+                    buttons[userAnswers[index]].classList.add('correct');
+                    feedbackDiv.innerHTML = `<span style="color:#16a34a; font-weight:bold">Correct!</span> ${item.exp}`;
+                    feedbackDiv.classList.add('show');
+                } else {
+                    buttons[userAnswers[index]].classList.add('incorrect');
+                    buttons[item.ans].classList.add('correct');
+                    feedbackDiv.innerHTML = `<span style="color:#dc2626; font-weight:bold">Incorrect.</span> ${item.exp}`;
+                    feedbackDiv.classList.add('show');
+                }
+            });
+
+            const scoreDisplay = document.getElementById('score-display');
+            const submitBtn = document.getElementById('check-btn');
+            
+            submitBtn.style.display = 'none';
+            scoreDisplay.style.display = 'block';
+            scoreDisplay.innerHTML = `You scored ${score} out of ${questions.length} (${Math.round(score/questions.length*100)}%)`;
+            
+            // Re-render math in explanations
+            if (window.MathJax) MathJax.typesetPromise();
+
+            // Scroll to bottom result
+            scoreDisplay.scrollIntoView({behavior: 'smooth'});
+        };
+
+        // Initialize
+        renderQuiz();
+
+    </script>
+</body>
+</html>
