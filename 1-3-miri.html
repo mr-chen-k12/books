@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Worksheet Solutions (Problems 1-30)</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f9;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 40px;
+        }
+        .problem-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #3498db;
+        }
+        .problem-header {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: #2980b9;
+        }
+        .problem-content {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .btn-toggle {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s;
+        }
+        .btn-toggle:hover {
+            background-color: #219150;
+        }
+        .solution-area {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #e8f6f3;
+            border-radius: 5px;
+            border: 1px solid #d4efdf;
+        }
+        .solution-step {
+            margin-bottom: 8px;
+        }
+        .final-answer {
+            font-weight: bold;
+            color: #c0392b;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #ccc;
+        }
+        canvas {
+            border: 1px solid #ccc;
+            margin-top: 10px;
+            background: #fff;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(10, 20px);
+            gap: 1px;
+            margin-bottom: 10px;
+        }
+        .grid-box {
+            width: 20px;
+            height: 20px;
+            background-color: #eee;
+            border: 1px solid #ddd;
+        }
+        .shaded {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Math Worksheet Solutions</h1>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 1</div>
+        <div class="problem-content">
+            Write and solve equations for problems 1-3.<br>
+            In the P.E. class there were four teams. Each team had eight players. How many players were on all four teams?
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-1')">Show Answer & Explanation</button>
+        <div id="sol-1" class="solution-area">
+            <div class="solution-step"><strong>Identify the values:</strong> 4 teams, 8 players per team.</div>
+            <div class="solution-step"><strong>Operation:</strong> Multiplication (groups of equal size).</div>
+            <div class="solution-step"><strong>Equation:</strong> \( 4 \times 8 = p \)</div>
+            <div class="final-answer">Answer: 32 players</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 2</div>
+        <div class="problem-content">
+            There were 7 pennies in each stack. There were 6 stacks of pennies. How many pennies were there in all?
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-2')">Show Answer & Explanation</button>
+        <div id="sol-2" class="solution-area">
+            <div class="solution-step"><strong>Identify the values:</strong> 6 stacks, 7 pennies per stack.</div>
+            <div class="solution-step"><strong>Operation:</strong> Multiplication.</div>
+            <div class="solution-step"><strong>Equation:</strong> \( 6 \times 7 = p \)</div>
+            <div class="final-answer">Answer: 42 pennies</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 3</div>
+        <div class="problem-content">
+            Lalo ran the first lap in 63.4 seconds and the second lap in 65.3 seconds. Lalo ran the first lap how much faster than the second lap?
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-3')">Show Answer & Explanation</button>
+        <div id="sol-3" class="solution-area">
+            <div class="solution-step"><strong>Goal:</strong> Find the difference between the two times.</div>
+            <div class="solution-step"><strong>Operation:</strong> Subtraction (\( \text{Larger Time} - \text{Smaller Time} \)).</div>
+            <div class="solution-step">
+                $$ 65.3 - 63.4 $$
+            </div>
+            <div class="solution-step">
+                \( 3 - 4 \) (borrow from 5, becomes 4. \(13 - 4 = 9\))<br>
+                \( 4 - 3 = 1 \)<br>
+                \( 6 - 6 = 0 \)
+            </div>
+            <div class="final-answer">Answer: 1.9 seconds</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 4</div>
+        <div class="problem-content">
+            Write four multiplication/division facts using the numbers 6, 7, and 42.
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-4')">Show Answer & Explanation</button>
+        <div id="sol-4" class="solution-area">
+            <div class="solution-step">A "Fact Family" uses the same three numbers for inverse operations.</div>
+            <div class="solution-step">1. \( 6 \times 7 = 42 \)</div>
+            <div class="solution-step">2. \( 7 \times 6 = 42 \)</div>
+            <div class="solution-step">3. \( 42 \div 6 = 7 \)</div>
+            <div class="solution-step">4. \( 42 \div 7 = 6 \)</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 5</div>
+        <div class="problem-content">
+            Compare: <br>
+            \( 1 + 3 + 5 + 7 + 9 \) ______ \( \text{five squared} \)
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-5')">Show Answer & Explanation</button>
+        <div id="sol-5" class="solution-area">
+            <div class="solution-step"><strong>Left Side:</strong> Sum of the first 5 odd numbers. <br> \( 1+3=4 \), \( 4+5=9 \), \( 9+7=16 \), \( 16+9=25 \).</div>
+            <div class="solution-step"><strong>Right Side:</strong> "five squared" means \( 5^2 \) or \( 5 \times 5 \). <br> \( 5 \times 5 = 25 \).</div>
+            <div class="final-answer">Answer: \( 1 + 3 + 5 + 7 + 9 = \text{five squared} \)</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 6</div>
+        <div class="problem-content">
+            a. Round 367 to the nearest hundred.<br>
+            b. Round 367 to the nearest ten.
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-6')">Show Answer & Explanation</button>
+        <div id="sol-6" class="solution-area">
+            <div class="solution-step"><strong>a. Nearest Hundred:</strong> Look at the tens digit (6). Since 6 is 5 or greater, round up. 300 becomes 400.</div>
+            <div class="solution-step"><strong>b. Nearest Ten:</strong> Look at the ones digit (7). Since 7 is 5 or greater, round up. 360 becomes 370.</div>
+            <div class="final-answer">Answer: a. 400, b. 370</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 7</div>
+        <div class="problem-content">
+            Draw a circle and shade 50% of it.
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-7')">Show Answer & Explanation</button>
+        <div id="sol-7" class="solution-area">
+            <div class="solution-step">50% equals one half (\( \frac{1}{2} \)). Draw a circle, draw a line through the center to divide it into two equal parts, and shade one part.</div>
+            <canvas id="canvas7" width="100" height="100"></canvas>
+            <script>
+                const c7 = document.getElementById("canvas7");
+                const ctx7 = c7.getContext("2d");
+                ctx7.beginPath();
+                ctx7.arc(50, 50, 40, 0, 2 * Math.PI);
+                ctx7.stroke();
+                // Fill half
+                ctx7.beginPath();
+                ctx7.arc(50, 50, 40, 0, Math.PI);
+                ctx7.fillStyle = "#888";
+                ctx7.fill();
+                ctx7.stroke(); // border for filled part
+            </script>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 8</div>
+        <div class="problem-content">
+            Name each type of angle shown below.<br>
+            (a. Small opening, b. Square corner, c. Wide opening)
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-8')">Show Answer & Explanation</button>
+        <div id="sol-8" class="solution-area">
+            <div class="solution-step"><strong>a.</strong> The angle is smaller than 90°. It is an <strong>Acute</strong> angle.</div>
+            <div class="solution-step"><strong>b.</strong> The angle has a square symbol indicating exactly 90°. It is a <strong>Right</strong> angle.</div>
+            <div class="solution-step"><strong>c.</strong> The angle is wider than 90° but less than 180°. It is an <strong>Obtuse</strong> angle.</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 9</div>
+        <div class="problem-content">
+            A rectangle is shown (4 ft by 2 ft).<br>
+            a. What is the length?<br>
+            b. What is the width?<br>
+            c. What is the perimeter?<br>
+            d. What is the area?
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-9')">Show Answer & Explanation</button>
+        <div id="sol-9" class="solution-area">
+            <div class="solution-step"><strong>a. Length:</strong> The longer side is <strong>4 ft</strong>.</div>
+            <div class="solution-step"><strong>b. Width:</strong> The shorter side is <strong>2 ft</strong>.</div>
+            <div class="solution-step"><strong>c. Perimeter:</strong> Distance around the outside. \( 2 \times (Length + Width) = 2 \times (4+2) = 2 \times 6 = \) <strong>12 ft</strong>.</div>
+            <div class="solution-step"><strong>d. Area:</strong> Space inside. \( Length \times Width = 4 \times 2 = \) <strong>8 sq ft</strong>.</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 10</div>
+        <div class="problem-content">
+            The amount of liquid in a container is 2.75 quarts. Use words to write that amount.
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-10')">Show Answer & Explanation</button>
+        <div id="sol-10" class="solution-area">
+            <div class="solution-step">The number is 2 (whole) and 0.75 (fractional).</div>
+            <div class="solution-step">0.75 is seventy-five hundredths.</div>
+            <div class="final-answer">Answer: Two and seventy-five hundredths quarts (or Two and three-quarter quarts).</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 11</div>
+        <div class="problem-content">
+            Grand Portage (MN) area: 710 acres. Oregon Caves (AZ) area: 488 acres. Estimate the difference by first rounding each area to the nearest hundred acres.
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-11')">Show Answer & Explanation</button>
+        <div id="sol-11" class="solution-area">
+            <div class="solution-step"><strong>Round 710:</strong> Nearest hundred is 700.</div>
+            <div class="solution-step"><strong>Round 488:</strong> Nearest hundred is 500 (since 88 > 50).</div>
+            <div class="solution-step"><strong>Estimate Difference:</strong> \( 700 - 500 = 200 \).</div>
+            <div class="final-answer">Answer: 200 acres</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 12</div>
+        <div class="problem-content">
+            Describe the order of operations in this expression and find the number it equals.
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-12')">Show Answer & Explanation</button>
+        <div id="sol-12" class="solution-area">
+            <div class="solution-step"><em>Note: The specific mathematical expression is blank/missing in the provided image box. However, typically these problems follow PEMDAS (Parentheses, Exponents, Multiplication/Division, Addition/Subtraction).</em></div>
+            <div class="final-answer">Answer: Expression not provided in image.</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 13</div>
+        <div class="problem-content">
+            \( 63,285 + 97,642 = \)
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-13')">Show Answer & Explanation</button>
+        <div id="sol-13" class="solution-area">
+            <div class="solution-step">Align numbers by place value and add vertically:</div>
+            <div class="solution-step">
+                &nbsp;&nbsp;63285<br>
+                + 97642<br>
+                -------<br>
+                &nbsp;160927
+            </div>
+            <div class="final-answer">Answer: 160,927</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 14</div>
+        <div class="problem-content">
+            \( \$5.00 - \$4.81 = \)
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-14')">Show Answer & Explanation</button>
+        <div id="sol-14" class="solution-area">
+            <div class="solution-step">Align decimals and subtract:</div>
+            <div class="solution-step">
+                &nbsp;&nbsp;5.00<br>
+                - 4.81<br>
+                -------
+            </div>
+            <div class="solution-step">You must borrow from the 5.<br> 5.00 becomes 4 and 100 hundredths.<br> 100 - 81 = 19.</div>
+            <div class="final-answer">Answer: $0.19</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 15</div>
+        <div class="problem-content">
+            \( n + 39.8 = 61.4 \)
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-15')">Show Answer & Explanation</button>
+        <div id="sol-15" class="solution-area">
+            <div class="solution-step">To find \( n \), do the inverse operation (subtraction).</div>
+            <div class="solution-step">\( n = 61.4 - 39.8 \)</div>
+            <div class="solution-step">
+                &nbsp;&nbsp;61.4<br>
+                - 39.8<br>
+                -------<br>
+                &nbsp;&nbsp;21.6
+            </div>
+            <div class="final-answer">Answer: n = 21.6</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 16</div>
+        <div class="problem-content">
+            \( 85 \times 5 = \)
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-16')">Show Answer & Explanation</button>
+        <div id="sol-16" class="solution-area">
+            <div class="solution-step">\( 5 \times 5 = 25 \) (write 5, carry 2)</div>
+            <div class="solution-step">\( 5 \times 8 = 40 \)</div>
+            <div class="solution-step">\( 40 + 2 (\text{carry}) = 42 \)</div>
+            <div class="final-answer">Answer: 425</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 17</div>
+        <div class="problem-content">
+            \( 37 \times 7 = \)
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-17')">Show Answer & Explanation</button>
+        <div id="sol-17" class="solution-area">
+            <div class="solution-step">\( 7 \times 7 = 49 \) (write 9, carry 4)</div>
+            <div class="solution-step">\( 7 \times 3 = 21 \)</div>
+            <div class="solution-step">\( 21 + 4 = 25 \)</div>
+            <div class="final-answer">Answer: 259</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 18</div>
+        <div class="problem-content">
+            \( 40 \times 8 = \)
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-18')">Show Answer & Explanation</button>
+        <div id="sol-18" class="solution-area">
+            <div class="solution-step">Use the zero trick: \( 4 \times 8 = 32 \).</div>
+            <div class="solution-step">Add the zero back: 320.</div>
+            <div class="final-answer">Answer: 320</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 19</div>
+        <div class="problem-content">
+            \( f \times 8 = 72 \)
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-19')">Show Answer & Explanation</button>
+        <div id="sol-19" class="solution-area">
+            <div class="solution-step">Inverse operation is division.</div>
+            <div class="solution-step">\( f = 72 \div 8 \)</div>
+            <div class="final-answer">Answer: f = 9</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 20</div>
+        <div class="problem-content">
+            \( 47.8 - c = 20.3 \)
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-20')">Show Answer & Explanation</button>
+        <div id="sol-20" class="solution-area">
+            <div class="solution-step">To find the subtracted part (subtrahend), subtract the difference from the total.</div>
+            <div class="solution-step">\( c = 47.8 - 20.3 \)</div>
+            <div class="solution-step">
+                &nbsp;&nbsp;47.8<br>
+                - 20.3<br>
+                -------<br>
+                &nbsp;&nbsp;27.5
+            </div>
+            <div class="final-answer">Answer: c = 27.5</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 21</div>
+        <div class="problem-content">
+            \( 462,586 + 39,728 = \)
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-21')">Show Answer & Explanation</button>
+        <div id="sol-21" class="solution-area">
+            <div class="solution-step">Align place values:</div>
+            <div class="solution-step">
+                &nbsp;&nbsp;462586<br>
+                + &nbsp;39728<br>
+                --------
+            </div>
+            <div class="solution-step">
+                6+8=14 (1)<br>
+                8+2+1=11 (1)<br>
+                5+7+1=13 (1)<br>
+                2+9+1=12 (1)<br>
+                6+3+1=10 (1)<br>
+                4+1=5
+            </div>
+            <div class="final-answer">Answer: 502,314</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 22</div>
+        <div class="problem-content">
+            \( z - 4.78 = 2.63 \)
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-22')">Show Answer & Explanation</button>
+        <div id="sol-22" class="solution-area">
+            <div class="solution-step">Inverse operation: Addition.</div>
+            <div class="solution-step">\( z = 2.63 + 4.78 \)</div>
+            <div class="solution-step">
+                &nbsp;&nbsp;4.78<br>
+                + 2.63<br>
+                -------<br>
+                &nbsp;&nbsp;7.41
+            </div>
+            <div class="final-answer">Answer: z = 7.41</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 23</div>
+        <div class="problem-content">
+            Divide. Check answer by multiplying.<br>
+            \( 2 \overline{) 18} \)
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-23')">Show Answer & Explanation</button>
+        <div id="sol-23" class="solution-area">
+            <div class="solution-step">\( 18 \div 2 = 9 \)</div>
+            <div class="solution-step"><strong>Check:</strong> \( 9 \times 2 = 18 \)</div>
+            <div class="final-answer">Answer: 9</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 24</div>
+        <div class="problem-content">
+            Divide.<br>
+            \( 7 \overline{) 21} \)
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-24')">Show Answer & Explanation</button>
+        <div id="sol-24" class="solution-area">
+            <div class="solution-step">\( 21 \div 7 = 3 \)</div>
+            <div class="solution-step"><strong>Check:</strong> \( 3 \times 7 = 21 \)</div>
+            <div class="final-answer">Answer: 3</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 25</div>
+        <div class="problem-content">
+            \( \frac{56}{8} \)
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-25')">Show Answer & Explanation</button>
+        <div id="sol-25" class="solution-area">
+            <div class="solution-step">A fraction indicates division.</div>
+            <div class="solution-step">\( 56 \div 8 = 7 \)</div>
+            <div class="final-answer">Answer: 7</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 26</div>
+        <div class="problem-content">
+            The length of AB is 7 cm. The length of AC is 12 cm. How long is BC?
+            (Points A, B, C are on a line).
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-26')">Show Answer & Explanation</button>
+        <div id="sol-26" class="solution-area">
+            <div class="solution-step">The total length is AC (12). The part AB is 7.</div>
+            <div class="solution-step">BC is the remainder. \( BC = AC - AB \)</div>
+            <div class="solution-step">\( BC = 12 - 7 = 5 \)</div>
+            <div class="final-answer">Answer: 5 cm</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 27</div>
+        <div class="problem-content">
+            If half the students are boys, then what percent of the students are girls?
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-27')">Show Answer & Explanation</button>
+        <div id="sol-27" class="solution-area">
+            <div class="solution-step">"Half" is equivalent to 50%.</div>
+            <div class="solution-step">The total student body is 100%.</div>
+            <div class="solution-step">\( 100\% - 50\% = 50\% \)</div>
+            <div class="final-answer">Answer: 50%</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 28</div>
+        <div class="problem-content">
+            If \( 5n = 0 \), then what does \( 6n \) equal?
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-28')">Show Answer & Explanation</button>
+        <div id="sol-28" class="solution-area">
+            <div class="solution-step">First, solve for \( n \). \( 5 \times n = 0 \). The only number times 5 that equals 0 is 0. So \( n = 0 \).</div>
+            <div class="solution-step">Now evaluate \( 6n \) (which means \( 6 \times n \)).</div>
+            <div class="solution-step">\( 6 \times 0 = 0 \)</div>
+            <div class="final-answer">Answer: 0</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 29</div>
+        <div class="problem-content">
+            Which of the following does <em>not</em> name the shaded portion of the large square?<br>
+            A. 11/100 &nbsp; B. 0.11 &nbsp; C. 11% &nbsp; D. 11
+            <br><br>
+            <div class="grid-container" id="grid29">
+                </div>
+            <script>
+                const gridContainer = document.getElementById('grid29');
+                for(let i=0; i<100; i++){
+                    let div = document.createElement('div');
+                    div.className = 'grid-box';
+                    // Shade first 11 (one column + 1)
+                    if(i < 11) div.classList.add('shaded');
+                    gridContainer.appendChild(div);
+                }
+            </script>
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-29')">Show Answer & Explanation</button>
+        <div id="sol-29" class="solution-area">
+            <div class="solution-step">There are 100 squares total. 11 are shaded.</div>
+            <div class="solution-step"><strong>A. 11/100:</strong> Correct (Fraction form).</div>
+            <div class="solution-step"><strong>B. 0.11:</strong> Correct (Decimal form of 11 hundredths).</div>
+            <div class="solution-step"><strong>C. 11%:</strong> Correct (Percent means per 100).</div>
+            <div class="solution-step"><strong>D. 11:</strong> Incorrect. The number 11 represents 11 whole large squares (1100%), not 11 small parts.</div>
+            <div class="final-answer">Answer: D</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-header">Problem 30</div>
+        <div class="problem-content">
+            In 1980, the median age of a resident of the United States was 30 years. By 2000, the median age had increased 5.3 years. What was the median age of a resident of the United States in the year 2000? Explain why your answer is reasonable.
+        </div>
+        <button class="btn-toggle" onclick="toggleSolution('sol-30')">Show Answer & Explanation</button>
+        <div id="sol-30" class="solution-area">
+            <div class="solution-step"><strong>Calculation:</strong> Start with age 30. Add the increase of 5.3.</div>
+            <div class="solution-step">\( 30 + 5.3 = 35.3 \) years.</div>
+            <div class="solution-step"><strong>Reasonableness:</strong> An increase means the number must be larger than 30. 35.3 is larger than 30. Since 5.3 is about 5, and 30+5=35, the answer 35.3 is very close to our estimate.</div>
+            <div class="final-answer">Answer: 35.3 years</div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSolution(id) {
+            var x = document.getElementById(id);
+            if (x.style.display === "none" || x.style.display === "") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        }
+    </script>
+
+</body>
+</html>
