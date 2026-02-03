@@ -12,10 +12,12 @@
                 displayMath: [['$$', '$$']]
             },
             startup: {
-                typeset: false // We will trigger it manually to be safe
+                // This tells MathJax: "Wait! I will tell you when to run."
+                typeset: false 
             }
         };
     </script>
+    
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
@@ -37,6 +39,19 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             text-align: center;
             border-bottom: 5px solid #3b82f6;
+            position: relative;
+        }
+
+        .force-render-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.8rem;
+            color: #3b82f6;
+            text-decoration: underline;
+            cursor: pointer;
+            background: none;
+            border: none;
         }
 
         h1 { margin: 0; color: #111827; font-size: 2rem; }
@@ -180,6 +195,7 @@
     <div class="header-container">
         <h1>Lesson 76 Review</h1>
         <p class="subtitle">30 Questions • Sales Tax, Geometry, & Algebra</p>
+        <button class="force-render-btn" onclick="rerenderMath()">Fix Math Display</button>
     </div>
 
     <div class="quiz-container" id="quiz-content">
@@ -192,7 +208,7 @@
 
     <script>
         /* NOTE: 
-           - Money is written as &#36; (HTML Entity) to strictly avoid MathJax conflicts.
+           - Money is written as &#36; (HTML Entity) to safely avoid conflicts.
            - Math is written inside \\( ... \\).
         */
         const questions = [
@@ -422,8 +438,9 @@
         const quizContainer = document.getElementById('quiz-content');
         let userAnswers = new Array(questions.length).fill(null);
 
-        // 1. Render Quiz Function
+        // 1. RENDER FUNCTION
         function renderQuiz() {
+            quizContainer.innerHTML = ''; // Clear just in case
             questions.forEach((item, index) => {
                 const card = document.createElement('div');
                 card.className = 'question-card';
@@ -442,16 +459,31 @@
                 `;
                 quizContainer.appendChild(card);
             });
+        }
 
-            // 2. CRITICAL: Trigger MathJax manually after content is injected
-            if (window.MathJax) {
+        // 2. MATH RENDERING TRIGGER
+        function rerenderMath() {
+            if (window.MathJax && MathJax.typesetPromise) {
                 MathJax.typesetPromise().then(() => {
-                    console.log("Math rendered successfully");
+                    console.log("Math updated successfully.");
                 }).catch((err) => console.log("MathJax error: " + err.message));
+            } else {
+                console.log("MathJax not ready yet.");
             }
         }
 
-        // 3. Selection Logic
+        // 3. STARTUP LOGIC (Solves the "rendering is off" issue)
+        window.addEventListener('DOMContentLoaded', () => {
+            renderQuiz();
+            // Try immediately
+            rerenderMath();
+            // Try again after 500ms (fixes race conditions)
+            setTimeout(rerenderMath, 500);
+            // Try again after 2 seconds (just to be safe)
+            setTimeout(rerenderMath, 2000);
+        });
+
+        // 4. INTERACTIVITY
         window.selectOption = function(qIndex, optIndex) {
             userAnswers[qIndex] = optIndex;
             const btnContainer = document.getElementById(`options-${qIndex}`);
@@ -461,7 +493,6 @@
             buttons[optIndex].classList.add('selected');
         };
 
-        // 4. Grading Logic
         window.checkAnswers = function() {
             let score = 0;
             let unanswered = 0;
@@ -481,7 +512,7 @@
                     unanswered++;
                     feedbackDiv.innerHTML = `<span style="color:#dc2626; font-weight:bold">Not Answered.</span> ${item.exp}`;
                     feedbackDiv.classList.add('show');
-                    buttons[item.ans].classList.add('correct'); // Show correct anyway
+                    buttons[item.ans].classList.add('correct'); 
                 } else if (userAnswers[index] === item.ans) {
                     score++;
                     buttons[userAnswers[index]].classList.add('correct');
@@ -503,16 +534,10 @@
             scoreDisplay.innerHTML = `You scored ${score} out of ${questions.length} (${Math.round(score/questions.length*100)}%)`;
             
             // Re-render math in explanations
-            if (window.MathJax) MathJax.typesetPromise();
+            rerenderMath();
 
-            // Scroll to bottom result
             scoreDisplay.scrollIntoView({behavior: 'smooth'});
         };
-
-        // Initialize
-        renderQuiz();
-
     </script>
 </body>
 </html>
- 
