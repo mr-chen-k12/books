@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saxon Math Course 1 - Lesson 77 Solutions</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #2980b9;
+            margin-top: 40px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+        .problem-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .problem-statement {
+            font-weight: 500;
+            margin-bottom: 15px;
+            background-color: #ecf0f1;
+            padding: 10px;
+            border-left: 5px solid #3498db;
+            border-radius: 4px;
+        }
+        .problem-number {
+            font-weight: bold;
+            color: #e74c3c;
+            margin-right: 5px;
+        }
+        .btn-reveal {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .btn-reveal:hover {
+            background-color: #2980b9;
+        }
+        .answer-block {
+            display: none; /* Hidden by default */
+            margin-top: 15px;
+            padding: 15px;
+            border-top: 1px dashed #ccc;
+            background-color: #f0f8ff;
+        }
+        .explanation {
+            font-style: italic;
+            color: #555;
+        }
+        .svg-container {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        .final-answer {
+            font-weight: bold;
+            color: #27ae60;
+            margin-top: 10px;
+        }
+    </style>
+    <script>
+        function toggleAnswer(id) {
+            var answerDiv = document.getElementById(id);
+            if (answerDiv.style.display === "block") {
+                answerDiv.style.display = "none";
+            } else {
+                answerDiv.style.display = "block";
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <h1>Saxon Math Course 1: Lesson 77 Solutions</h1>
+    <p style="text-align: center;">Click the "Show Answer" button to review the step-by-step solution for each problem.</p>
+
+    <h2>Lesson Practice</h2>
+
+    <div class="problem-card">
+        <div class="problem-statement">
+            <strong>Diagram this statement. Then answer the questions that follow.</strong><br>
+            Three eighths of the 40 little engines could climb the hill.
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <span class="problem-number">a.</span> Into how many parts was the group divided? <button class="btn-reveal" onclick="toggleAnswer('ans-a')">Show Answer</button>
+            <div id="ans-a" class="answer-block">
+                <p>The denominator of the fraction $\frac{3}{8}$ tells us how many parts the whole is divided into.</p>
+                <div class="final-answer">Answer: 8 parts</div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <span class="problem-number">b.</span> How many engines were in each part? <button class="btn-reveal" onclick="toggleAnswer('ans-b')">Show Answer</button>
+            <div id="ans-b" class="answer-block">
+                <p>Divide the total number of engines (40) by the number of parts (8):</p>
+                $$40 \div 8 = 5$$
+                <div class="final-answer">Answer: 5 engines</div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <span class="problem-number">c.</span> How many parts could climb the hill? <button class="btn-reveal" onclick="toggleAnswer('ans-c')">Show Answer</button>
+            <div id="ans-c" class="answer-block">
+                <p>The numerator of the fraction $\frac{3}{8}$ tells us how many parts are counted.</p>
+                <div class="final-answer">Answer: 3 parts</div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <span class="problem-number">d.</span> How many engines could climb the hill? <button class="btn-reveal" onclick="toggleAnswer('ans-d')">Show Answer</button>
+            <div id="ans-d" class="answer-block">
+                <p>Multiply the number of parts (3) by the number of engines in each part (5):</p>
+                $$3 \times 5 = 15$$
+                <div class="final-answer">Answer: 15 engines</div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <span class="problem-number">e.</span> How many parts could not climb the hill? <button class="btn-reveal" onclick="toggleAnswer('ans-e')">Show Answer</button>
+            <div id="ans-e" class="answer-block">
+                <p>Subtract the climbing parts from the total parts:</p>
+                $$8 - 3 = 5$$
+                <div class="final-answer">Answer: 5 parts</div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <span class="problem-number">f.</span> How many engines could not climb the hill? <button class="btn-reveal" onclick="toggleAnswer('ans-f')">Show Answer</button>
+            <div id="ans-f" class="answer-block">
+                <p>Multiply the remaining parts (5) by the engines per part (5):</p>
+                $$5 \times 5 = 25$$
+                <div class="final-answer">Answer: 25 engines</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement">
+            <strong>Read the statement and then answer the questions that follow.</strong><br>
+            The face of a spinner is divided into 12 equal sectors. The probability of spinning red on one spin is $\frac{1}{4}$.
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <span class="problem-number">g.</span> How many sectors are red? <button class="btn-reveal" onclick="toggleAnswer('ans-g')">Show Answer</button>
+            <div id="ans-g" class="answer-block">
+                <p>Calculate $\frac{1}{4}$ of the total sectors (12):</p>
+                $$\frac{1}{4} \times 12 = 3$$
+                <div class="final-answer">Answer: 3 sectors</div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <span class="problem-number">h.</span> How many sectors are not red? <button class="btn-reveal" onclick="toggleAnswer('ans-h')">Show Answer</button>
+            <div id="ans-h" class="answer-block">
+                <p>Subtract the red sectors from the total:</p>
+                $$12 - 3 = 9$$
+                <div class="final-answer">Answer: 9 sectors</div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <span class="problem-number">i.</span> What is the probability of spinning not red in one spin? <button class="btn-reveal" onclick="toggleAnswer('ans-i')">Show Answer</button>
+            <div id="ans-i" class="answer-block">
+                <p>The probability is the ratio of "not red" sectors to total sectors:</p>
+                $$P(\text{not red}) = \frac{9}{12}$$
+                <p>Reduce the fraction by dividing numerator and denominator by 3:</p>
+                $$\frac{3}{4}$$
+                <div class="final-answer">Answer: $\frac{3}{4}$</div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <span class="problem-number">j.</span> What is the sum of the probabilities of spinning red and not red? How are the events related? <button class="btn-reveal" onclick="toggleAnswer('ans-j')">Show Answer</button>
+            <div id="ans-j" class="answer-block">
+                <p>Add the two probabilities:</p>
+                $$\frac{1}{4} + \frac{3}{4} = \frac{4}{4} = 1$$
+                <p>Because the sum is 1 and they cover all possibilities, the events are <strong>complementary</strong>.</p>
+                <div class="final-answer">Answer: 1; The events are complementary.</div>
+            </div>
+        </div>
+    </div>
+
+    <h2>Written Practice</h2>
+
+    <div class="problem-card">
+        <div class="problem-statement"><span class="problem-number">1.</span> The weight of an object on the Moon is about $\frac{1}{6}$ of its weight on Earth. A person weighing 114 pounds on Earth would weigh about how much on the Moon?</div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-1')">Show Answer</button>
+        <div id="ans-1" class="answer-block">
+            <p>To find the weight on the Moon, divide the Earth weight by 6:</p>
+            $$114 \div 6 = 19$$
+            <div class="final-answer">Answer: 19 pounds</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement"><span class="problem-number">2.</span> ESTIMATE: Estimate the weight of an object in your classroom such as a table or desk. Use the information in problem 1 to calculate the approximate weight of the object on the moon.</div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-2')">Show Answer</button>
+        <div id="ans-2" class="answer-block">
+            <p><em>Note: Answers will vary based on the object chosen. Here is an example.</em></p>
+            <p><strong>Example Object:</strong> A student desk.</p>
+            <p><strong>Estimated Earth Weight:</strong> 30 pounds.</p>
+            <p><strong>Calculation for Moon Weight:</strong> Multiply by $\frac{1}{6}$ (or divide by 6).</p>
+            $$30 \div 6 = 5$$
+            <div class="final-answer">Example Answer: Earth weight ~30 lbs; Moon weight ~5 lbs.</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement"><span class="problem-number">3.</span> Mekhi was at bat 24 times and got 6 hits. <br>a. What fraction of the times at bat did Mekhi get a hit?<br>b. What percent of the times at bat did Mekhi get a hit?</div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-3')">Show Answer</button>
+        <div id="ans-3" class="answer-block">
+            <p><strong>a. Fraction:</strong></p>
+            $$\frac{6}{24}$$
+            <p>Reduce by dividing by 6:</p>
+            $$\frac{1}{4}$$
+            <p><strong>b. Percent:</strong></p>
+            <p>Convert $\frac{1}{4}$ to a percent.</p>
+            $$ \frac{1}{4} \times 100\% = 25\%$$
+            <div class="final-answer">Answer: a. $\frac{1}{4}$, b. 25%</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement">
+            <span class="problem-number">4.</span> <strong>MODEL</strong> Diagram this statement. There are 30 students in the class. Three fifths of them are boys.<br>
+            a. Into how many parts is the class divided?<br>
+            b. How many students are in each part?<br>
+            c. How many boys are in the class?<br>
+            d. How many girls are in the class?
+        </div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-4')">Show Answer</button>
+        <div id="ans-4" class="answer-block">
+            <p><strong>a. Parts:</strong> The denominator is 5.</p>
+            <p><strong>b. Students per part:</strong> $30 \div 5 = 6$ students.</p>
+            <p><strong>c. Boys:</strong> The numerator is 3. So, $3 \text{ parts} \times 6 = 18$ boys.</p>
+            <p><strong>d. Girls:</strong> Total students - Boys = $30 - 18 = 12$ girls.</p>
+            <div class="final-answer">Answer: a. 5, b. 6, c. 18, d. 12</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement">
+            <span class="problem-number">5.</span> In the figure (shown in book), what fraction of the group is shaded? Convert to decimal and percent.<br>
+            <em>(The figure shows 10 circles total, with 3 shaded.)</em>
+        </div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-5')">Show Answer</button>
+        <div id="ans-5" class="answer-block">
+            <p><strong>a. Fraction:</strong> 3 out of 10 circles are shaded.</p>
+            $$\frac{3}{10}$$
+            <p><strong>b. Decimal:</strong> Convert $\frac{3}{10}$ to decimal.</p>
+            $$0.3$$
+            <p><strong>c. Percent:</strong> Convert to percent.</p>
+            $$30\%$$
+            <div class="final-answer">Answer: a. $\frac{3}{10}$, b. 0.3, c. 30%</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement"><span class="problem-number">6.</span> Write the decimal number 3.6 as a mixed number.</div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-6')">Show Answer</button>
+        <div id="ans-6" class="answer-block">
+            <p>3.6 means "three and six tenths".</p>
+            $$3 \frac{6}{10}$$
+            <p>Reduce the fraction part ($\frac{6}{10}$ simplifies to $\frac{3}{5}$).</p>
+            <div class="final-answer">Answer: $3 \frac{3}{5}$</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement"><span class="problem-number">7.</span> Find the unknown number: $3.6 + a = 4.15$</div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-7')">Show Answer</button>
+        <div id="ans-7" class="answer-block">
+            <p>To isolate $a$, subtract 3.6 from 4.15.</p>
+            $$a = 4.15 - 3.60$$
+            $$a = 0.55$$
+            <div class="final-answer">Answer: a = 0.55</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement"><span class="problem-number">8.</span> Find the unknown number: $\frac{2}{5}x = 1$</div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-8')">Show Answer</button>
+        <div id="ans-8" class="answer-block">
+            <p>To find $x$, multiply by the reciprocal of $\frac{2}{5}$, which is $\frac{5}{2}$.</p>
+            $$x = \frac{5}{2}$$
+            <p>Or as a mixed number:</p>
+            $$x = 2 \frac{1}{2}$$
+            <div class="final-answer">Answer: $x = \frac{5}{2}$ or $2 \frac{1}{2}$</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement"><span class="problem-number">9.</span> <strong>EXPLAIN</strong> If the chance of rain is 60%, is it more likely to rain or not to rain? Why?</div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-9')">Show Answer</button>
+        <div id="ans-9" class="answer-block">
+            <p>The chance of rain is 60%. The chance of it <em>not</em> raining is $100\% - 60\% = 40\%$.</p>
+            <p>Since 60% is greater than 40% (and greater than half, 50%), it is more likely to rain.</p>
+            <div class="final-answer">Answer: It is more likely to rain.</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement"><span class="problem-number">10.</span> Three fifths of a circle is what percent of a circle?</div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-10')">Show Answer</button>
+        <div id="ans-10" class="answer-block">
+            <p>Convert $\frac{3}{5}$ to a percent.</p>
+            $$\frac{3}{5} = \frac{3 \times 20}{5 \times 20} = \frac{60}{100} = 60\%$$
+            <div class="final-answer">Answer: 60%</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement"><span class="problem-number">11.</span> A temperature of -3°F is how many degrees below the freezing temperature of water?</div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-11')">Show Answer</button>
+        <div id="ans-11" class="answer-block">
+            <p>The freezing temperature of water is 32°F.</p>
+            <p>Find the difference between 32 and -3:</p>
+            $$32 - (-3) = 32 + 3 = 35$$
+            <div class="final-answer">Answer: 35 degrees</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement"><span class="problem-number">12.</span> Compare:<br>a. 0.35 &#9675; $\frac{7}{20}$<br>b. $3^2$ &#9675; $2^3$</div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-12')">Show Answer</button>
+        <div id="ans-12" class="answer-block">
+            <p><strong>a.</strong> Convert $\frac{7}{20}$ to decimal: $\frac{7 \times 5}{20 \times 5} = \frac{35}{100} = 0.35$.</p>
+            <p>So, $0.35 = \frac{7}{20}$.</p>
+            <p><strong>b.</strong> Calculate powers: $3^2 = 9$ and $2^3 = 8$.</p>
+            <p>Since 9 > 8, $3^2 > 2^3$.</p>
+            <div class="final-answer">Answer: a. =, b. ></div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement"><span class="problem-number">13.</span> $\frac{1}{2} + \frac{2}{3}$</div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-13')">Show Answer</button>
+        <div id="ans-13" class="answer-block">
+            <p>Find a common denominator (6).</p>
+            $$\frac{3}{6} + \frac{4}{6} = \frac{7}{6}$$
+            <p>Convert to mixed number:</p>
+            $$1 \frac{1}{6}$$
+            <div class="final-answer">Answer: $1 \frac{1}{6}$</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement"><span class="problem-number">14.</span> $3 \frac{1}{5} - 1 \frac{3}{5}$</div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-14')">Show Answer</button>
+        <div id="ans-14" class="answer-block">
+            <p>You cannot subtract $\frac{3}{5}$ from $\frac{1}{5}$. Borrow 1 from the 3.</p>
+            $$3 \frac{1}{5} = 2 + 1 + \frac{1}{5} = 2 + \frac{5}{5} + \frac{1}{5} = 2 \frac{6}{5}$$
+            <p>Now subtract:</p>
+            $$2 \frac{6}{5} - 1 \frac{3}{5} = 1 \frac{3}{5}$$
+            <div class="final-answer">Answer: $1 \frac{3}{5}$</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement"><span class="problem-number">15.</span> $\frac{1}{2} + \frac{2}{4} + \frac{7}{8}$</div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-15')">Show Answer</button>
+        <div id="ans-15" class="answer-block">
+            <p>Find common denominator (8).</p>
+            $$\frac{1}{2} = \frac{4}{8}, \quad \frac{2}{4} = \frac{4}{8}$$
+            $$\frac{4}{8} + \frac{4}{8} + \frac{7}{8} = \frac{15}{8}$$
+            <p>Convert to mixed number:</p>
+            $$1 \frac{7}{8}$$
+            <div class="final-answer">Answer: $1 \frac{7}{8}$</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement"><span class="problem-number">16.</span> $3 \times 1 \frac{1}{3}$</div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-16')">Show Answer</button>
+        <div id="ans-16" class="answer-block">
+            <p>Convert mixed number to improper fraction:</p>
+            $$1 \frac{1}{3} = \frac{4}{3}$$
+            <p>Multiply:</p>
+            $$3 \times \frac{4}{3} = \frac{12}{3} = 4$$
+            <div class="final-answer">Answer: 4</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement"><span class="problem-number">17.</span> $3 \div 1 \frac{1}{3}$</div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-17')">Show Answer</button>
+        <div id="ans-17" class="answer-block">
+            <p>Convert mixed number to improper fraction:</p>
+            $$1 \frac{1}{3} = \frac{4}{3}$$
+            <p>Divide by multiplying by the reciprocal:</p>
+            $$3 \div \frac{4}{3} = \frac{3}{1} \times \frac{3}{4} = \frac{9}{4}$$
+            <p>Convert to mixed number:</p>
+            $$2 \frac{1}{4}$$
+            <div class="final-answer">Answer: $2 \frac{1}{4}$</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement"><span class="problem-number">18.</span> $1 \frac{1}{3} \div 3$</div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-18')">Show Answer</button>
+        <div id="ans-18" class="answer-block">
+            <p>Convert mixed number to improper fraction:</p>
+            $$1 \frac{1}{3} = \frac{4}{3}$$
+            <p>Divide by 3 (multiply by $\frac{1}{3}$):</p>
+            $$\frac{4}{3} \times \frac{1}{3} = \frac{4}{9}$$
+            <div class="final-answer">Answer: $\frac{4}{9}$</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement">
+            <span class="problem-number">19.</span> What is the perimeter of this rectangle? (1.5 cm by 0.9 cm)<br>
+            <span class="problem-number">20.</span> What is the area of this rectangle?
+        </div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-19-20')">Show Answer</button>
+        <div id="ans-19-20" class="answer-block">
+            <p><strong>19. Perimeter:</strong> Add all sides ($2 \times (\text{length} + \text{width})$).</p>
+            $$P = 2 \times (1.5 + 0.9) = 2 \times 2.4 = 4.8 \text{ cm}$$
+            
+            <p><strong>20. Area:</strong> Multiply length by width.</p>
+            $$A = 1.5 \times 0.9 = 1.35 \text{ sq cm}$$
+            <div class="final-answer">19. 4.8 cm, 20. 1.35 sq cm</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement"><span class="problem-number">21.</span> Write the prime factorization of 1000 using exponents.</div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-21')">Show Answer</button>
+        <div id="ans-21" class="answer-block">
+            <p>We know that $1000 = 10 \times 10 \times 10 = 10^3$.</p>
+            <p>The prime factorization of 10 is $2 \times 5$.</p>
+            <p>So, $1000 = (2 \times 5) \times (2 \times 5) \times (2 \times 5) = 2^3 \times 5^3$.</p>
+            <div class="final-answer">Answer: $2^3 \times 5^3$</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement">
+            <span class="problem-number">22.</span> Coats were on sale for 40% off. One coat was regularly priced at $80.<br>
+            a. How much money would be taken off the regular price of the coat during the sale?<br>
+            b. What would be the sale price of the coat?
+        </div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-22')">Show Answer</button>
+        <div id="ans-22" class="answer-block">
+            <p><strong>a. Discount amount:</strong> Find 40% of $80.</p>
+            $$0.40 \times 80 = 32.00$$
+            <p>Discount is $32.</p>
+            <p><strong>b. Sale price:</strong> Subtract discount from regular price.</p>
+            $$80 - 32 = 48$$
+            <div class="final-answer">Answer: a. $32, b. $48</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement">
+            <span class="problem-number">23.</span> Patricia bought a coat that cost $38.80. The sales-tax rate was 7%.<br>
+            a. What was the tax on the purchase?<br>
+            b. What was the total purchase price including tax?
+        </div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-23')">Show Answer</button>
+        <div id="ans-23" class="answer-block">
+            <p><strong>a. Tax:</strong> Calculate $0.07 \times 38.80$.</p>
+            $$38.80 \times 0.07 = 2.716$$
+            <p>Round to the nearest cent: $2.72.</p>
+            <p><strong>b. Total:</strong> Add cost plus tax.</p>
+            $$38.80 + 2.72 = 41.52$$
+            <div class="final-answer">Answer: a. $2.72, b. $41.52</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement"><span class="problem-number">24.</span> <strong>CLASSIFY</strong> Is every quadrilateral a polygon?</div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-24')">Show Answer</button>
+        <div id="ans-24" class="answer-block">
+            <p>A polygon is a closed figure with straight sides. A quadrilateral is defined as a 4-sided polygon. Therefore, yes, every quadrilateral is a polygon.</p>
+            <div class="final-answer">Answer: Yes</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement"><span class="problem-number">25.</span> What time is one hour fourteen minutes before noon?</div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-25')">Show Answer</button>
+        <div id="ans-25" class="answer-block">
+            <p>Noon is 12:00 PM.</p>
+            <p>1 hour before noon is 11:00 AM.</p>
+            <p>14 minutes before 11:00 AM is 10:46 AM ($60 - 14 = 46$).</p>
+            <div class="final-answer">Answer: 10:46 AM</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement">
+            <span class="problem-number">26.</span> <strong>ESTIMATE</strong> What percent of this rectangle appears to be shaded?<br>
+            A. 20% &nbsp;&nbsp; B. 40% &nbsp;&nbsp; C. 60% &nbsp;&nbsp; D. 80%
+        </div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-26')">Show Answer</button>
+        <div id="ans-26" class="answer-block">
+            <p>The rectangle has a smaller shaded portion at the bottom. Visually, the white part is significantly larger than the blue part, so it must be less than 50% (eliminating C and D).</p>
+            <p>Comparing 20% (1/5) vs 40% (2/5): The shaded part appears to take up roughly 2/5 of the total height. (One shaded box plus another fits into the white space with a little room left, suggesting the white space is roughly 1.5x the shaded space, which leads to a 2/5 or 40% ratio).</p>
+            <div class="final-answer">Answer: B. 40%</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement">
+            <span class="problem-number">27.</span> <strong>REPRESENT</strong> Sketch a coordinate plane on graph paper. Graph point W(2, 3), point X(1, 0), point Y(-3, 0), and point Z(-2, 3). Then draw WX, XY, YZ, and ZW.
+        </div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-27')">Show Answer</button>
+        <div id="ans-27" class="answer-block">
+            <p>Plotting the points:</p>
+            <ul>
+                <li>W: Right 2, Up 3</li>
+                <li>X: Right 1, Stay on axis</li>
+                <li>Y: Left 3, Stay on axis</li>
+                <li>Z: Left 2, Up 3</li>
+            </ul>
+            <div class="svg-container">
+                <svg width="200" height="200" viewBox="-5 -5 10 10" style="background:#f0f0f0; border:1px solid #ccc;">
+                    <line x1="0" y1="-5" x2="0" y2="5" stroke="black" stroke-width="0.1"/>
+                    <line x1="-5" y1="0" x2="5" y2="0" stroke="black" stroke-width="0.1"/>
+                    
+                    <polygon points="2,-3 1,0 -3,0 -2,-3" fill="rgba(52, 152, 219, 0.3)" stroke="#2980b9" stroke-width="0.2"/>
+                    
+                    <text x="2" y="-3.2" font-size="1" text-anchor="middle">W</text>
+                    <text x="1" y="1" font-size="1" text-anchor="middle">X</text>
+                    <text x="-3" y="1" font-size="1" text-anchor="middle">Y</text>
+                    <text x="-2" y="-3.2" font-size="1" text-anchor="middle">Z</text>
+                </svg>
+            </div>
+            <p class="explanation">Note: SVG Y-axis is inverted typically, but visual representation is a parallelogram.</p>
+            <div class="final-answer">Answer: See graph above (Parallelogram).</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement">
+            <span class="problem-number">28.</span> a. Which segment in problem 27 is parallel to $\overline{WX}$?<br>
+            b. Which segment in problem 27 is parallel to $\overline{XY}$?
+        </div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-28')">Show Answer</button>
+        <div id="ans-28" class="answer-block">
+            <p><strong>a.</strong> The side opposite to $WX$ in the parallelogram is $YZ$ (or $ZY$).</p>
+            <p><strong>b.</strong> The side opposite to $XY$ (which lies on the x-axis) is the top segment $ZW$ (or $WZ$). Both are horizontal.</p>
+            <div class="final-answer">Answer: a. $\overline{YZ}$, b. $\overline{ZW}$</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement"><span class="problem-number">29.</span> Write the prime factorization of both the numerator and the denominator of this fraction. Then reduce the fraction.<br>$$ \frac{210}{350} $$</div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-29')">Show Answer</button>
+        <div id="ans-29" class="answer-block">
+            <p><strong>Numerator (210):</strong> $21 \times 10 = (3 \times 7) \times (2 \times 5) = 2 \times 3 \times 5 \times 7$.</p>
+            <p><strong>Denominator (350):</strong> $35 \times 10 = (5 \times 7) \times (2 \times 5) = 2 \times 5 \times 5 \times 7$.</p>
+            <p><strong>Reduce:</strong></p>
+            $$ \frac{2 \times 3 \times 5 \times 7}{2 \times 5 \times 5 \times 7} $$
+            <p>Cancel common factors (2, 5, 7):</p>
+            $$ \frac{\not{2} \times 3 \times \not{5} \times \not{7}}{\not{2} \times 5 \times \not{5} \times \not{7}} = \frac{3}{5} $$
+            <div class="final-answer">Answer: $\frac{3}{5}$</div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-statement">
+            <span class="problem-number">30.</span> a. The moon has the shape of what geometric solid?<br>
+            b. The diameter of the moon is about 2160 miles. Calculate the approximate circumference of the moon using 3.14 for $\pi$. Round answer to nearest ten miles.
+        </div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-30')">Show Answer</button>
+        <div id="ans-30" class="answer-block">
+            <p><strong>a. Shape:</strong> Sphere.</p>
+            <p><strong>b. Circumference:</strong> Formula $C = \pi d$.</p>
+            $$ C \approx 3.14 \times 2160 $$
+            $$ C \approx 6782.4 $$
+            <p>Round to nearest ten: 6780.</p>
+            <div class="final-answer">Answer: a. Sphere, b. 6780 miles</div>
+        </div>
+    </div>
+
+    <h2>Real-World Connection</h2>
+    <div class="problem-card">
+        <div class="problem-statement">
+            Simplify each prime factorization below. Then identify which prime factorization does not belong in the group. Explain your reasoning.<br>
+            $3^2 \times 2^3$ &nbsp;&nbsp; $2^2 \times 3^3 \times 5$ &nbsp;&nbsp; $2^2 \times 3^2 \times 5^2$ &nbsp;&nbsp; $3^5$ &nbsp;&nbsp; $2^4 \times 7^2$
+        </div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-rw')">Show Answer</button>
+        <div id="ans-rw" class="answer-block">
+            <p><strong>Simplify:</strong></p>
+            <ul>
+                <li>$3^2 \times 2^3 = 9 \times 8 = 72$</li>
+                <li>$2^2 \times 3^3 \times 5 = 4 \times 27 \times 5 = 540$</li>
+                <li>$2^2 \times 3^2 \times 5^2 = 4 \times 9 \times 25 = 900$</li>
+                <li>$3^5 = 243$</li>
+                <li>$2^4 \times 7^2 = 16 \times 49 = 784$</li>
+            </ul>
+            <p><strong>Reasoning:</strong></p>
+            <p>The term $3^5$ (243) is the only <strong>odd number</strong> in the group. All others have a factor of 2, making them even numbers. Also, it is the only one with a single distinct prime base.</p>
+            <div class="final-answer">Answer: $3^5$ does not belong.</div>
+        </div>
+    </div>
+
+</body>
+</html>
