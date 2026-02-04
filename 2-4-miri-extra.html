@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extra Practice Worksheet</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #ecf0f1;
+            --accent-color: #3498db;
+            --correct-color: #27ae60;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+
+        .problem-card {
+            border: 1px solid #e1e4e8;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: white;
+        }
+
+        .question-text {
+            font-size: 1.15em;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .option {
+            padding: 10px;
+            background-color: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .option:hover {
+            background-color: #e8f4fd;
+            border-color: var(--accent-color);
+        }
+
+        .toggle-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.2s;
+        }
+
+        .toggle-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .answer-panel {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: var(--secondary-color);
+            border-radius: 6px;
+            border-left: 5px solid var(--correct-color);
+        }
+
+        .answer-panel.visible {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Extra Math Practice</h1>
+    <p style="text-align: center; color: #666;">Similar problems to #3, #10, #19, and #30</p>
+
+    <h2>Set 1: Division Word Problems (Like #3)</h2>
+
+    <div class="problem-card">
+        <div class="question-text">1. A teacher distributed 35 pencils equally among 5 students. How many pencils did each student get?</div>
+        <div class="options-grid">
+            <div class="option">A) 6</div>
+            <div class="option">B) 7</div>
+            <div class="option">C) 8</div>
+            <div class="option">D) 5</div>
+        </div>
+        <button class="toggle-btn" onclick="toggleAnswer('s1-1')">Show Answer</button>
+        <div id="ans-s1-1" class="answer-panel">
+            <strong>Correct Answer: B) 7</strong><br>
+            <em>Reasoning:</em> Divide the total items by the number of groups: \( 35 \div 5 = 7 \).
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="question-text">2. There are 48 cookies in a jar. If you put them into bags of 6 cookies each, how many bags do you need?</div>
+        <div class="options-grid">
+            <div class="option">A) 8</div>
+            <div class="option">B) 9</div>
+            <div class="option">C) 7</div>
+            <div class="option">D) 6</div>
+        </div>
+        <button class="toggle-btn" onclick="toggleAnswer('s1-2')">Show Answer</button>
+        <div id="ans-s1-2" class="answer-panel">
+            <strong>Correct Answer: A) 8</strong><br>
+            <em>Reasoning:</em> \( 48 \div 6 = 8 \).
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="question-text">3. A gardener planted 24 flowers in 3 equal rows. How many flowers were in each row?</div>
+        <div class="options-grid">
+            <div class="option">A) 6</div>
+            <div class="option">B) 12</div>
+            <div class="option">C) 9</div>
+            <div class="option">D) 8</div>
+        </div>
+        <button class="toggle-btn" onclick="toggleAnswer('s1-3')">Show Answer</button>
+        <div id="ans-s1-3" class="answer-panel">
+            <strong>Correct Answer: D) 8</strong><br>
+            <em>Reasoning:</em> \( 24 \div 3 = 8 \).
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="question-text">4. The librarian stacked 56 books on 7 shelves. If each shelf has the same number of books, how many books are on one shelf?</div>
+        <div class="options-grid">
+            <div class="option">A) 7</div>
+            <div class="option">B) 9</div>
+            <div class="option">C) 8</div>
+            <div class="option">D) 6</div>
+        </div>
+        <button class="toggle-btn" onclick="toggleAnswer('s1-4')">Show Answer</button>
+        <div id="ans-s1-4" class="answer-panel">
+            <strong>Correct Answer: C) 8</strong><br>
+            <em>Reasoning:</em> \( 56 \div 7 = 8 \).
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="question-text">5. Four friends shared a pack of 32 stickers equally. How many stickers did each friend receive?</div>
+        <div class="options-grid">
+            <div class="option">A) 8</div>
+            <div class="option">B) 4</div>
+            <div class="option">C) 7</div>
+            <div class="option">D) 9</div>
+        </div>
+        <button class="toggle-btn" onclick="toggleAnswer('s1-5')">Show Answer</button>
+        <div id="ans-s1-5" class="answer-panel">
+            <strong>Correct Answer: A) 8</strong><br>
+            <em>Reasoning:</em> \( 32 \div 4 = 8 \).
+        </div>
+    </div>
+
+    <h2>Set 2: Decimal Addition (Like #10)</h2>
+
+    <div class="problem-card">
+        <div class="question-text">6. \( 5.2 + 3.45 + 1.8 = \)</div>
+        <div class="options-grid">
+            <div class="option">A) 9.45</div>
+            <div class="option">B) 10.45</div>
+            <div class="option">C) 10.25</div>
+            <div class="option">D) 9.65</div>
+        </div>
+        <button class="toggle-btn" onclick="toggleAnswer('s2-1')">Show Answer</button>
+        <div id="ans-s2-1" class="answer-panel">
+            <strong>Correct Answer: B) 10.45</strong><br>
+            <em>Reasoning:</em> Align the decimals: \( 5.20 + 3.45 + 1.80 = 10.45 \).
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="question-text">7. \( 9.1 + 2.76 + 4.05 = \)</div>
+        <div class="options-grid">
+            <div class="option">A) 15.81</div>
+            <div class="option">B) 16.01</div>
+            <div class="option">C) 15.91</div>
+            <div class="option">D) 14.91</div>
+        </div>
+        <button class="toggle-btn" onclick="toggleAnswer('s2-2')">Show Answer</button>
+        <div id="ans-s2-2" class="answer-panel">
+            <strong>Correct Answer: C) 15.91</strong><br>
+            <em>Reasoning:</em> \( 9.10 + 2.76 + 4.05 = 15.91 \).
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="question-text">8. \( 12.5 + 6.34 + 0.9 = \)</div>
+        <div class="options-grid">
+            <div class="option">A) 19.74</div>
+            <div class="option">B) 18.84</div>
+            <div class="option">C) 19.64</div>
+            <div class="option">D) 20.14</div>
+        </div>
+        <button class="toggle-btn" onclick="toggleAnswer('s2-3')">Show Answer</button>
+        <div id="ans-s2-3" class="answer-panel">
+            <strong>Correct Answer: A) 19.74</strong><br>
+            <em>Reasoning:</em> \( 12.50 + 6.34 + 0.90 = 19.74 \).
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="question-text">9. \( 3.88 + 4.1 + 7.2 = \)</div>
+        <div class="options-grid">
+            <div class="option">A) 14.18</div>
+            <div class="option">B) 15.08</div>
+            <div class="option">C) 15.18</div>
+            <div class="option">D) 14.98</div>
+        </div>
+        <button class="toggle-btn" onclick="toggleAnswer('s2-4')">Show Answer</button>
+        <div id="ans-s2-4" class="answer-panel">
+            <strong>Correct Answer: C) 15.18</strong><br>
+            <em>Reasoning:</em> \( 3.88 + 4.10 + 7.20 = 15.18 \).
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="question-text">10. \( 15.2 + 3.99 + 1.4 = \)</div>
+        <div class="options-grid">
+            <div class="option">A) 20.49</div>
+            <div class="option">B) 19.59</div>
+            <div class="option">C) 20.69</div>
+            <div class="option">D) 20.59</div>
+        </div>
+        <button class="toggle-btn" onclick="toggleAnswer('s2-5')">Show Answer</button>
+        <div id="ans-s2-5" class="answer-panel">
+            <strong>Correct Answer: D) 20.59</strong><br>
+            <em>Reasoning:</em> \( 15.20 + 3.99 + 1.40 = 20.59 \).
+        </div>
+    </div>
+
+    <h2>Set 3: Solving for 'n' (Like #19)</h2>
+
+    <div class="problem-card">
+        <div class="question-text">11. Solve for n: \( 300 - n = 145 \)</div>
+        <div class="options-grid">
+            <div class="option">A) 165</div>
+            <div class="option">B) 155</div>
+            <div class="option">C) 445</div>
+            <div class="option">D) 145</div>
+        </div>
+        <button class="toggle-btn" onclick="toggleAnswer('s3-1')">Show Answer</button>
+        <div id="ans-s3-1" class="answer-panel">
+            <strong>Correct Answer: B) 155</strong><br>
+            <em>Reasoning:</em> \( n = 300 - 145 \).
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="question-text">12. Solve for n: \( 500 - n = 230 \)</div>
+        <div class="options-grid">
+            <div class="option">A) 330</div>
+            <div class="option">B) 730</div>
+            <div class="option">C) 270</div>
+            <div class="option">D) 230</div>
+        </div>
+        <button class="toggle-btn" onclick="toggleAnswer('s3-2')">Show Answer</button>
+        <div id="ans-s3-2" class="answer-panel">
+            <strong>Correct Answer: C) 270</strong><br>
+            <em>Reasoning:</em> \( n = 500 - 230 \).
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="question-text">13. Solve for n: \( 100 - n = 37 \)</div>
+        <div class="options-grid">
+            <div class="option">A) 63</div>
+            <div class="option">B) 73</div>
+            <div class="option">C) 137</div>
+            <div class="option">D) 53</div>
+        </div>
+        <button class="toggle-btn" onclick="toggleAnswer('s3-3')">Show Answer</button>
+        <div id="ans-s3-3" class="answer-panel">
+            <strong>Correct Answer: A) 63</strong><br>
+            <em>Reasoning:</em> \( n = 100 - 37 \).
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="question-text">14. Solve for n: \( 250 - n = 198 \)</div>
+        <div class="options-grid">
+            <div class="option">A) 62</div>
+            <div class="option">B) 52</div>
+            <div class="option">C) 152</div>
+            <div class="option">D) 448</div>
+        </div>
+        <button class="toggle-btn" onclick="toggleAnswer('s3-4')">Show Answer</button>
+        <div id="ans-s3-4" class="answer-panel">
+            <strong>Correct Answer: B) 52</strong><br>
+            <em>Reasoning:</em> \( n = 250 - 198 \).
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="question-text">15. Solve for n: \( 600 - n = 455 \)</div>
+        <div class="options-grid">
+            <div class="option">A) 245</div>
+            <div class="option">B) 1055</div>
+            <div class="option">C) 155</div>
+            <div class="option">D) 145</div>
+        </div>
+        <button class="toggle-btn" onclick="toggleAnswer('s3-5')">Show Answer</button>
+        <div id="ans-s3-5" class="answer-panel">
+            <strong>Correct Answer: D) 145</strong><br>
+            <em>Reasoning:</em> \( n = 600 - 455 \).
+        </div>
+    </div>
+
+    <h2>Set 4: Counting Coins (Like #30)</h2>
+
+    <div class="problem-card">
+        <div class="question-text">16. You have exactly two coins: one Quarter and one Dime. What is the total amount?</div>
+        <div class="options-grid">
+            <div class="option">A) $0.30</div>
+            <div class="option">B) $0.35</div>
+            <div class="option">C) $0.40</div>
+            <div class="option">D) $0.45</div>
+        </div>
+        <button class="toggle-btn" onclick="toggleAnswer('s4-1')">Show Answer</button>
+        <div id="ans-s4-1" class="answer-panel">
+            <strong>Correct Answer: B) $0.35</strong><br>
+            <em>Reasoning:</em> Quarter ($0.25) + Dime ($0.10) = $0.35.
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="question-text">17. Which two coins add up to $0.75?</div>
+        <div class="options-grid">
+            <div class="option">A) Two Quarters</div>
+            <div class="option">B) A Half Dollar and a Quarter</div>
+            <div class="option">C) A Half Dollar and a Dime</div>
+            <div class="option">D) Three Quarters</div>
+        </div>
+        <button class="toggle-btn" onclick="toggleAnswer('s4-2')">Show Answer</button>
+        <div id="ans-s4-2" class="answer-panel">
+            <strong>Correct Answer: B) A Half Dollar and a Quarter</strong><br>
+            <em>Reasoning:</em> Half Dollar ($0.50) + Quarter ($0.25) = $0.75.
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="question-text">18. What is the total value of one Half Dollar and one Nickel?</div>
+        <div class="options-grid">
+            <div class="option">A) $0.55</div>
+            <div class="option">B) $0.60</div>
+            <div class="option">C) $0.45</div>
+            <div class="option">D) $0.15</div>
+        </div>
+        <button class="toggle-btn" onclick="toggleAnswer('s4-3')">Show Answer</button>
+        <div id="ans-s4-3" class="answer-panel">
+            <strong>Correct Answer: A) $0.55</strong><br>
+            <em>Reasoning:</em> Half Dollar ($0.50) + Nickel ($0.05) = $0.55.
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="question-text">19. Which amount can you make using exactly two coins?</div>
+        <div class="options-grid">
+            <div class="option">A) $0.13</div>
+            <div class="option">B) $0.26</div>
+            <div class="option">C) $0.08</div>
+            <div class="option">D) $0.29</div>
+        </div>
+        <button class="toggle-btn" onclick="toggleAnswer('s4-4')">Show Answer</button>
+        <div id="ans-s4-4" class="answer-panel">
+            <strong>Correct Answer: B) $0.26</strong><br>
+            <em>Reasoning:</em> A Quarter ($0.25) + A Penny ($0.01) = $0.26. The others require more than 2 coins.
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="question-text">20. What is the total value of two Dimes and one Penny?</div>
+        <div class="options-grid">
+            <div class="option">A) $0.11</div>
+            <div class="option">B) $0.21</div>
+            <div class="option">C) $0.31</div>
+            <div class="option">D) $0.25</div>
+        </div>
+        <button class="toggle-btn" onclick="toggleAnswer('s4-5')">Show Answer</button>
+        <div id="ans-s4-5" class="answer-panel">
+            <strong>Correct Answer: B) $0.21</strong><br>
+            <em>Reasoning:</em> 10 + 10 + 1 = 21 cents ($0.21).
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function toggleAnswer(id) {
+        var answerDiv = document.getElementById('ans-' + id);
+        if (answerDiv.style.display === "block") {
+            answerDiv.style.display = "none";
+            answerDiv.classList.remove('visible');
+        } else {
+            answerDiv.style.display = "block";
+            setTimeout(() => {
+                answerDiv.classList.add('visible');
+            }, 10);
+        }
+    }
+</script>
+
+</body>
+</html>
