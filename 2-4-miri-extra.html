@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Extra Practice Worksheet</title>
+    <title>Interactive Math Quiz</title>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
@@ -12,12 +12,14 @@
             --secondary-color: #ecf0f1;
             --accent-color: #3498db;
             --correct-color: #27ae60;
+            --wrong-color: #e74c3c;
+            --text-color: #333;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
-            color: #333;
+            color: var(--text-color);
             background-color: #f4f7f6;
             margin: 0;
             padding: 20px;
@@ -28,8 +30,34 @@
             margin: 0 auto;
             background: white;
             padding: 40px;
+            padding-top: 100px; /* Space for fixed scoreboard */
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        /* Sticky Scoreboard */
+        .scoreboard {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: flex;
+            gap: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .score-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         h1 {
@@ -51,6 +79,11 @@
             padding: 20px;
             margin-bottom: 20px;
             background-color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .problem-card.answered {
+            background-color: #f9f9f9;
         }
 
         .question-text {
@@ -67,381 +100,387 @@
         }
 
         .option {
-            padding: 10px;
+            padding: 15px;
             background-color: #fafafa;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
             cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            font-weight: 500;
         }
 
-        .option:hover {
+        .option:hover:not(.disabled) {
             background-color: #e8f4fd;
             border-color: var(--accent-color);
+            transform: translateY(-2px);
         }
 
-        .toggle-btn {
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: background-color 0.2s;
+        /* States for clicked options */
+        .option.correct {
+            background-color: #d4edda;
+            border-color: var(--correct-color);
+            color: var(--correct-color);
         }
 
-        .toggle-btn:hover {
-            background-color: #2980b9;
+        .option.wrong {
+            background-color: #f8d7da;
+            border-color: var(--wrong-color);
+            color: var(--wrong-color);
         }
 
-        .answer-panel {
-            display: none;
+        .option.disabled {
+            cursor: default;
+            opacity: 0.6;
+        }
+
+        .feedback-panel {
+            display: none; /* Hidden by default */
             margin-top: 15px;
             padding: 15px;
-            background-color: var(--secondary-color);
             border-radius: 6px;
-            border-left: 5px solid var(--correct-color);
+            font-weight: bold;
         }
 
-        .answer-panel.visible {
+        .feedback-panel.show-correct {
             display: block;
-            animation: fadeIn 0.3s ease-in;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
+        .feedback-panel.show-wrong {
+            display: block;
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            .scoreboard {
+                width: 90%;
+                justify-content: space-between;
+                font-size: 1em;
+            }
         }
     </style>
 </head>
 <body>
 
+<div class="scoreboard">
+    <div class="score-item">
+        <span>✅ Correct:</span>
+        <span id="score-correct">0</span>
+    </div>
+    <div class="score-item">
+        <span>❌ Incorrect:</span>
+        <span id="score-wrong">0</span>
+    </div>
+    <div class="score-item">
+        <span>Total:</span>
+        <span id="score-total">0 / 20</span>
+    </div>
+</div>
+
 <div class="container">
-    <h1>Extra Math Practice</h1>
-    <p style="text-align: center; color: #666;">Similar problems to #3, #10, #19, and #30</p>
+    <h1>Interactive Math Quiz</h1>
+    <p style="text-align: center; color: #666;">Click the best answer for each question. The scoreboard will update automatically!</p>
 
-    <h2>Set 1: Division Word Problems (Like #3)</h2>
+    <h2>Set 1: Division Word Problems</h2>
 
-    <div class="problem-card">
+    <div class="problem-card" id="q1">
         <div class="question-text">1. A teacher distributed 35 pencils equally among 5 students. How many pencils did each student get?</div>
         <div class="options-grid">
-            <div class="option">A) 6</div>
-            <div class="option">B) 7</div>
-            <div class="option">C) 8</div>
-            <div class="option">D) 5</div>
+            <div class="option" onclick="checkAnswer(1, 'A')">A) 6</div>
+            <div class="option" data-correct="true" onclick="checkAnswer(1, 'B')">B) 7</div>
+            <div class="option" onclick="checkAnswer(1, 'C')">C) 8</div>
+            <div class="option" onclick="checkAnswer(1, 'D')">D) 5</div>
         </div>
-        <button class="toggle-btn" onclick="toggleAnswer('s1-1')">Show Answer</button>
-        <div id="ans-s1-1" class="answer-panel">
-            <strong>Correct Answer: B) 7</strong><br>
-            <em>Reasoning:</em> Divide the total items by the number of groups: \( 35 \div 5 = 7 \).
-        </div>
+        <div class="feedback-panel" id="feedback-1"></div>
     </div>
 
-    <div class="problem-card">
+    <div class="problem-card" id="q2">
         <div class="question-text">2. There are 48 cookies in a jar. If you put them into bags of 6 cookies each, how many bags do you need?</div>
         <div class="options-grid">
-            <div class="option">A) 8</div>
-            <div class="option">B) 9</div>
-            <div class="option">C) 7</div>
-            <div class="option">D) 6</div>
+            <div class="option" data-correct="true" onclick="checkAnswer(2, 'A')">A) 8</div>
+            <div class="option" onclick="checkAnswer(2, 'B')">B) 9</div>
+            <div class="option" onclick="checkAnswer(2, 'C')">C) 7</div>
+            <div class="option" onclick="checkAnswer(2, 'D')">D) 6</div>
         </div>
-        <button class="toggle-btn" onclick="toggleAnswer('s1-2')">Show Answer</button>
-        <div id="ans-s1-2" class="answer-panel">
-            <strong>Correct Answer: A) 8</strong><br>
-            <em>Reasoning:</em> \( 48 \div 6 = 8 \).
-        </div>
+        <div class="feedback-panel" id="feedback-2"></div>
     </div>
 
-    <div class="problem-card">
+    <div class="problem-card" id="q3">
         <div class="question-text">3. A gardener planted 24 flowers in 3 equal rows. How many flowers were in each row?</div>
         <div class="options-grid">
-            <div class="option">A) 6</div>
-            <div class="option">B) 12</div>
-            <div class="option">C) 9</div>
-            <div class="option">D) 8</div>
+            <div class="option" onclick="checkAnswer(3, 'A')">A) 6</div>
+            <div class="option" onclick="checkAnswer(3, 'B')">B) 12</div>
+            <div class="option" onclick="checkAnswer(3, 'C')">C) 9</div>
+            <div class="option" data-correct="true" onclick="checkAnswer(3, 'D')">D) 8</div>
         </div>
-        <button class="toggle-btn" onclick="toggleAnswer('s1-3')">Show Answer</button>
-        <div id="ans-s1-3" class="answer-panel">
-            <strong>Correct Answer: D) 8</strong><br>
-            <em>Reasoning:</em> \( 24 \div 3 = 8 \).
-        </div>
+        <div class="feedback-panel" id="feedback-3"></div>
     </div>
 
-    <div class="problem-card">
+    <div class="problem-card" id="q4">
         <div class="question-text">4. The librarian stacked 56 books on 7 shelves. If each shelf has the same number of books, how many books are on one shelf?</div>
         <div class="options-grid">
-            <div class="option">A) 7</div>
-            <div class="option">B) 9</div>
-            <div class="option">C) 8</div>
-            <div class="option">D) 6</div>
+            <div class="option" onclick="checkAnswer(4, 'A')">A) 7</div>
+            <div class="option" onclick="checkAnswer(4, 'B')">B) 9</div>
+            <div class="option" data-correct="true" onclick="checkAnswer(4, 'C')">C) 8</div>
+            <div class="option" onclick="checkAnswer(4, 'D')">D) 6</div>
         </div>
-        <button class="toggle-btn" onclick="toggleAnswer('s1-4')">Show Answer</button>
-        <div id="ans-s1-4" class="answer-panel">
-            <strong>Correct Answer: C) 8</strong><br>
-            <em>Reasoning:</em> \( 56 \div 7 = 8 \).
-        </div>
+        <div class="feedback-panel" id="feedback-4"></div>
     </div>
 
-    <div class="problem-card">
+    <div class="problem-card" id="q5">
         <div class="question-text">5. Four friends shared a pack of 32 stickers equally. How many stickers did each friend receive?</div>
         <div class="options-grid">
-            <div class="option">A) 8</div>
-            <div class="option">B) 4</div>
-            <div class="option">C) 7</div>
-            <div class="option">D) 9</div>
+            <div class="option" data-correct="true" onclick="checkAnswer(5, 'A')">A) 8</div>
+            <div class="option" onclick="checkAnswer(5, 'B')">B) 4</div>
+            <div class="option" onclick="checkAnswer(5, 'C')">C) 7</div>
+            <div class="option" onclick="checkAnswer(5, 'D')">D) 9</div>
         </div>
-        <button class="toggle-btn" onclick="toggleAnswer('s1-5')">Show Answer</button>
-        <div id="ans-s1-5" class="answer-panel">
-            <strong>Correct Answer: A) 8</strong><br>
-            <em>Reasoning:</em> \( 32 \div 4 = 8 \).
-        </div>
+        <div class="feedback-panel" id="feedback-5"></div>
     </div>
 
-    <h2>Set 2: Decimal Addition (Like #10)</h2>
+    <h2>Set 2: Decimal Addition</h2>
 
-    <div class="problem-card">
+    <div class="problem-card" id="q6">
         <div class="question-text">6. \( 5.2 + 3.45 + 1.8 = \)</div>
         <div class="options-grid">
-            <div class="option">A) 9.45</div>
-            <div class="option">B) 10.45</div>
-            <div class="option">C) 10.25</div>
-            <div class="option">D) 9.65</div>
+            <div class="option" onclick="checkAnswer(6, 'A')">A) 9.45</div>
+            <div class="option" data-correct="true" onclick="checkAnswer(6, 'B')">B) 10.45</div>
+            <div class="option" onclick="checkAnswer(6, 'C')">C) 10.25</div>
+            <div class="option" onclick="checkAnswer(6, 'D')">D) 9.65</div>
         </div>
-        <button class="toggle-btn" onclick="toggleAnswer('s2-1')">Show Answer</button>
-        <div id="ans-s2-1" class="answer-panel">
-            <strong>Correct Answer: B) 10.45</strong><br>
-            <em>Reasoning:</em> Align the decimals: \( 5.20 + 3.45 + 1.80 = 10.45 \).
-        </div>
+        <div class="feedback-panel" id="feedback-6"></div>
     </div>
 
-    <div class="problem-card">
+    <div class="problem-card" id="q7">
         <div class="question-text">7. \( 9.1 + 2.76 + 4.05 = \)</div>
         <div class="options-grid">
-            <div class="option">A) 15.81</div>
-            <div class="option">B) 16.01</div>
-            <div class="option">C) 15.91</div>
-            <div class="option">D) 14.91</div>
+            <div class="option" onclick="checkAnswer(7, 'A')">A) 15.81</div>
+            <div class="option" onclick="checkAnswer(7, 'B')">B) 16.01</div>
+            <div class="option" data-correct="true" onclick="checkAnswer(7, 'C')">C) 15.91</div>
+            <div class="option" onclick="checkAnswer(7, 'D')">D) 14.91</div>
         </div>
-        <button class="toggle-btn" onclick="toggleAnswer('s2-2')">Show Answer</button>
-        <div id="ans-s2-2" class="answer-panel">
-            <strong>Correct Answer: C) 15.91</strong><br>
-            <em>Reasoning:</em> \( 9.10 + 2.76 + 4.05 = 15.91 \).
-        </div>
+        <div class="feedback-panel" id="feedback-7"></div>
     </div>
 
-    <div class="problem-card">
+    <div class="problem-card" id="q8">
         <div class="question-text">8. \( 12.5 + 6.34 + 0.9 = \)</div>
         <div class="options-grid">
-            <div class="option">A) 19.74</div>
-            <div class="option">B) 18.84</div>
-            <div class="option">C) 19.64</div>
-            <div class="option">D) 20.14</div>
+            <div class="option" data-correct="true" onclick="checkAnswer(8, 'A')">A) 19.74</div>
+            <div class="option" onclick="checkAnswer(8, 'B')">B) 18.84</div>
+            <div class="option" onclick="checkAnswer(8, 'C')">C) 19.64</div>
+            <div class="option" onclick="checkAnswer(8, 'D')">D) 20.14</div>
         </div>
-        <button class="toggle-btn" onclick="toggleAnswer('s2-3')">Show Answer</button>
-        <div id="ans-s2-3" class="answer-panel">
-            <strong>Correct Answer: A) 19.74</strong><br>
-            <em>Reasoning:</em> \( 12.50 + 6.34 + 0.90 = 19.74 \).
-        </div>
+        <div class="feedback-panel" id="feedback-8"></div>
     </div>
 
-    <div class="problem-card">
+    <div class="problem-card" id="q9">
         <div class="question-text">9. \( 3.88 + 4.1 + 7.2 = \)</div>
         <div class="options-grid">
-            <div class="option">A) 14.18</div>
-            <div class="option">B) 15.08</div>
-            <div class="option">C) 15.18</div>
-            <div class="option">D) 14.98</div>
+            <div class="option" onclick="checkAnswer(9, 'A')">A) 14.18</div>
+            <div class="option" onclick="checkAnswer(9, 'B')">B) 15.08</div>
+            <div class="option" data-correct="true" onclick="checkAnswer(9, 'C')">C) 15.18</div>
+            <div class="option" onclick="checkAnswer(9, 'D')">D) 14.98</div>
         </div>
-        <button class="toggle-btn" onclick="toggleAnswer('s2-4')">Show Answer</button>
-        <div id="ans-s2-4" class="answer-panel">
-            <strong>Correct Answer: C) 15.18</strong><br>
-            <em>Reasoning:</em> \( 3.88 + 4.10 + 7.20 = 15.18 \).
-        </div>
+        <div class="feedback-panel" id="feedback-9"></div>
     </div>
 
-    <div class="problem-card">
+    <div class="problem-card" id="q10">
         <div class="question-text">10. \( 15.2 + 3.99 + 1.4 = \)</div>
         <div class="options-grid">
-            <div class="option">A) 20.49</div>
-            <div class="option">B) 19.59</div>
-            <div class="option">C) 20.69</div>
-            <div class="option">D) 20.59</div>
+            <div class="option" onclick="checkAnswer(10, 'A')">A) 20.49</div>
+            <div class="option" onclick="checkAnswer(10, 'B')">B) 19.59</div>
+            <div class="option" onclick="checkAnswer(10, 'C')">C) 20.69</div>
+            <div class="option" data-correct="true" onclick="checkAnswer(10, 'D')">D) 20.59</div>
         </div>
-        <button class="toggle-btn" onclick="toggleAnswer('s2-5')">Show Answer</button>
-        <div id="ans-s2-5" class="answer-panel">
-            <strong>Correct Answer: D) 20.59</strong><br>
-            <em>Reasoning:</em> \( 15.20 + 3.99 + 1.40 = 20.59 \).
-        </div>
+        <div class="feedback-panel" id="feedback-10"></div>
     </div>
 
-    <h2>Set 3: Solving for 'n' (Like #19)</h2>
+    <h2>Set 3: Solving for 'n'</h2>
 
-    <div class="problem-card">
+    <div class="problem-card" id="q11">
         <div class="question-text">11. Solve for n: \( 300 - n = 145 \)</div>
         <div class="options-grid">
-            <div class="option">A) 165</div>
-            <div class="option">B) 155</div>
-            <div class="option">C) 445</div>
-            <div class="option">D) 145</div>
+            <div class="option" onclick="checkAnswer(11, 'A')">A) 165</div>
+            <div class="option" data-correct="true" onclick="checkAnswer(11, 'B')">B) 155</div>
+            <div class="option" onclick="checkAnswer(11, 'C')">C) 445</div>
+            <div class="option" onclick="checkAnswer(11, 'D')">D) 145</div>
         </div>
-        <button class="toggle-btn" onclick="toggleAnswer('s3-1')">Show Answer</button>
-        <div id="ans-s3-1" class="answer-panel">
-            <strong>Correct Answer: B) 155</strong><br>
-            <em>Reasoning:</em> \( n = 300 - 145 \).
-        </div>
+        <div class="feedback-panel" id="feedback-11"></div>
     </div>
 
-    <div class="problem-card">
+    <div class="problem-card" id="q12">
         <div class="question-text">12. Solve for n: \( 500 - n = 230 \)</div>
         <div class="options-grid">
-            <div class="option">A) 330</div>
-            <div class="option">B) 730</div>
-            <div class="option">C) 270</div>
-            <div class="option">D) 230</div>
+            <div class="option" onclick="checkAnswer(12, 'A')">A) 330</div>
+            <div class="option" onclick="checkAnswer(12, 'B')">B) 730</div>
+            <div class="option" data-correct="true" onclick="checkAnswer(12, 'C')">C) 270</div>
+            <div class="option" onclick="checkAnswer(12, 'D')">D) 230</div>
         </div>
-        <button class="toggle-btn" onclick="toggleAnswer('s3-2')">Show Answer</button>
-        <div id="ans-s3-2" class="answer-panel">
-            <strong>Correct Answer: C) 270</strong><br>
-            <em>Reasoning:</em> \( n = 500 - 230 \).
-        </div>
+        <div class="feedback-panel" id="feedback-12"></div>
     </div>
 
-    <div class="problem-card">
+    <div class="problem-card" id="q13">
         <div class="question-text">13. Solve for n: \( 100 - n = 37 \)</div>
         <div class="options-grid">
-            <div class="option">A) 63</div>
-            <div class="option">B) 73</div>
-            <div class="option">C) 137</div>
-            <div class="option">D) 53</div>
+            <div class="option" data-correct="true" onclick="checkAnswer(13, 'A')">A) 63</div>
+            <div class="option" onclick="checkAnswer(13, 'B')">B) 73</div>
+            <div class="option" onclick="checkAnswer(13, 'C')">C) 137</div>
+            <div class="option" onclick="checkAnswer(13, 'D')">D) 53</div>
         </div>
-        <button class="toggle-btn" onclick="toggleAnswer('s3-3')">Show Answer</button>
-        <div id="ans-s3-3" class="answer-panel">
-            <strong>Correct Answer: A) 63</strong><br>
-            <em>Reasoning:</em> \( n = 100 - 37 \).
-        </div>
+        <div class="feedback-panel" id="feedback-13"></div>
     </div>
 
-    <div class="problem-card">
+    <div class="problem-card" id="q14">
         <div class="question-text">14. Solve for n: \( 250 - n = 198 \)</div>
         <div class="options-grid">
-            <div class="option">A) 62</div>
-            <div class="option">B) 52</div>
-            <div class="option">C) 152</div>
-            <div class="option">D) 448</div>
+            <div class="option" onclick="checkAnswer(14, 'A')">A) 62</div>
+            <div class="option" data-correct="true" onclick="checkAnswer(14, 'B')">B) 52</div>
+            <div class="option" onclick="checkAnswer(14, 'C')">C) 152</div>
+            <div class="option" onclick="checkAnswer(14, 'D')">D) 448</div>
         </div>
-        <button class="toggle-btn" onclick="toggleAnswer('s3-4')">Show Answer</button>
-        <div id="ans-s3-4" class="answer-panel">
-            <strong>Correct Answer: B) 52</strong><br>
-            <em>Reasoning:</em> \( n = 250 - 198 \).
-        </div>
+        <div class="feedback-panel" id="feedback-14"></div>
     </div>
 
-    <div class="problem-card">
+    <div class="problem-card" id="q15">
         <div class="question-text">15. Solve for n: \( 600 - n = 455 \)</div>
         <div class="options-grid">
-            <div class="option">A) 245</div>
-            <div class="option">B) 1055</div>
-            <div class="option">C) 155</div>
-            <div class="option">D) 145</div>
+            <div class="option" onclick="checkAnswer(15, 'A')">A) 245</div>
+            <div class="option" onclick="checkAnswer(15, 'B')">B) 1055</div>
+            <div class="option" onclick="checkAnswer(15, 'C')">C) 155</div>
+            <div class="option" data-correct="true" onclick="checkAnswer(15, 'D')">D) 145</div>
         </div>
-        <button class="toggle-btn" onclick="toggleAnswer('s3-5')">Show Answer</button>
-        <div id="ans-s3-5" class="answer-panel">
-            <strong>Correct Answer: D) 145</strong><br>
-            <em>Reasoning:</em> \( n = 600 - 455 \).
-        </div>
+        <div class="feedback-panel" id="feedback-15"></div>
     </div>
 
-    <h2>Set 4: Counting Coins (Like #30)</h2>
+    <h2>Set 4: Counting Coins</h2>
 
-    <div class="problem-card">
+    <div class="problem-card" id="q16">
         <div class="question-text">16. You have exactly two coins: one Quarter and one Dime. What is the total amount?</div>
         <div class="options-grid">
-            <div class="option">A) $0.30</div>
-            <div class="option">B) $0.35</div>
-            <div class="option">C) $0.40</div>
-            <div class="option">D) $0.45</div>
+            <div class="option" onclick="checkAnswer(16, 'A')">A) $0.30</div>
+            <div class="option" data-correct="true" onclick="checkAnswer(16, 'B')">B) $0.35</div>
+            <div class="option" onclick="checkAnswer(16, 'C')">C) $0.40</div>
+            <div class="option" onclick="checkAnswer(16, 'D')">D) $0.45</div>
         </div>
-        <button class="toggle-btn" onclick="toggleAnswer('s4-1')">Show Answer</button>
-        <div id="ans-s4-1" class="answer-panel">
-            <strong>Correct Answer: B) $0.35</strong><br>
-            <em>Reasoning:</em> Quarter ($0.25) + Dime ($0.10) = $0.35.
-        </div>
+        <div class="feedback-panel" id="feedback-16"></div>
     </div>
 
-    <div class="problem-card">
+    <div class="problem-card" id="q17">
         <div class="question-text">17. Which two coins add up to $0.75?</div>
         <div class="options-grid">
-            <div class="option">A) Two Quarters</div>
-            <div class="option">B) A Half Dollar and a Quarter</div>
-            <div class="option">C) A Half Dollar and a Dime</div>
-            <div class="option">D) Three Quarters</div>
+            <div class="option" onclick="checkAnswer(17, 'A')">A) Two Quarters</div>
+            <div class="option" data-correct="true" onclick="checkAnswer(17, 'B')">B) A Half Dollar and a Quarter</div>
+            <div class="option" onclick="checkAnswer(17, 'C')">C) A Half Dollar and a Dime</div>
+            <div class="option" onclick="checkAnswer(17, 'D')">D) Three Quarters</div>
         </div>
-        <button class="toggle-btn" onclick="toggleAnswer('s4-2')">Show Answer</button>
-        <div id="ans-s4-2" class="answer-panel">
-            <strong>Correct Answer: B) A Half Dollar and a Quarter</strong><br>
-            <em>Reasoning:</em> Half Dollar ($0.50) + Quarter ($0.25) = $0.75.
-        </div>
+        <div class="feedback-panel" id="feedback-17"></div>
     </div>
 
-    <div class="problem-card">
+    <div class="problem-card" id="q18">
         <div class="question-text">18. What is the total value of one Half Dollar and one Nickel?</div>
         <div class="options-grid">
-            <div class="option">A) $0.55</div>
-            <div class="option">B) $0.60</div>
-            <div class="option">C) $0.45</div>
-            <div class="option">D) $0.15</div>
+            <div class="option" data-correct="true" onclick="checkAnswer(18, 'A')">A) $0.55</div>
+            <div class="option" onclick="checkAnswer(18, 'B')">B) $0.60</div>
+            <div class="option" onclick="checkAnswer(18, 'C')">C) $0.45</div>
+            <div class="option" onclick="checkAnswer(18, 'D')">D) $0.15</div>
         </div>
-        <button class="toggle-btn" onclick="toggleAnswer('s4-3')">Show Answer</button>
-        <div id="ans-s4-3" class="answer-panel">
-            <strong>Correct Answer: A) $0.55</strong><br>
-            <em>Reasoning:</em> Half Dollar ($0.50) + Nickel ($0.05) = $0.55.
-        </div>
+        <div class="feedback-panel" id="feedback-18"></div>
     </div>
 
-    <div class="problem-card">
+    <div class="problem-card" id="q19">
         <div class="question-text">19. Which amount can you make using exactly two coins?</div>
         <div class="options-grid">
-            <div class="option">A) $0.13</div>
-            <div class="option">B) $0.26</div>
-            <div class="option">C) $0.08</div>
-            <div class="option">D) $0.29</div>
+            <div class="option" onclick="checkAnswer(19, 'A')">A) $0.13</div>
+            <div class="option" data-correct="true" onclick="checkAnswer(19, 'B')">B) $0.26</div>
+            <div class="option" onclick="checkAnswer(19, 'C')">C) $0.08</div>
+            <div class="option" onclick="checkAnswer(19, 'D')">D) $0.29</div>
         </div>
-        <button class="toggle-btn" onclick="toggleAnswer('s4-4')">Show Answer</button>
-        <div id="ans-s4-4" class="answer-panel">
-            <strong>Correct Answer: B) $0.26</strong><br>
-            <em>Reasoning:</em> A Quarter ($0.25) + A Penny ($0.01) = $0.26. The others require more than 2 coins.
-        </div>
+        <div class="feedback-panel" id="feedback-19"></div>
     </div>
 
-    <div class="problem-card">
+    <div class="problem-card" id="q20">
         <div class="question-text">20. What is the total value of two Dimes and one Penny?</div>
         <div class="options-grid">
-            <div class="option">A) $0.11</div>
-            <div class="option">B) $0.21</div>
-            <div class="option">C) $0.31</div>
-            <div class="option">D) $0.25</div>
+            <div class="option" onclick="checkAnswer(20, 'A')">A) $0.11</div>
+            <div class="option" data-correct="true" onclick="checkAnswer(20, 'B')">B) $0.21</div>
+            <div class="option" onclick="checkAnswer(20, 'C')">C) $0.31</div>
+            <div class="option" onclick="checkAnswer(20, 'D')">D) $0.25</div>
         </div>
-        <button class="toggle-btn" onclick="toggleAnswer('s4-5')">Show Answer</button>
-        <div id="ans-s4-5" class="answer-panel">
-            <strong>Correct Answer: B) $0.21</strong><br>
-            <em>Reasoning:</em> 10 + 10 + 1 = 21 cents ($0.21).
-        </div>
+        <div class="feedback-panel" id="feedback-20"></div>
     </div>
 
 </div>
 
 <script>
-    function toggleAnswer(id) {
-        var answerDiv = document.getElementById('ans-' + id);
-        if (answerDiv.style.display === "block") {
-            answerDiv.style.display = "none";
-            answerDiv.classList.remove('visible');
+    let correctCount = 0;
+    let wrongCount = 0;
+    let totalAnswered = 0;
+    const totalQuestions = 20;
+
+    // Track which questions have been answered to prevent multi-guessing
+    const answeredStatus = {};
+
+    function checkAnswer(questionId, selectedOption) {
+        // Prevent answering the same question twice
+        if (answeredStatus[questionId]) return;
+
+        const card = document.getElementById('q' + questionId);
+        const feedback = document.getElementById('feedback-' + questionId);
+        const options = card.querySelectorAll('.option');
+        
+        let isCorrect = false;
+
+        // Find correct option and check user selection
+        options.forEach(option => {
+            const isThisCorrect = option.getAttribute('data-correct') === 'true';
+            
+            // Mark the selected option
+            if (option.innerText.startsWith(selectedOption)) {
+                if (isThisCorrect) {
+                    option.classList.add('correct');
+                    isCorrect = true;
+                } else {
+                    option.classList.add('wrong');
+                }
+            } else if (isThisCorrect) {
+                // Always highlight the correct answer so they learn
+                option.classList.add('correct');
+            }
+
+            // Disable all options
+            option.classList.add('disabled');
+            option.onclick = null;
+        });
+
+        // Update Scoreboard
+        if (isCorrect) {
+            correctCount++;
+            feedback.innerHTML = "🎉 Correct! Great job.";
+            feedback.classList.add('show-correct');
         } else {
-            answerDiv.style.display = "block";
-            setTimeout(() => {
-                answerDiv.classList.add('visible');
-            }, 10);
+            wrongCount++;
+            feedback.innerHTML = "❌ Incorrect. The correct answer is highlighted above.";
+            feedback.classList.add('show-wrong');
         }
+        
+        answeredStatus[questionId] = true;
+        totalAnswered++;
+        
+        document.getElementById('score-correct').innerText = correctCount;
+        document.getElementById('score-wrong').innerText = wrongCount;
+        document.getElementById('score-total').innerText = totalAnswered + " / " + totalQuestions;
+        
+        // Visual cue that card is done
+        card.classList.add('answered');
     }
 </script>
 
