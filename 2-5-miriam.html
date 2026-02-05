@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solutions & Explanations</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .problem-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .problem-title {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #2980b9;
+            margin-bottom: 10px;
+        }
+        .canvas-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        canvas {
+            border: 1px solid #ddd;
+            background-color: #fff;
+        }
+        .reveal-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: block;
+            margin: 15px 0;
+        }
+        .reveal-btn:hover {
+            background-color: #219150;
+        }
+        .solution {
+            display: none; /* Hidden by default */
+            background-color: #e8f6f3;
+            padding: 15px;
+            border-left: 5px solid #27ae60;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+        .solution.visible {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Problem Set Solutions</h1>
+
+    <div class="problem-container">
+        <div class="problem-title">Problem 1: Area Under a Curve</div>
+        <p>
+            Find the area under the curve of the function \( f(x) = x^2 \) from \( x = 0 \) to \( x = 10 \).
+        </p>
+
+        <div class="canvas-container">
+            <canvas id="canvas1" width="400" height="250"></canvas>
+            <p><em>Figure 1: Graph of \( y = x^2 \)</em></p>
+        </div>
+
+        <button class="reveal-btn" onclick="toggleSolution('sol1')">Reveal Answer</button>
+
+        <div id="sol1" class="solution">
+            <h3>Step-by-Step Explanation:</h3>
+            <p>To find the area under the curve, we calculate the definite integral of the function:</p>
+            $$ Area = \int_{0}^{10} x^2 \, dx $$
+            <p>Using the power rule for integration \( \int x^n dx = \frac{x^{n+1}}{n+1} \):</p>
+            $$ = \left[ \frac{x^3}{3} \right]_{0}^{10} $$
+            <p>Evaluate at the bounds:</p>
+            $$ = \left( \frac{10^3}{3} \right) - \left( \frac{0^3}{3} \right) $$
+            $$ = \frac{1000}{3} \approx 333.33 $$
+            <p><strong>Final Answer:</strong> The area is approximately 333.33 square units.</p>
+        </div>
+    </div>
+
+    <div class="problem-container">
+        <div class="problem-title">Problem 2: Triangle Geometry</div>
+        <p>
+            Given a right-angled triangle with a base of 30 units and a height of 40 units, calculate the length of the hypotenuse.
+        </p>
+
+        <div class="canvas-container">
+            <canvas id="canvas2" width="400" height="250"></canvas>
+            <p><em>Figure 2: The Right Triangle</em></p>
+        </div>
+
+        <button class="reveal-btn" onclick="toggleSolution('sol2')">Reveal Answer</button>
+
+        <div id="sol2" class="solution">
+            <h3>Step-by-Step Explanation:</h3>
+            <p>We use the Pythagorean theorem:</p>
+            $$ a^2 + b^2 = c^2 $$
+            <p>Substitute the given values:</p>
+            $$ 30^2 + 40^2 = c^2 $$
+            $$ 900 + 1600 = c^2 $$
+            $$ 2500 = c^2 $$
+            $$ c = \sqrt{2500} = 50 $$
+            <p><strong>Final Answer:</strong> The hypotenuse is 50 units.</p>
+        </div>
+    </div>
+
+    <script>
+        // FUNCTION TO TOGGLE ANSWERS
+        function toggleSolution(id) {
+            var x = document.getElementById(id);
+            if (x.classList.contains('visible')) {
+                x.classList.remove('visible');
+            } else {
+                x.classList.add('visible');
+            }
+        }
+
+        // DRAWING ON CANVAS
+        window.onload = function() {
+            drawGraph1();
+            drawGraph2();
+        };
+
+        function drawGraph1() {
+            const canvas = document.getElementById('canvas1');
+            const ctx = canvas.getContext('2d');
+            
+            // Draw Axes
+            ctx.beginPath();
+            ctx.moveTo(40, 220); ctx.lineTo(380, 220); // X axis
+            ctx.moveTo(40, 220); ctx.lineTo(40, 20);   // Y axis
+            ctx.stroke();
+
+            // Draw Parabola y = x^2 (Scale it to fit)
+            ctx.beginPath();
+            ctx.strokeStyle = "blue";
+            ctx.lineWidth = 2;
+            for(let x = 0; x <= 100; x++) {
+                let xPlot = 40 + (x * 3); // Scale X
+                let yPlot = 220 - ( (x*x) / 100 * 1.8 ); // Scale Y (rough fit)
+                if (x==0) ctx.moveTo(xPlot, yPlot);
+                else ctx.lineTo(xPlot, yPlot);
+            }
+            ctx.stroke();
+            
+            // Fill Area
+            ctx.fillStyle = "rgba(52, 152, 219, 0.3)";
+            ctx.beginPath();
+            ctx.moveTo(40, 220);
+            for(let x = 0; x <= 100; x++) { // Assume 100 steps = x=10
+                let xPlot = 40 + (x * 3);
+                let yPlot = 220 - ( (x*x) / 100 * 1.8 );
+                ctx.lineTo(xPlot, yPlot);
+            }
+            ctx.lineTo(40 + 300, 220);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function drawGraph2() {
+            const canvas = document.getElementById('canvas2');
+            const ctx = canvas.getContext('2d');
+            
+            // Draw Triangle
+            ctx.beginPath();
+            ctx.strokeStyle = "#e74c3c";
+            ctx.lineWidth = 3;
+            ctx.moveTo(100, 200); // Bottom Left
+            ctx.lineTo(300, 200); // Bottom Right (Base 30 scaled)
+            ctx.lineTo(100, 50);  // Top Left (Height 40 scaled)
+            ctx.closePath();
+            ctx.stroke();
+            
+            // Labels
+            ctx.font = "16px Arial";
+            ctx.fillStyle = "black";
+            ctx.fillText("30", 200, 220);
+            ctx.fillText("40", 70, 130);
+            ctx.fillText("?", 210, 120);
+        }
+    </script>
+</body>
+</html>
