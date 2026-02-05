@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saxon Math Course 1 - Lesson 78 Solutions</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 10px;
+        }
+        .problem-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .problem-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: #2980b9;
+        }
+        .problem-text {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        .btn-reveal {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .btn-reveal:hover {
+            background-color: #219150;
+        }
+        .solution {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #e8f8f5;
+            border-left: 4px solid #27ae60;
+            border-radius: 4px;
+        }
+        .diagram-container {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        table {
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+    <script>
+        function toggleAnswer(id) {
+            var x = document.getElementById(id);
+            var btn = document.getElementById("btn-" + id);
+            if (x.style.display === "none") {
+                x.style.display = "block";
+                btn.textContent = "Hide Answer";
+            } else {
+                x.style.display = "none";
+                btn.textContent = "Show Answer";
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <h1>Lesson 78: Written Practice Solutions</h1>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 1</div>
+        <div class="problem-text">
+            What is the difference when the product of \(\frac{1}{2}\) and \(\frac{1}{2}\) is subtracted from the sum of \(\frac{1}{2}\) and \(\frac{1}{2}\)?
+        </div>
+        <button id="btn-sol1" class="btn-reveal" onclick="toggleAnswer('sol1')">Show Answer</button>
+        <div id="sol1" class="solution">
+            <p><strong>Step 1: Find the product.</strong><br>
+            Product = \(\frac{1}{2} \times \frac{1}{2} = \frac{1}{4}\)</p>
+            
+            <p><strong>Step 2: Find the sum.</strong><br>
+            Sum = \(\frac{1}{2} + \frac{1}{2} = \frac{2}{2} = 1\)</p>
+            
+            <p><strong>Step 3: Find the difference.</strong><br>
+            Subtract the product from the sum: \(1 - \frac{1}{4} = \frac{4}{4} - \frac{1}{4} = \mathbf{\frac{3}{4}}\)</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 2</div>
+        <div class="problem-text">
+            The claws of a Siberian tiger are 10 centimeters long. How many millimeters is that?
+        </div>
+        <button id="btn-sol2" class="btn-reveal" onclick="toggleAnswer('sol2')">Show Answer</button>
+        <div id="sol2" class="solution">
+            <p>We know that \(1 \text{ cm} = 10 \text{ mm}\).</p>
+            <p>\(10 \text{ cm} \times 10 \text{ mm/cm} = \mathbf{100 \text{ mm}}\)</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 3</div>
+        <div class="problem-text">
+            Sue was thinking of a number between 40 and 50 that is a multiple of 3 and 4. Of what number was she thinking?
+        </div>
+        <button id="btn-sol3" class="btn-reveal" onclick="toggleAnswer('sol3')">Show Answer</button>
+        <div id="sol3" class="solution">
+            <p>A number that is a multiple of both 3 and 4 must be a multiple of their Least Common Multiple (LCM).</p>
+            <p>LCM of 3 and 4 is 12.</p>
+            <p>Multiples of 12 are: 12, 24, 36, 48, 60...</p>
+            <p>The only multiple that falls between 40 and 50 is <strong>48</strong>.</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 4</div>
+        <div class="problem-text">
+            Four fifths of the 60 lights were on.<br>
+            a. Into how many parts have the 60 lights been divided?<br>
+            b. How many lights are in each part?<br>
+            c. How many lights were on?<br>
+            d. How many lights were off?
+        </div>
+        <button id="btn-sol4" class="btn-reveal" onclick="toggleAnswer('sol4')">Show Answer</button>
+        <div id="sol4" class="solution">
+            <p><strong>a.</strong> The denominator of the fraction \(\frac{4}{5}\) is 5, so the lights are divided into <strong>5 parts</strong>.</p>
+            <p><strong>b.</strong> \(60 \div 5 = \mathbf{12}\) lights in each part.</p>
+            <p><strong>c.</strong> 4 parts were on. \(4 \times 12 = \mathbf{48}\) lights were on.</p>
+            <p><strong>d.</strong> 1 part was off (5 parts total - 4 parts on). \(1 \times 12 = \mathbf{12}\) lights were off.</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 5</div>
+        <div class="problem-text">
+            Which counting number is neither a prime number nor a composite number?
+        </div>
+        <button id="btn-sol5" class="btn-reveal" onclick="toggleAnswer('sol5')">Show Answer</button>
+        <div id="sol5" class="solution">
+            <p>The number <strong>1</strong> is neither prime nor composite.</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 6</div>
+        <div class="problem-text">
+            Find the unknown number: \(\frac{4}{5}m = 1\)
+        </div>
+        <button id="btn-sol6" class="btn-reveal" onclick="toggleAnswer('sol6')">Show Answer</button>
+        <div id="sol6" class="solution">
+            <p>To solve for \(m\), multiply by the reciprocal of \(\frac{4}{5}\), which is \(\frac{5}{4}\).</p>
+            <p>\(m = 1 \times \frac{5}{4} = \frac{5}{4}\) or \(\mathbf{1\frac{1}{4}}\)</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 7</div>
+        <div class="problem-text">
+            Find the unknown number: \(\frac{4}{5} + w = 1\)
+        </div>
+        <button id="btn-sol7" class="btn-reveal" onclick="toggleAnswer('sol7')">Show Answer</button>
+        <div id="sol7" class="solution">
+            <p>Subtract \(\frac{4}{5}\) from 1.</p>
+            <p>\(w = 1 - \frac{4}{5} = \frac{5}{5} - \frac{4}{5} = \mathbf{\frac{1}{5}}\)</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 8</div>
+        <div class="problem-text">
+            Find the unknown number: \(\frac{4}{5} \div x = 1\)
+        </div>
+        <button id="btn-sol8" class="btn-reveal" onclick="toggleAnswer('sol8')">Show Answer</button>
+        <div id="sol8" class="solution">
+            <p>Any number divided by itself is 1.</p>
+            <p>Therefore, \(x = \mathbf{\frac{4}{5}}\)</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 9</div>
+        <div class="problem-text">
+            Find the unknown number: \(\frac{3}{4} = \frac{n}{100}\)
+        </div>
+        <button id="btn-sol9" class="btn-reveal" onclick="toggleAnswer('sol9')">Show Answer</button>
+        <div id="sol9" class="solution">
+            <p>To go from denominator 4 to 100, we multiply by 25.</p>
+            <p>We must do the same to the numerator: \(3 \times 25 = 75\).</p>
+            <p>\(n = \mathbf{75}\)</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 10</div>
+        <div class="problem-text">
+            a. What fraction of the rectangle below is shaded?<br>
+            b. Write the answer to part a as a decimal number.<br>
+            c. What percent of the rectangle is shaded?
+        </div>
+        <div class="diagram-container">
+            <svg width="200" height="80" viewBox="0 0 250 100">
+                <rect x="0" y="0" width="250" height="100" fill="white" stroke="black" stroke-width="2"/>
+                
+                <rect x="0" y="0" width="50" height="50" fill="#89CFF0" stroke="black"/>
+                <rect x="50" y="0" width="50" height="50" fill="#89CFF0" stroke="black"/>
+                <rect x="100" y="0" width="50" height="50" fill="#89CFF0" stroke="black"/>
+                <rect x="150" y="0" width="50" height="50" fill="#89CFF0" stroke="black"/>
+                <rect x="200" y="0" width="50" height="50" fill="#89CFF0" stroke="black"/>
+
+                <rect x="0" y="50" width="50" height="50" fill="#89CFF0" stroke="black"/>
+                <rect x="50" y="50" width="50" height="50" fill="#89CFF0" stroke="black"/>
+                <rect x="100" y="50" width="50" height="50" fill="white" stroke="black"/>
+                <rect x="150" y="50" width="50" height="50" fill="white" stroke="black"/>
+                <rect x="200" y="50" width="50" height="50" fill="white" stroke="black"/>
+            </svg>
+        </div>
+        <button id="btn-sol10" class="btn-reveal" onclick="toggleAnswer('sol10')">Show Answer</button>
+        <div id="sol10" class="solution">
+            <p>The rectangle is a grid of 2 rows and 5 columns, totaling 10 small squares.</p>
+            <p>Count the shaded squares: 5 in the top row + 2 in the bottom row = 7 shaded squares.</p>
+            <p><strong>a. Fraction:</strong> \(\mathbf{\frac{7}{10}}\)</p>
+            <p><strong>b. Decimal:</strong> \(\mathbf{0.7}\)</p>
+            <p><strong>c. Percent:</strong> \(\mathbf{70\%}\)</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 11</div>
+        <div class="problem-text">
+            Convert the decimal number 1.15 to a mixed number.
+        </div>
+        <button id="btn-sol11" class="btn-reveal" onclick="toggleAnswer('sol11')">Show Answer</button>
+        <div id="sol11" class="solution">
+            <p>\(1.15 = 1 \frac{15}{100}\)</p>
+            <p>Simplify the fraction by dividing numerator and denominator by 5:</p>
+            <p>\(1 \frac{3}{20}\)</p>
+            <p>Answer: \(\mathbf{1\frac{3}{20}}\)</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 12</div>
+        <div class="problem-text">
+            Compare:<br>
+            a. \(\frac{3}{5} \bigcirc 0.35\)<br>
+            b. \(\sqrt{100} \bigcirc 1^4 + 2^3\)
+        </div>
+        <button id="btn-sol12" class="btn-reveal" onclick="toggleAnswer('sol12')">Show Answer</button>
+        <div id="sol12" class="solution">
+            <p><strong>a.</strong> Convert \(\frac{3}{5}\) to decimal: \(\frac{3}{5} = 0.6\).<br>
+            \(0.6 > 0.35\)<br>
+            Answer: \(\mathbf{>}\)</p>
+            <hr>
+            <p><strong>b.</strong> Solve the expressions:<br>
+            Left side: \(\sqrt{100} = 10\)<br>
+            Right side: \(1^4 + 2^3 = 1 + 8 = 9\)<br>
+            \(10 > 9\)<br>
+            Answer: \(\mathbf{>}\)</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 13</div>
+        <div class="problem-text">
+            \(\frac{5}{6} - \frac{1}{2}\)
+        </div>
+        <button id="btn-sol13" class="btn-reveal" onclick="toggleAnswer('sol13')">Show Answer</button>
+        <div id="sol13" class="solution">
+            <p>Find a common denominator (6).</p>
+            <p>\(\frac{1}{2} = \frac{3}{6}\)</p>
+            <p>\(\frac{5}{6} - \frac{3}{6} = \frac{2}{6}\)</p>
+            <p>Simplify: \(\mathbf{\frac{1}{3}}\)</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 14</div>
+        <div class="problem-text">
+            \(4\frac{1}{4} - 3\frac{1}{3}\)
+        </div>
+        <button id="btn-sol14" class="btn-reveal" onclick="toggleAnswer('sol14')">Show Answer</button>
+        <div id="sol14" class="solution">
+            <p>Find common denominator (12).</p>
+            <p>\(4\frac{3}{12} - 3\frac{4}{12}\)</p>
+            <p>We cannot subtract 4 from 3, so borrow from the whole number 4.</p>
+            <p>\(4\frac{3}{12} = 3\frac{15}{12}\) (Since \(1 = \frac{12}{12}\))</p>
+            <p>\(3\frac{15}{12} - 3\frac{4}{12} = \mathbf{\frac{11}{12}}\)</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 15</div>
+        <div class="problem-text">
+            \(\frac{1}{2} + \frac{2}{3} + \frac{5}{6}\)
+        </div>
+        <button id="btn-sol15" class="btn-reveal" onclick="toggleAnswer('sol15')">Show Answer</button>
+        <div id="sol15" class="solution">
+            <p>The Least Common Denominator is 6.</p>
+            <p>\(\frac{3}{6} + \frac{4}{6} + \frac{5}{6} = \frac{12}{6}\)</p>
+            <p>\(\frac{12}{6} = \mathbf{2}\)</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 16</div>
+        <div class="problem-text">
+            \(1\frac{1}{2} \times 2\frac{2}{3}\)
+        </div>
+        <button id="btn-sol16" class="btn-reveal" onclick="toggleAnswer('sol16')">Show Answer</button>
+        <div id="sol16" class="solution">
+            <p>Convert to improper fractions:</p>
+            <p>\(1\frac{1}{2} = \frac{3}{2}\)</p>
+            <p>\(2\frac{2}{3} = \frac{8}{3}\)</p>
+            <p>Multiply: \(\frac{3}{2} \times \frac{8}{3}\)</p>
+            <p>Cancel out the 3s and simplify \(\frac{8}{2}\).</p>
+            <p>Answer: \(\mathbf{4}\)</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 17</div>
+        <div class="problem-text">
+            \(1\frac{1}{2} \div 2\frac{2}{3}\)
+        </div>
+        <button id="btn-sol17" class="btn-reveal" onclick="toggleAnswer('sol17')">Show Answer</button>
+        <div id="sol17" class="solution">
+            <p>Convert to improper fractions:</p>
+            <p>\(\frac{3}{2} \div \frac{8}{3}\)</p>
+            <p>Multiply by the reciprocal of the divisor:</p>
+            <p>\(\frac{3}{2} \times \frac{3}{8} = \mathbf{\frac{9}{16}}\)</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 18</div>
+        <div class="problem-text">
+            \(2\frac{2}{3} \div 1\frac{1}{2}\)
+        </div>
+        <button id="btn-sol18" class="btn-reveal" onclick="toggleAnswer('sol18')">Show Answer</button>
+        <div id="sol18" class="solution">
+            <p>Convert to improper fractions:</p>
+            <p>\(\frac{8}{3} \div \frac{3}{2}\)</p>
+            <p>Multiply by reciprocal:</p>
+            <p>\(\frac{8}{3} \times \frac{2}{3} = \frac{16}{9}\)</p>
+            <p>Convert to mixed number: \(\mathbf{1\frac{7}{9}}\)</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 19</div>
+        <div class="problem-text">
+            a. What is the perimeter of this square?<br>
+            b. What is the area of this square?<br>
+            <em>(Square side is labeled \(\frac{1}{2}\) in.)</em>
+        </div>
+        <div class="diagram-container">
+            <svg width="100" height="100">
+                <rect x="10" y="10" width="80" height="80" fill="none" stroke="black" stroke-width="2"/>
+                <text x="95" y="50" font-family="Arial" font-size="14">1/2 in</text>
+            </svg>
+        </div>
+        <button id="btn-sol19" class="btn-reveal" onclick="toggleAnswer('sol19')">Show Answer</button>
+        <div id="sol19" class="solution">
+            <p>Side \(s = \frac{1}{2}\) inch.</p>
+            <p><strong>a. Perimeter</strong> = \(4 \times s = 4 \times \frac{1}{2} = \mathbf{2 \text{ inches}}\)</p>
+            <p><strong>b. Area</strong> = \(s \times s = \frac{1}{2} \times \frac{1}{2} = \mathbf{\frac{1}{4} \text{ sq. in.}}\)</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 20</div>
+        <div class="problem-text">
+            "The opposite sides of a rectangle are parallel." True or false?
+        </div>
+        <button id="btn-sol20" class="btn-reveal" onclick="toggleAnswer('sol20')">Show Answer</button>
+        <div id="sol20" class="solution">
+            <p><strong>True.</strong> By definition, a rectangle is a parallelogram, which means its opposite sides are parallel.</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 21</div>
+        <div class="problem-text">
+            What is the average of \(3^3\) and \(5^2\)?
+        </div>
+        <button id="btn-sol21" class="btn-reveal" onclick="toggleAnswer('sol21')">Show Answer</button>
+        <div id="sol21" class="solution">
+            <p>First, evaluate the exponents:</p>
+            <p>\(3^3 = 3 \times 3 \times 3 = 27\)</p>
+            <p>\(5^2 = 5 \times 5 = 25\)</p>
+            <p>Find the average:</p>
+            <p>\(\frac{27 + 25}{2} = \frac{52}{2} = \mathbf{26}\)</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 22</div>
+        <div class="problem-text">
+            The diameter of the small wheel was 7 inches. The circumference was about 22 inches. Write the ratio of the circumference to the diameter of the circle as a decimal number rounded to the nearest hundredth.
+        </div>
+        <button id="btn-sol22" class="btn-reveal" onclick="toggleAnswer('sol22')">Show Answer</button>
+        <div id="sol22" class="solution">
+            <p>Ratio = \(\frac{\text{Circumference}}{\text{Diameter}} = \frac{22}{7}\)</p>
+            <p>Perform the division: \(22 \div 7 \approx 3.1428...\)</p>
+            <p>Rounded to the nearest hundredth: \(\mathbf{3.14}\)</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 23</div>
+        <div class="problem-text">
+            How many inches is \(2\frac{1}{2}\) feet?
+        </div>
+        <button id="btn-sol23" class="btn-reveal" onclick="toggleAnswer('sol23')">Show Answer</button>
+        <div id="sol23" class="solution">
+            <p>We know \(1 \text{ foot} = 12 \text{ inches}\).</p>
+            <p>\(2.5 \text{ feet} \times 12 \text{ inches/ft} = \mathbf{30 \text{ inches}}\).</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 24</div>
+        <div class="problem-text">
+            Which arrow below could be pointing to 0.1?
+        </div>
+        <div class="diagram-container">
+            <svg width="300" height="50">
+                <line x1="10" y1="25" x2="290" y2="25" stroke="black" stroke-width="2" />
+                <line x1="50" y1="20" x2="50" y2="30" stroke="black" /> <text x="45" y="45" font-family="Arial" font-size="12">-1</text>
+                
+                <line x1="150" y1="20" x2="150" y2="30" stroke="black" /> <text x="145" y="45" font-family="Arial" font-size="12">0</text>
+                
+                <line x1="250" y1="20" x2="250" y2="30" stroke="black" /> <text x="245" y="45" font-family="Arial" font-size="12">1</text>
+
+                <text x="70" y="15" font-family="Arial" font-size="12">A</text>
+                <path d="M75 16 L75 22" stroke="black" marker-end="url(#arrow)" />
+
+                 <text x="130" y="15" font-family="Arial" font-size="12">B</text>
+                 <path d="M135 16 L135 22" stroke="black" marker-end="url(#arrow)" />
+
+                 <text x="160" y="15" font-family="Arial" font-size="12">C</text>
+                 <path d="M165 16 L165 22" stroke="black" marker-end="url(#arrow)" />
+
+                 <text x="230" y="15" font-family="Arial" font-size="12">D</text>
+                 <path d="M235 16 L235 22" stroke="black" marker-end="url(#arrow)" />
+            </svg>
+        </div>
+        <button id="btn-sol24" class="btn-reveal" onclick="toggleAnswer('sol24')">Show Answer</button>
+        <div id="sol24" class="solution">
+            <p>The number 0.1 is one-tenth. It is a positive number very close to 0.</p>
+            <p>Arrow C is just to the right of 0, indicating a small positive value.</p>
+            <p>Answer: <strong>Arrow C</strong></p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 25</div>
+        <div class="problem-text">
+            Draw a quadrilateral that is not a rectangle.
+        </div>
+        <button id="btn-sol25" class="btn-reveal" onclick="toggleAnswer('sol25')">Show Answer</button>
+        <div id="sol25" class="solution">
+            <p>You can draw a trapezoid, a rhombus, or a generic four-sided shape with no right angles.</p>
+            <div class="diagram-container">
+                <svg width="150" height="100">
+                    <polygon points="30,80 120,80 100,20 50,20" fill="none" stroke="black" stroke-width="2"/>
+                    <text x="50" y="95" font-family="Arial" font-size="12">Trapezoid</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 26</div>
+        <div class="problem-text">
+            Find the prime factorization of 900 by using a factor tree. Then write the prime factorization using exponents.
+        </div>
+        <button id="btn-sol26" class="btn-reveal" onclick="toggleAnswer('sol26')">Show Answer</button>
+        <div id="sol26" class="solution">
+            <p><strong>Factor Tree Steps:</strong></p>
+            <ul>
+                <li>900 = 90 × 10</li>
+                <li>90 = 9 × 10</li>
+                <li>9 = 3 × 3 (Prime)</li>
+                <li>10 = 2 × 5 (Prime)</li>
+                <li>Original 10 = 2 × 5 (Prime)</li>
+            </ul>
+            <p>Factors: \(3, 3, 2, 5, 2, 5\)</p>
+            <p>Grouped: \(2 \times 2 \times 3 \times 3 \times 5 \times 5\)</p>
+            <p>Using exponents: \(\mathbf{2^2 \cdot 3^2 \cdot 5^2}\)</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 27</div>
+        <div class="problem-text">
+            Three vertices of a rectangle have the coordinates (5, 3), (5, -1), and (-1, -1). What are the coordinates of the fourth vertex of the rectangle?
+        </div>
+        <button id="btn-sol27" class="btn-reveal" onclick="toggleAnswer('sol27')">Show Answer</button>
+        <div id="sol27" class="solution">
+            <p>Plot the points mentally:</p>
+            <ul>
+                <li>(5, -1) is the bottom-right corner.</li>
+                <li>(5, 3) is the top-right corner.</li>
+                <li>(-1, -1) is the bottom-left corner.</li>
+            </ul>
+            <p>To complete the rectangle, we need the top-left corner.</p>
+            <p>It must have the x-coordinate of the left side (-1) and the y-coordinate of the top side (3).</p>
+            <p>Answer: \(\mathbf{(-1, 3)}\)</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 28</div>
+        <div class="problem-text">
+            Refer to this table to answer a and b.<br>
+            <small>
+            3 teaspoons = 1 tablespoon<br>
+            16 tablespoons = 1 cup<br>
+            2 cups = 1 pint<br>
+            2 pints = 1 quart<br>
+            4 quarts = 1 gallon
+            </small>
+            <br><br>
+            a. A teaspoon of soup is what fraction of a tablespoon of soup?<br>
+            b. How many cups of milk is a gallon of milk?
+        </div>
+        <button id="btn-sol28" class="btn-reveal" onclick="toggleAnswer('sol28')">Show Answer</button>
+        <div id="sol28" class="solution">
+            <p><strong>a.</strong> Since 3 teaspoons make 1 tablespoon, 1 teaspoon is \(\mathbf{\frac{1}{3}}\) of a tablespoon.</p>
+            <p><strong>b.</strong> Work upwards from gallons to cups:</p>
+            <ul>
+                <li>1 gallon = 4 quarts</li>
+                <li>4 quarts = \(4 \times 2 = 8\) pints</li>
+                <li>8 pints = \(8 \times 2 = 16\) cups</li>
+            </ul>
+            <p>Answer: \(\mathbf{16 \text{ cups}}\)</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 29</div>
+        <div class="problem-text">
+            A liter is closest in size to which of the following?<br>
+            A. pint &nbsp;&nbsp; B. quart &nbsp;&nbsp; C. 1/2 gallon &nbsp;&nbsp; D. gallon
+        </div>
+        <button id="btn-sol29" class="btn-reveal" onclick="toggleAnswer('sol29')">Show Answer</button>
+        <div id="sol29" class="solution">
+            <p>A liter is approximately equal to 1.057 quarts.</p>
+            <p>Therefore, it is closest to a <strong>B. quart</strong>.</p>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="problem-title">Problem 30</div>
+        <div class="problem-text">
+            In 1881 Clara Barton founded the American Red Cross... How many ounces is a pint?
+        </div>
+        <button id="btn-sol30" class="btn-reveal" onclick="toggleAnswer('sol30')">Show Answer</button>
+        <div id="sol30" class="solution">
+            <p>In the US customary system:</p>
+            <p>1 pint = 2 cups</p>
+            <p>1 cup = 8 fluid ounces</p>
+            <p>\(2 \times 8 = 16\)</p>
+            <p>Answer: \(\mathbf{16 \text{ ounces}}\)</p>
+        </div>
+    </div>
+
+</body>
+</html>
