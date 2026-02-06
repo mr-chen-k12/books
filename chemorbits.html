@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electron Configuration Mastery</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f4f7f6; }
+        h1 { text-align: center; color: #2c3e50; }
+        .difficulty-section { margin-top: 40px; border-top: 3px solid #ddd; padding-top: 20px; }
+        .easy { border-left: 10px solid #2ecc71; padding-left: 15px; }
+        .medium { border-left: 10px solid #f1c40f; padding-left: 15px; }
+        .hard { border-left: 10px solid #e74c3c; padding-left: 15px; }
+        .question-card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .options { margin-top: 15px; }
+        button { display: block; width: 100%; text-align: left; padding: 10px; margin-bottom: 5px; border: 1px solid #ddd; border-radius: 4px; background: #fff; cursor: pointer; transition: 0.2s; }
+        button:hover { background: #f0f0f0; }
+        .feedback { display: none; margin-top: 10px; padding: 10px; border-radius: 4px; font-weight: bold; }
+        .correct { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .wrong { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .explanation { display: none; margin-top: 10px; font-style: italic; color: #555; background: #eee; padding: 10px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<h1>Electron Configuration Practice</h1>
+<p style="text-align: center;">Test your knowledge of Aufbau, Pauli, and Hund's rules!</p>
+
+<div id="quiz-container"></div>
+
+<script>
+const questions = [
+    // EASY (10 questions)
+    { level: 'easy', q: "What is the ground-state electron configuration of Helium (Z=2)?", options: ["1s¹", "1s²", "2s²", "1s² 2s¹"], correct: 1, exp: "Helium has 2 electrons, which fill the lowest 1s orbital completely." },
+    { level: 'easy', q: "Which element has the configuration \(1s^2 2s^2 2p^3\)?", options: ["Carbon", "Nitrogen", "Oxygen", "Fluorine"], correct: 1, exp: "Adding the exponents: 2+2+3 = 7 electrons. Atomic number 7 is Nitrogen." },
+    { level: 'easy', q: "How many electrons can a single 'p' subshell (all three orbitals) hold?", options: ["2", "4", "6", "8"], correct: 2, exp: "A 'p' subshell has 3 orbitals, each holding 2 electrons, for a total of 6." },
+    { level: 'easy', q: "The first shell (n=1) can hold a maximum of how many electrons?", options: ["2", "8", "18", "32"], correct: 0, exp: "The first shell only has the 1s orbital, which holds 2 electrons." },
+    { level: 'easy', q: "Which orbital is filled after 2s?", options: ["2p", "3s", "1p", "3p"], correct: 0, exp: "Following the Aufbau principle, 2p is higher in energy than 2s but lower than 3s." },
+    { level: 'easy', q: "What is the configuration of Lithium (Z=3)?", options: ["1s³", "1s² 2s¹", "1s² 2p¹", "1s¹ 2s²"], correct: 1, exp: "Lithium has 3 electrons. 1s takes 2, and the 3rd goes into 2s." },
+    { level: 'easy', q: "What is the configuration for Boron (Z=5)?", options: ["1s² 2s³", "1s² 2s² 3s¹", "1s² 2s² 2p¹", "1s⁵"], correct: 2, exp: "2+2+1 = 5 electrons. The 5th electron enters the 2p orbital." },
+    { level: 'easy', q: "How many valence electrons does Carbon (\(1s^2 2s^2 2p^2\)) have?", options: ["2", "4", "6", "8"], correct: 1, exp: "Valence electrons are in the outermost shell (n=2). 2s² + 2p² = 4 valence electrons." },
+    { level: 'easy', q: "Which rule states that electrons must have opposite spins in the same orbital?", options: ["Hund's Rule", "Aufbau Principle", "Pauli Exclusion Principle", "Octet Rule"], correct: 2, exp: "The Pauli Exclusion Principle states no two electrons can have the same four quantum numbers." },
+    { level: 'easy', q: "What is the noble gas notation for Neon (Z=10)?", options: ["[He] 2s² 2p⁶", "[Ne]", "[He] 2p⁸", "1s² 2s² 2p⁶"], correct: 0, exp: "Neon is a noble gas, but its notation relative to the previous noble gas is [He] 2s² 2p⁶." },
+
+    // MEDIUM (10 questions)
+    { level: 'medium', q: "What is the electron configuration for Magnesium (Z=12)?", options: ["[Ne] 3s¹", "[Ne] 3s²", "[Ne] 3p²", "[Ar] 4s²"], correct: 1, exp: "Magnesium has 12 electrons. Neon covers 10, leaving 2 for the 3s orbital." },
+    { level: 'medium', q: "Which element has the configuration [Ne] 3s² 3p⁵?", options: ["Sulfur", "Chlorine", "Argon", "Phosphorus"], correct: 1, exp: "10 (Ne) + 2 + 5 = 17. Atomic number 17 is Chlorine." },
+    { level: 'medium', q: "According to Hund's rule, how are electrons placed in the 3p orbitals for Phosphorus (Z=15)?", options: ["Three pairs in one orbital", "One pair and one single", "Three single electrons with parallel spins", "One pair and one empty"], correct: 2, exp: "Hund's rule states you must occupy each orbital singly before pairing." },
+    { level: 'medium', q: "What is the configuration of the \(Al^{3+}\) ion?", options: ["1s² 2s² 2p⁶ 3s² 3p¹", "1s² 2s² 2p⁶", "1s² 2s² 2p⁶ 3s²", "1s² 2s² 2p³"], correct: 1, exp: "Aluminum (13) loses 3 valence electrons, leaving it with 10 electrons (the configuration of Neon)." },
+    { level: 'medium', q: "Which orbital fills after 3p?", options: ["3d", "4s", "4p", "4d"], correct: 1, exp: "Due to orbital overlapping, 4s is lower in energy than 3d and fills first." },
+    { level: 'medium', q: "How many unpaired electrons are in a neutral Oxygen atom (Z=8)?", options: ["0", "1", "2", "3"], correct: 2, exp: "Oxygen is \(2p^4\). Following Hund's rule: ↑↓, ↑, ↑. Two electrons are unpaired." },
+    { level: 'medium', q: "What is the noble gas notation for Potassium (Z=19)?", options: ["[Ne] 4s¹", "[Ar] 4s¹", "[Ar] 3d¹", "[Kr] 5s¹"], correct: 1, exp: "Potassium follows Argon (18) and starts the 4th period." },
+    { level: 'medium', q: "How many electrons are in the 'd' subshell of Sc (Z=21)?", options: ["0", "1", "2", "10"], correct: 1, exp: "Scandium is the first transition metal: [Ar] 4s² 3d¹." },
+    { level: 'medium', q: "Which of these is the correct configuration for Sulfur (Z=16)?", options: ["1s² 2s² 2p⁶ 3s² 3p⁴", "1s² 2s² 2p⁶ 3s² 3p⁶", "1s² 2s² 2p⁶ 3s¹ 3p⁵", "1s² 2s² 2p⁶ 4s²"], correct: 0, exp: "16 electrons: 2+2+6+2+4 = 16." },
+    { level: 'medium', q: "What is the maximum number of electrons in the n=3 shell?", options: ["8", "10", "18", "32"], correct: 2, exp: "Shell 3 has 3s(2), 3p(6), and 3d(10) = 18 electrons total." },
+
+    // HARD (10 questions)
+    { level: 'hard', q: "What is the ground state configuration of Chromium (Z=24)?", options: ["[Ar] 4s² 3d⁴", "[Ar] 4s¹ 3d⁵", "[Ar] 3d⁶", "[Ar] 4s² 3d⁶"], correct: 1, exp: "EXCEPTIONAL: Chromium promotes a 4s electron to 3d to achieve two half-filled subshells, which is more stable." },
+    { level: 'hard', q: "What is the ground state configuration of Copper (Z=29)?", options: ["[Ar] 4s² 3d⁹", "[Ar] 4s¹ 3d¹⁰", "[Ar] 4s⁰ 3d¹¹", "[Ar] 3d⁹ 4s²"], correct: 1, exp: "EXCEPTIONAL: Copper promotes a 4s electron to 3d to fully fill the d-subshell." },
+    { level: 'hard', q: "Which orbital fills immediately after 4d?", options: ["4f", "5s", "5p", "6s"], correct: 2, exp: "According to the diagonal rule/Aufbau, 5p follows 4d." },
+    { level: 'hard', q: "What is the configuration for the \(Fe^{2+}\) ion (Z=26)?", options: ["[Ar] 4s² 3d⁴", "[Ar] 3d⁶", "[Ar] 4s¹ 3d⁵", "[Ar] 4s² 3d⁶"], correct: 1, exp: "Transition metals lose electrons from the highest 's' orbital (4s) before the 'd' orbital." },
+    { level: 'hard', q: "Which element has the configuration [Kr] 5s² 4d¹⁰ 5p³?", options: ["Arsenic", "Antimony", "Bismuth", "Tin"], correct: 1, exp: "36 (Kr) + 2 + 10 + 3 = 51. Atomic number 51 is Antimony (Sb)." },
+    { level: 'hard', q: "How many unpaired electrons are in an atom of Iron (Z=26)?", options: ["2", "3", "4", "6"], correct: 2, exp: "Iron is [Ar] 4s² 3d⁶. In the five d-orbitals: ↑↓, ↑, ↑, ↑, ↑. There are 4 unpaired electrons." },
+    { level: 'hard', q: "What is the configuration of Silver (Z=47)?", options: ["[Kr] 5s² 4d⁹", "[Kr] 5s¹ 4d¹⁰", "[Kr] 5s² 4d¹⁰", "[Xe] 5s¹ 4d¹⁰"], correct: 1, exp: "Like Copper, Silver is an exception and fills the 4d subshell completely." },
+    { level: 'hard', q: "Which of these represents an excited state for Sodium?", options: ["1s² 2s² 2p⁶ 3s¹", "1s² 2s² 2p⁶ 3p¹", "1s² 2s² 2p⁶", "1s² 2s² 2p⁵ 3s²"], correct: 1, exp: "In an excited state, an electron moves to a higher energy level (3s to 3p) before the lower one is full." },
+    { level: 'hard', q: "How many total 'p' electrons are in Bromine (Z=35)?", options: ["5", "11", "17", "23"], correct: 2, exp: "Bromine: 2p⁶, 3p⁶, 4p⁵. Total p-electrons = 6 + 6 + 5 = 17." },
+    { level: 'hard', q: "The 'f' subshell begins appearing in which principal energy level?", options: ["n=3", "n=4", "n=5", "n=6"], correct: 1, exp: "The 4f subshell is the first 'f' orbital, though it doesn't start filling until after the 6s orbital." }
+];
+
+const container = document.getElementById('quiz-container');
+
+function renderQuiz() {
+    let currentLevel = "";
+    questions.forEach((item, index) => {
+        if (item.level !== currentLevel) {
+            currentLevel = item.level;
+            const header = document.createElement('h2');
+            header.className = `difficulty-section`;
+            header.innerText = currentLevel.toUpperCase() + " QUESTIONS";
+            container.appendChild(header);
+        }
+
+        const card = document.createElement('div');
+        card.className = `question-card ${item.level}`;
+        card.innerHTML = `
+            <p><strong>Question ${index + 1}:</strong> ${item.q}</p>
+            <div class="options" id="opt-${index}">
+                ${item.options.map((opt, i) => `<button onclick="checkAnswer(${index}, ${i})">${opt}</button>`).join('')}
+            </div>
+            <div class="feedback" id="feed-${index}"></div>
+            <div class="explanation" id="exp-${index}"><strong>Explanation:</strong> ${item.exp}</div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+window.checkAnswer = function(qIdx, choiceIdx) {
+    const feedback = document.getElementById(`feed-${qIdx}`);
+    const explanation = document.getElementById(`exp-${qIdx}`);
+    const isCorrect = choiceIdx === questions[qIdx].correct;
+
+    feedback.style.display = 'block';
+    explanation.style.display = 'block';
+
+    if (isCorrect) {
+        feedback.innerText = "Correct!";
+        feedback.className = "feedback correct";
+    } else {
+        feedback.innerText = "Incorrect.";
+        feedback.className = "feedback wrong";
+    }
+};
+
+renderQuiz();
+</script>
+
+</body>
+</html>
