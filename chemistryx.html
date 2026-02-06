@@ -1,0 +1,1508 @@
+       
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chemistry Study App</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --bg-color: #f4f4f9;
+            --text-color: #333;
+            --card-bg: #ffffff;
+            --accent: #3498db;
+            --accent-hover: #2980b9;
+            --correct: #2ecc71;
+            --wrong: #e74c3c;
+            --panel-bg: rgba(255, 255, 255, 0.98);
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --key-hint-bg: #eee;
+            --key-hint-text: #555;
+        }
+
+        body.dark-mode {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --card-bg: #2d2d2d;
+            --accent: #5dade2;
+            --accent-hover: #3498db;
+            --panel-bg: rgba(45, 45, 45, 0.98);
+            --shadow: 0 4px 6px rgba(0,0,0,0.5);
+            --key-hint-bg: #444;
+            --key-hint-text: #ccc;
+        }
+
+        * { box-sizing: border-box; transition: background 0.3s, color 0.3s; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+        /* --- Main Content --- */
+        #app-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding-bottom: 140px;
+        }
+
+        .question-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            margin-bottom: 20px;
+            touch-action: pan-y; 
+        }
+
+        .question-text { font-size: 1.2rem; margin-bottom: 1.5rem; line-height: 1.6; }
+        .question-text img { max-width: 100%; height: auto; border-radius: 8px; margin-top: 10px; }
+
+        .options-grid { display: grid; gap: 10px; }
+        .option-btn {
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--text-color);
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            position: relative;
+            touch-action: manipulation;
+        }
+        .option-btn:hover { background: var(--accent); color: white; }
+        
+        .key-hint {
+            background: var(--key-hint-bg);
+            color: var(--key-hint-text);
+            font-weight: bold;
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-right: 15px;
+            min-width: 30px;
+            text-align: center;
+            transition: inherit;
+        }
+        .option-btn:hover .key-hint { background: rgba(255,255,255,0.3); color: white; }
+
+        .option-btn.correct { background: var(--correct); border-color: var(--correct); color: white; }
+        .option-btn.correct .key-hint { background: rgba(255,255,255,0.3); color: white; }
+        
+        .option-btn.wrong { background: var(--wrong); border-color: var(--wrong); color: white; }
+        .option-btn.wrong .key-hint { background: rgba(255,255,255,0.3); color: white; }
+        
+        .option-btn.disabled { pointer-events: none; opacity: 0.8; }
+
+        /* --- Modal Styles --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 2000;
+            display: flex; justify-content: center; align-items: center;
+            backdrop-filter: blur(3px);
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        .modal-content {
+            background: var(--card-bg); padding: 25px; border-radius: 15px;
+            width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center;
+            transform: scale(0.9); transition: transform 0.3s;
+        }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        
+        .review-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 10px; margin-top: 20px;
+        }
+        .review-btn-item {
+            background: var(--wrong); color: white; padding: 12px;
+            border-radius: 8px; border: none; font-weight: bold;
+            cursor: pointer; font-size: 1rem;
+        }
+        .review-btn-item:hover { opacity: 0.8; transform: scale(1.05); }
+
+        .modal-close {
+            margin-top: 20px; background: transparent; border: 1px solid var(--text-color);
+            color: var(--text-color); padding: 8px 16px; border-radius: 20px; cursor: pointer;
+        }
+
+        /* --- Bottom Control Panel --- */
+        #bottom-panel {
+            position: fixed;
+            bottom: 0; left: 0; width: 100%;
+            background: var(--panel-bg);
+            padding: 15px 20px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            display: flex; justify-content: space-between; align-items: center;
+            transform: translateY(0); transition: transform 0.3s ease-in-out;
+            z-index: 1001;
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        }
+
+        #bottom-panel.hidden { transform: translateY(100%); }
+
+        .control-group { display: flex; gap: 10px; align-items: center; }
+        
+        button { touch-action: manipulation; }
+
+        button.icon-btn {
+            background: var(--accent); color: white; border: none;
+            padding: 12px 16px; border-radius: 6px; cursor: pointer;
+            font-weight: bold; font-size: 0.95rem; white-space: nowrap;
+        }
+        button.icon-btn.secondary { background: transparent; border: 1px solid var(--accent); color: var(--text-color); }
+        button.icon-btn:hover { opacity: 0.9; }
+
+        body.focus-mode #bottom-panel { transform: translateY(100%); } 
+
+        /* --- Trigger Zone --- */
+        #trigger-zone {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 40px;
+            z-index: 1000; background: transparent; pointer-events: none;
+        }
+        #trigger-zone.active { pointer-events: auto; }
+
+        .hidden-el { display: none !important; }
+        .stat-badge { font-size: 0.9rem; margin-right: 15px; font-weight: bold; }
+
+        @media (max-width: 600px) {
+            .question-card { padding: 1.5rem; }
+            #bottom-panel { flex-direction: column; gap: 15px; padding-bottom: 30px; }
+            .control-group { width: 100%; justify-content: space-between; flex-wrap: wrap; }
+            button.icon-btn { flex: 1; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        <div id="quiz-area" class="question-card">
+            <div id="question-text" class="question-text">Loading...</div>
+            <div id="options-container" class="options-grid"></div>
+        </div>
+        
+        <div id="feedback-area" style="margin-top: 15px; text-align: center; min-height: 24px;"></div>
+    </div>
+
+    <div id="review-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="margin: 0 0 10px 0;">Select Question to Review</h3>
+            <p style="font-size: 0.9rem; opacity: 0.7; margin-bottom: 0;">Tap a number to jump to it.</p>
+            <div id="review-list" class="review-grid">
+                </div>
+            <button class="modal-close" onclick="closeReviewModal()">Cancel</button>
+        </div>
+    </div>
+
+    <div id="trigger-zone"></div>
+
+    <div id="bottom-panel">
+        <div class="control-group">
+            <span id="progress-text" class="stat-badge">Q 1/10</span>
+            <button class="icon-btn secondary" onclick="toggleDarkMode()">&#9790; Dark</button>
+            <button class="icon-btn secondary" onclick="toggleFocusMode()">&#128065; Focus</button>
+            <button class="icon-btn secondary" onclick="togglePanel(true)">&#9660; Hide</button>
+        </div>
+        
+        <div class="control-group">
+            <button class="icon-btn" style="background-color: #e67e22;" onclick="openReviewMenu()" id="review-btn">Review (0)</button>
+            <button class="icon-btn" onclick="prevQuestion()">&larr; Prev</button>
+            <button class="icon-btn" onclick="nextQuestion()">Next &rarr;</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Data ---
+
+
+const fullQuestionData = [
+
+
+    {
+        q: "A teacher makes tennis balls, string, and tape available to students to simulate the Rutherford gold foil experiment. Which of the following student-designed activities would best demonstrate the observations that led to Rutherford's conclusions?",
+        options: [
+            "Balls are placed equal distances apart on the floor to represent electrons dispersed throughout a uniform positive medium represented by the floor. The balls represent the gold particles that deflect the alpha particles.",
+            "Several balls are clustered together on the floor to represent protons and neutrons in the gold atom nucleus. The nucleus is circled with multiple rings of string to represent the various orbitals' energy levels from which the electrons were ejected by the alpha particles.",
+            "Balls are taped to the classroom floor about 2 m apart. Pieces of string are used to shape the outlines of s and p orbitals on the floor around the balls. Two small pieces of rolled-up tape are placed inside each orbital to represent electrons. The orbital shapes represent where the gold electrons are located when they interact with the alpha particles.",
+            "Some balls are suspended about 2 m above the floor and 2 m apart in a straight line across the room to represent the gold atoms' nuclei in the foil. Students take turns throwing the other balls at the suspended balls and count the number of times a suspended ball is hit or missed. The hits represent deflection of the alpha particles by the gold nuclei."
+        ],
+        answer: 3
+    },
+    {
+        q: "Which of the following questions was addressed by Bohr's, but not by Rutherford's, atomic model?",
+        options: [
+            "How do electrons transition between orbits to emit energy?",
+            "Is there a distinction between a nucleus and the orbiting electrons?",
+            "How do the positively charged protons hold on to the electrons?",
+            "What is the specific location of the electrons in relation to the nucleus?"
+        ],
+        answer: 0
+    },
+    {
+        q: "A student wants to make a poster that explains why gold has its particular atomic emission spectrum. The student decides to start with an explanation of a model of a gold atom. Which of the following types of models should the student use in the poster?",
+        options: ["quantum model", "planetary model", "nuclear model", "plum pudding model"],
+        answer: 0
+    },
+    {
+        q: "Use the data below for a hypothetical element to answer the question:<br><br><table border='1' style='width:100%; border-collapse: collapse; text-align: center;'><tr><th>Isotope</th><th>Atomic Mass</th><th>% Abundance</th></tr><tr><td>Ah-24</td><td>23.98501417</td><td>78.99</td></tr><tr><td>Ah-25</td><td>24.98583696</td><td>10.00</td></tr><tr><td>Ah-26</td><td>25.98259292</td><td>11.01</td></tr></table><br>What is the average atomic mass of the hypothetical element Ah based on the data?",
+        options: ["23.99", "24.31", "24.98", "25.00"],
+        answer: 1
+    },
+    {
+        q: "Use the table below to answer the question:<br><br><table border='1' style='width:100%; border-collapse: collapse; text-align: center;'><tr><th>Abundance (%)</th><th>Relative Masses (amu)</th></tr><tr><td>0.00550</td><td>234.041</td></tr><tr><td>0.720</td><td>235.044</td></tr><tr><td>99.275</td><td>238.051</td></tr></table><br>Based on the data, what is the average atomic mass of the element?",
+        options: ["238.029 amu", "235.712 amu", "236.297 amu", "238.051 amu"],
+        answer: 0
+    },
+    {
+        q: "Which of the following diagrams shows the orbital notation for the ground state electron configuration of a neutral sulfur (S) atom?",
+        options: [
+            "<img src='./Practice Test _ Chemistry_files/MA067_q6_A.png' style='max-width:200px;'>",
+            "<img src='./Practice Test _ Chemistry_files/MA067_q6_B.png' style='max-width:200px;'>",
+            "<img src='./Practice Test _ Chemistry_files/MA067_q6_C.png' style='max-width:200px;'>",
+            "<img src='./Practice Test _ Chemistry_files/MA067_q6_D.png' style='max-width:200px;'>"
+        ],
+        answer: 2
+    },
+    {
+        q: "Which of the following electron configurations represents a carbon atom in an excited state prior to hybridization?",
+        options: [
+            "\\( 1s^2 2s^2 2p^2 \\)",
+            "\\( 1s^2 2s^2 2p^3 \\)",
+            "\\( 1s^2 2s^1 2p^2 \\)",
+            "\\( 1s^2 2s^1 2p^3 \\)"
+        ],
+        answer: 3
+    },
+    {
+        q: "Which of the following statements is true about the ions \\( Al^{3+}, N^{3-}, Na^{+}, \\) and \\( O^{2-} \\)?",
+        options: [
+            "\\( Al^{3+} \\) has the largest ionic radius because it has the highest number of valence electrons repelling one another.",
+            "\\( N^{3-} \\) has the largest ionic radius because it has the smallest number of protons attracting the electrons.",
+            "\\( Na^{+} \\) has the largest ionic radius because it has a full valence shell of electrons equally repelling each other.",
+            "\\( O^{2-} \\) has the largest ionic radius because it has the highest number of neutrons increasing the attraction from the protons."
+        ],
+        answer: 1
+    },
+    {
+        q: "Which of the following is the correct electron configuration for a neutral iron (Fe) atom?",
+        options: [
+            "\\( 1s^2 2s^2 2p^6 3s^2 3p^6 4s^2 4d^6 \\)",
+            "\\( 1s^2 2s^2 2p^6 3s^2 3p^6 4s^2 3d^6 \\)",
+            "\\( 1s^2 2s^2 2p^6 3s^2 3p^6 4s^2 4p^6 \\)",
+            "\\( 1s^2 2s^2 2p^6 3s^2 3p^6 4s^2 3f^6 \\)"
+        ],
+        answer: 1
+    },
+    {
+        q: "Which of the following compounds has a cation in the +3 oxidation state?",
+        options: [
+            "carbon tetrachloride (\\( CCl_4 \\))",
+            "magnesium sulfate (\\( MgSO_4 \\))",
+            "sodium sulfide (\\( Na_2S \\))",
+            "aluminum oxide (\\( Al_2O_3 \\))"
+        ],
+        answer: 3
+    },
+   {
+        q: "Use the image below of a partial stock room label to answer the question that follows.<br><img src='./Practice Test _ Chemistry_files/MA067_q11.png' class='q-img'><br>The label of a stock element is damaged so that the name of the element is missing. The unknown element is hard and granular. Based on the data shown on the label, to which of the following elements could the label belong?",
+        options: ["tin (Sn)", "sodium (Na)", "sulfur (S)", "mercury (Hg)"],
+        answer: 0
+    },
+    {
+        q: "Which of the following properties causes nitrogen to be more likely than boron to attract the electrons of another atom?",
+        options: ["Boron has a larger ionization energy.", "Nitrogen has a larger atomic radius.", "Boron has a higher number of electron shells.", "Nitrogen has a higher electronegativity."],
+        answer: 3
+    },
+    {
+        q: "Magnesium (Mg) has a first ionization energy of 738 kJ/mol and an atomic radius of about 136 pm. Which of the following pairs of values is most likely to be the first ionization energy and atomic radius of beryllium (Be)?",
+        options: ["496 kJ/mol; 73 pm", "590 kJ/mol; 174 pm", "899 kJ/mol; 90 pm", "1,086 kJ/mol; 221 pm"],
+        answer: 2
+    },
+    {
+        q: "Which of the following oxidation states is most likely to occur in an atom with a ground state electron configuration of \\( 1s^2 2s^2 \\)?",
+        options: ["-2", "-1", "+1", "+2"],
+        answer: 3
+    },
+    {
+        q: "As atomic number increases in a group of the periodic table, which of the following atomic properties decreases?",
+        options: ["electronegativity", "metallic character", "atomic mass", "atomic radius"],
+        answer: 0
+    },
+    {
+        q: "What is the name of the compound with the formula \\( CF_4 \\)?",
+        options: ["carbon fluoride", "carbon tetrafluoride", "monocarbon tetrafluoride", "carbon(IV) fluoride"],
+        answer: 1
+    },
+    {
+        q: "Use the skeletal structure below to answer the question that follows.<br><img src='./Practice Test _ Chemistry_files/MA067_q17.png' class='q-img'><br>Which of the following organic functional groups does the molecule represented by the skeletal structure contain?",
+        options: ["ketone", "ester", "carboxylic acid", "ether"],
+        answer: 2
+    },
+   {
+        q: "What is the IUPAC name for the molecule \\( CH_3CH_2CHClCH_3 \\)?",
+        options: ["2-chlorobutane", "3-chloropropane", "2-chloroethane", "3-chloropentane"],
+        answer: 0
+    },
+    {
+        q: "Use the table below to answer the question that follows.<br><br><table border='1' style='width:100%; border-collapse: collapse; text-align: center;'><tr><th>Compound</th><th>Bonded Pairs</th><th>Lone Pairs</th><th>Bond Angle</th></tr><tr><td>\\( NH_3 \\)</td><td>3</td><td>1</td><td>107.8°</td></tr><tr><td>\\( H_2O \\)</td><td>2</td><td>2</td><td>104.5°</td></tr><tr><td>\\( XeF_2 \\)</td><td>2</td><td>3</td><td>180.0°</td></tr><tr><td>\\( CH_4 \\)</td><td>4</td><td>0</td><td>109.5°</td></tr><tr><td>\\( PCl_5 \\)</td><td>5</td><td>0</td><td>90.0°</td></tr></table><br>Which of the following claims about the VSEPR model can be supported by the patterns determined from the data?",
+        options: [
+            "Compounds with only bonded pair electrons show no deviation from electron geometries.",
+            "As the number of lone pair electrons decreases, the angle of the bond decreases.",
+            "The number of lone pair electrons determines the molecular geometry.",
+            "The bond angle is equal to 360° divided by the number of bonded pairs."
+        ],
+        answer: 2
+    },
+    {
+        q: "Which of the following molecules has a bent molecular geometry?",
+        options: ["\\( H_2O \\)", "\\( CO_2 \\)", "\\( NH_3 \\)", "\\( CH_4 \\)"],
+        answer: 0
+    },
+    {
+        q: "Use the Lewis structures below to answer the question that follows.<br><img src='./Practice Test _ Chemistry_files/MA067_q21.png' class='q-img'><br>Which of the following pairs of Lewis structures represents molecules with the same molecular geometry?",
+        options: ["1 and 2", "2 and 3", "3 and 4", "4 and 1"],
+        answer: 3
+    },
+    {//22
+    q: "Which of the following substances is a network covalent solid with a very high melting point?", 
+    // Note: If the text on your screen is different (e.g., 'Which is ionic?'), you can edit the text above.
+    options: ["magnesium sulfide", "silicon dioxide", "hydrogen chloride", "carbon tetrabromide"],
+    answer: 1 // silicon dioxide (SiO2)
+    },
+
+ {
+        q: "Which of the following diagrams correctly shows the ions in barium chloride?",
+        options: [
+            "<img src='./Practice Test _ Chemistry_files/MA067_q23_A.png' style='max-height:60px; vertical-align:middle;'>",
+            "<img src='./Practice Test _ Chemistry_files/MA067_q23_B.png' style='max-height:60px; vertical-align:middle;'>",
+            "<img src='./Practice Test _ Chemistry_files/MA067_q23_C.png' style='max-height:60px; vertical-align:middle;'>",
+            "<img src='./Practice Test _ Chemistry_files/MA067_q23_D.png' style='max-height:60px; vertical-align:middle;'>"
+        ],
+        answer: 1 // Option B is chemically correct for BaCl2 (Ba2+ and 2 Cl-)
+    },
+    
+
+
+
+
+    //24 to 25
+    {
+
+
+        q: "Which of the following molecules has the strongest O—H bond?",
+        options: [
+            "\\( HClO_4 \\)",
+            "\\( HClO_3 \\)",
+            "\\( HClO_2 \\)",
+            "\\( HClO \\)"
+        ],
+        answer: 3 // Option D (HClO) is the weakest acid, so it has the strongest O-H bond.
+    },
+
+
+{
+    "q": "Use the information below to answer the question that follows.<br><br>In an experiment, colorless, transparent solution A is analyzed using the following procedure:<br><b>Step 1:</b> Solution A is cooled and becomes white as solid B precipitates out of it.<br><b>Step 2:</b> Solid B is collected by filtration and dried.<br><b>Step 3:</b> Solid B is heated until it decomposes into solid C and gas D.<br><b>Step 4:</b> Solid C and liquid E mix homogeneously.<br><b>Step 5:</b> Gas D is found not to be flammable in air.<br><br>Which of the following conclusions can be drawn from these observations?",
+    "options": [
+        "Solution A is an acid.",
+        "Solid B is an element.",
+        "Solid C is a compound.",
+        "Gas D is a pure substance."
+    ],
+    "answer": 2
+},
+
+{
+    "q": "Use the information below to answer the question that follows.<br><br>In an experiment, colorless, transparent solution A is analyzed using the following procedure:<br><b>Step 1:</b> Solution A is cooled and becomes white as solid B precipitates out of it.<br><b>Step 2:</b> Solid B is collected by filtration and dried.<br><b>Step 3:</b> Solid B is heated until it decomposes into solid C and gas D.<br><b>Step 4:</b> Solid C and liquid E mix homogeneously.<br><b>Step 5:</b> Gas D is found not to be flammable in air.<br><br>26. In which of the following pairs of steps are both processes physical?",
+    "options": [
+        "step 1 and step 2",
+        "step 1 and step 5",
+        "step 2 and step 3",
+        "step 3 and step 5"
+    ],
+    "answer": 0
+},
+//27
+{
+    "q": "Use the procedural steps below to answer the question that follows.<br><br>1. Compare results of calculations to known values.<br>2. Identify the unknown metals.<br>3. Calculate the density of the unknown metal.<br>4. Record the mass of the unknown metal sample.<br>5. Arrange the metals from least to most dense.<br>6. Determine the volume of the unknown metal sample using water displacement.<br><br>Students are conducting an investigation on several metals in the same group in the periodic table. They are provided the density of one of the metals within the group. They are then given three unidentified metal samples and must identify each sample. In which of the following orders should the students follow the procedural steps shown?",
+    "options": [
+        "4, 6, 1, 4, 5, 2",
+        "5, 1, 4, 6, 2, 3",
+        "6, 4, 3, 2, 1, 5",
+        "4, 6, 3, 5, 1, 2"
+    ],
+    "answer": 3
+},
+    
+
+
+
+//28 on
+
+  {
+    "q": "<b>Use the table below to answer the question that follows.</b><br><br><table border='1' style='width:100%; text-align:center; border-collapse: collapse;'><thead><tr><th>Name</th><th>Structure</th><th>Melting Point</th><th>Density</th></tr></thead><tbody><tr><td>maleic acid</td><td><img src='./Practice Test _ Chemistry_files/MA067_q28_1.png' style='max-width:150px;'><br>(cis-isomer)</td><td>135°C</td><td>1.58 g/cm³</td></tr><tr><td>fumaric acid</td><td><img src='./Practice Test _ Chemistry_files/MA067_q28_2.png' style='max-width:150px;'><br>(trans-isomer)</td><td>287°C</td><td>1.64 g/cm³</td></tr></tbody></table><br>Which of the following statements explains why maleic acid has a lower density and melting point than fumaric acid?",
+    "options": [
+      "Weaker dispersion forces are the main intermolecular force in maleic acid, because it is a nonpolar molecule.",
+      "Maleic acid is more polar, resulting in stronger dipole-dipole attractions between molecules.",
+      "Repulsion between carboxyl groups in fumaric acid causes the double bond to bend slightly, increasing intermolecular distance.",
+      "The location of carboxyl groups in fumaric acid increases their ability to form hydrogen bonds between molecules."
+    ],
+    "answer": 3
+  },
+  {
+    "q": "Which of the following mixtures is the best example of a solution?",
+    "options": [
+      "air at sea level",
+      "fog over a city street",
+      "whipped cream",
+      "wood fire smoke"
+    ],
+    "answer": 0
+  },
+  {
+    "q": "A chemist hypothesizes that a newly developed photodegradable plastic will degrade twice as fast as currently available photodegradable plastics. Which of the following investigations would best test this hypothesis?",
+    "options": [
+      "modeling the chemical reactions involved in the degradation and projecting rates under different conditions",
+      "subjecting the new plastic and existing plastics to the same environmental conditions and measuring their degradation rates",
+      "comparing the degradation rate of the new plastic with rates provided by the manufacturers of existing plastics",
+      "exposing the new plastic to conditions of constant UV radiation and no UV radiation and comparing the rates"
+    ],
+    "answer": 1
+  },
+  {
+    "q": "<b>Use the table below to answer the question that follows.</b><br><br><b>Properties of Selected Alcohols</b><br><table border='1' style='width:100%; text-align:center; border-collapse: collapse; margin-top:10px;'><thead><tr><th>Alcohol</th><th>Melting Point (°C)</th><th>Boiling Point (°C)</th><th>Density (g/cm³)</th></tr></thead><tbody><tr><td>2-propanol</td><td>−90</td><td>82</td><td>0.786</td></tr><tr><td>cyclopentanol</td><td>−19</td><td>141</td><td>0.948</td></tr><tr><td>cyclohexanol</td><td>25</td><td>161</td><td>0.962</td></tr><tr><td>2-methyl-2-propanol</td><td>26</td><td>82</td><td>0.789</td></tr></tbody></table><br>An unknown alcohol is a liquid at room temperature (20°C), and a 50.0 mL sample has a mass of 39.4 g. Based on these properties, the unknown alcohol can be identified as:",
+    "options": [
+        "2-propanol.",
+        "cyclopentanol.",
+        "cyclohexanol.",
+        "2-methyl-2-propanol."
+    ],
+    "answer": 0
+},
+
+
+{
+    "q": "<b>Use the chemical equation below to answer the question that follows.</b><br><br><p style='text-align:center; font-size:1.2em;'>NaOH + HNO₃ → NaNO₃ + H₂O</p><br>Which of the following types of reactions is represented by the equation?",
+    "options": [
+        "redox reaction",
+        "combustion reaction",
+        "precipitation reaction",
+        "neutralization reaction"
+    ],
+    "answer": 3
+},
+
+
+//33
+{
+    "q": "Use the chemical equations below to answer the question that follows.<br><br>\\( 2\\text{V}(s) + 5\\text{F}_2(g) \\rightarrow 2\\text{VF}_5(l) \\)<br>\\( 4\\text{V}(s) + 5\\text{O}_2(g) \\rightarrow 2\\text{V}_2\\text{O}_5(s) \\)<br>\\( 2\\text{V}(s) + \\text{N}_2(g) \\rightarrow 2\\text{VN}(s) \\)<br><br>The vanadium compound synthesis reactions shown can also be characterized as which of the following types of reaction?",
+    "options": [
+        "oxidation reactions",
+        "redox reactions",
+        "electrochemical reactions",
+        "single replacement reactions"
+    ],
+    "answer": 1
+}
+,
+
+//34
+{
+    "q": "<b>Use the chemical equation below to answer the question that follows.</b><br><br><p style='text-align:center; font-size:1.1em;'>2Al + 3FeO → Al₂O₃ + 3Fe</p><br>Which of the following types of reactions is represented by the equation?",
+    "options": [
+        "oxidation-reduction reactions",
+        "redox reactions",
+        "double replacement reactions",
+        "acid-base reactions"
+    ],
+    "answer": 0
+}
+,
+{
+    "q": "Use the chemical equation below to answer the question that follows.<br><br>\\( \\text{Pb(NO}_3)_2(aq) + 2\\text{KBr}(aq) \\rightarrow 2\\text{KNO}_3(aq) + \\text{PbBr}_2(s) \\)<br><br>The equation above shows a double replacement reaction. Which of the following equations represents the balanced net ionic equation?",
+    "options": [
+        "\\( \\text{Pb(NO}_3)_2(aq) + 2\\text{Br}^{-}(aq) \\rightarrow 2\\text{NO}_3^{-}(aq) + \\text{PbBr}_2(s) \\)",
+        "\\( \\text{NO}_3^{-}(aq) + \\text{KBr}(aq) \\rightarrow \\text{KNO}_3(aq) + \\text{Br}^{-}(s) \\)",
+        "\\( \\text{K}^{+}(aq) + \\text{NO}_3^{-}(aq) \\rightarrow \\text{KNO}_3(aq) \\)",
+        "\\( \\text{Pb}^{2+}(aq) + 2\\text{Br}^{-}(aq) \\rightarrow \\text{PbBr}_2(s) \\)"
+    ],
+    "answer": 3
+},
+//36
+{
+    "q": "In a reaction between KBr and \\( \\text{Pb(NO}_3)_2 \\), which of the following substances will precipitate out of solution?",
+    "options": [
+        "\\( \\text{PbBr}_2 \\)",
+        "\\( \\text{K}_2\\text{Pb} \\)",
+        "\\( \\text{KNO}_3 \\)",
+        "\\( \\text{NO}_3\\text{Br} \\)"
+    ],
+    "answer": 0
+}
+,
+
+{
+    "q": "Use the unbalanced chemical equation below to answer the question that follows.<br><br>\\( \\text{C}_7\\text{H}_{16} + \\text{O}_2 \\rightarrow \\text{CO}_2 + \\text{H}_2\\text{O} \\)<br><br>What is the coefficient for the reactant \\( \\text{O}_2 \\) in the balanced equation for this reaction?",
+    "options": [
+        "3",
+        "7",
+        "11",
+        "15"
+    ],
+    "answer": 2
+}
+
+,
+
+
+
+  {
+    "q": "How many grams of carbon dioxide (\\( \\text{CO}_2 \\)) can theoretically be produced by the complete combustion of 5.0 g butane (\\( \\text{C}_4\\text{H}_{10} \\)) in excess oxygen (\\( \\text{O}_2 \\))?",
+    "options": [
+      "1.5 g",
+      "3.8 g",
+      "15 g",
+      "38 g"
+    ],
+    "answer": 2
+  },
+  {
+    "q": "If a student requires 37.2 mL of 0.50 \\( M \\) NaOH to completely titrate 51.0 mL of HCl, what is the concentration of the HCl?",
+    "options": [
+      "0.010 \\( M \\)",
+      "0.36 \\( M \\)",
+      "0.69 \\( M \\)",
+      "1.2 \\( M \\)"
+    ],
+    "answer": 1
+  },
+  {
+    "q": "<b>Use the information below to answer the question that follows.</b><br><br>Students performed an acid-base titration experiment. Student groups were asked to perform at least three trials... The table below represents the data collected by one group.<br><br><table border='1' style='width:100%; text-align:center; border-collapse: collapse;'><thead><tr><th>Trial</th><th>Initial Burette Reading (mL)</th><th>Final Burette Reading (mL)</th><th>Volume Added (mL)</th></tr></thead><tbody><tr><td>1</td><td>0.00</td><td>12.53</td><td>12.51</td></tr><tr><td>2</td><td>2.50</td><td>15.12</td><td>12.69</td></tr><tr><td>3</td><td>0.00</td><td>27.75</td><td>27.73</td></tr></tbody></table><br>Which of the following experimental errors most likely accounts for the data collected by this group during trial 3?",
+    "options": [
+      "misjudging the color of the indicator",
+      "reading the burette volume from a different relative position",
+      "incorrectly noting the initial burette reading",
+      "reversing the position of the acid and base in the experimental setup"
+    ],
+    "answer": 2
+  },
+  {
+    "q": "Which of the following chemical equations is balanced correctly?",
+    "options": [
+      "\\( \\text{Zn}(s) + 2\\text{AgNO}_3(aq) \\rightarrow 2\\text{Ag}(s) + \\text{Zn(NO}_3)_2(aq) \\)",
+      "\\( \\text{CH}_3\\text{OH}(l) + 2\\text{O}_2(g) \\rightarrow \\text{CO}_2(g) + 2\\text{H}_2\\text{O}(l) \\)",
+      "\\( \\text{Al}(s) + 3\\text{O}_2(g) \\rightarrow \\text{Al}_2\\text{O}_3(s) \\)",
+      "\\( \\text{H}_2\\text{SO}_4(aq) + 2\\text{NaOH}(aq) \\rightarrow \\text{Na}_2\\text{SO}_4(s) + \\text{H}_2\\text{O}(l) \\)"
+    ],
+    "answer": 0
+  },
+  {
+    "q": "<b>Use the chemical equation below to answer the question that follows.</b><br><br>\\( 2\\text{H}_2\\text{O}_2(l) \\rightarrow 2\\text{H}_2\\text{O}(l) + \\text{O}_2(g) \\)<br><br>Hydrogen peroxide decomposes according to the equation shown. What volume of oxygen gas, measured at standard temperature and pressure, will be produced from the decomposition of 50.0 g of hydrogen peroxide?",
+    "options": [
+      "16.5 L",
+      "23.5 L",
+      "33.0 L",
+      "65.9 L"
+    ],
+    "answer": 0
+  },
+  {
+    "q": "The protein elastin has the molecular formula \\( \\text{C}_{27}\\text{H}_{48}\\text{N}_6\\text{O}_6 \\). Which of the following elements makes up the smallest percentage of elastin by mass?",
+    "options": [
+      "C",
+      "H",
+      "N",
+      "O"
+    ],
+    "answer": 1
+  },
+  {
+    "q": "Elemental analysis of an unknown iron oxide sample showed it to be 77.7% iron by mass. What is the empirical formula of this unknown oxide?",
+    "options": [
+      "\\( \\text{FeO} \\)",
+      "\\( \\text{Fe}_2\\text{O}_3 \\)",
+      "\\( \\text{Fe}_3\\text{O}_4 \\)",
+      "\\( \\text{Fe}_4\\text{O}_5 \\)"
+    ],
+    "answer": 0
+  },
+  {
+    "q": "What is the molar mass of the compound \\( \\text{Zr(NO}_3)_4 \\)?",
+    "options": [
+      "259.2 g/mol",
+      "297.2 g/mol",
+      "339.2 g/mol",
+      "612.8 g/mol"
+    ],
+    "answer": 2
+  },
+  {
+    "q": "What is the percentage by mass of oxygen in \\( \\text{C}_3\\text{H}_5\\text{N}_3\\text{O}_9 \\)?",
+    "options": [
+      "7.045%",
+      "37.18%",
+      "63.41%",
+      "84.20%"
+    ],
+    "answer": 2
+  },
+  {
+    "q": "A compound is found to be composed of 30.9% sodium, 47.7% chlorine, and 21.5% oxygen. What is the empirical formula of this compound?",
+    "options": [
+      "\\( \\text{NaClO} \\)",
+      "\\( \\text{NaClO}_2 \\)",
+      "\\( \\text{NaClO}_3 \\)",
+      "\\( \\text{NaClO}_4 \\)"
+    ],
+    "answer": 0
+  },
+  {
+    "q": "A substance with an empirical formula of \\( \\text{CH}_2 \\) has a molecular weight of 28.05 amu. What is the molecular formula for this substance?",
+    "options": [
+      "\\( \\text{CH} \\)",
+      "\\( \\text{CH}_2 \\)",
+      "\\( \\text{C}_2\\text{H}_4 \\)",
+      "\\( \\text{C}_3\\text{H}_6 \\)"
+    ],
+    "answer": 2
+  },
+  {
+    "q": "What is the pH of the resulting solution when 45.0 mL of 1.20 \\( M \\) lactic acid (\\( \\text{HC}_3\\text{H}_5\\text{O}_3 \\), \\( K_a = 1.38 \\times 10^{-4} \\)) is fully neutralized through reaction with 30.0 mL of 1.80 \\( M \\) potassium hydroxide (KOH)?",
+    "options": [
+      "5.14",
+      "7.00",
+      "8.86",
+      "13.86"
+    ],
+    "answer": 2
+  },
+  {
+    "q": "<b>Use the graph below to answer the question that follows.</b><br><br><img src='./Practice Test _ Chemistry_files/MA067_q50.png' style='max-width:100%;' alt='Titration Curve'><br>The graph above depicts the results of a titration experiment. Which of the following conclusions about the titration experiment is best supported by these data?",
+    "options": [
+      "The acid being titrated is a polyprotic acid.",
+      "A strong base is being titrated with a weak acid.",
+      "The titrant used in this experiment is a strong acid.",
+      "A weak acid is being titrated with a strong base."
+    ],
+    "answer": 3
+  },
+//51 to 55
+
+  {
+    "q": "What is the pH of a buffer made from 0.25 \\( M \\) \\( \\text{NH}_3 \\) and 0.50 \\( M \\) \\( \\text{NH}_4\\text{Cl} \\) at 25°C? (\\( K_b \\) for \\( \\text{NH}_3 = 1.8 \\times 10^{-5} \\))?",
+    "options": [
+      "4.7",
+      "7.5",
+      "9.0",
+      "13"
+    ],
+    "answer": 2
+  },
+  {
+    "q": "A chemist uses 22.0 mL of 0.10 \\( M \\) \\( \\text{H}_2\\text{SO}_4 \\) to neutralize 10.0 mL of \\( \\text{NaOH} \\). What is the concentration of the \\( \\text{NaOH} \\) solution?",
+    "options": [
+      "0.055 \\( M \\)",
+      "0.11 \\( M \\)",
+      "0.22 \\( M \\)",
+      "0.44 \\( M \\)"
+    ],
+    "answer": 3
+  },
+  {
+    "q": "How many grams of \\( \\text{NaCl} \\) are contained in 50.0 mL of a 1.75 \\( M \\) \\( \\text{NaCl} \\) solution?",
+    "options": [
+      "35.0 g",
+      "28.6 g",
+      "5.12 g",
+      "0.875 g"
+    ],
+    "answer": 2
+  },
+  {
+    "q": "What is the pH of a 0.22 \\( M \\) hypochlorous acid (\\( \\text{HOCl} \\)) solution? (\\( K_a = 3.5 \\times 10^{-7} \\))",
+    "options": [
+      "0.66",
+      "3.56",
+      "5.80",
+      "6.46"
+    ],
+    "answer": 1
+  },
+  {
+    "q": "Assuming complete dissociation of the solute, what is the freezing point of a solution containing 24.0 g of \\( \\text{SrCl}_2 \\) and 100.0 g of water?",
+    "options": [
+      "−2.32°C",
+      "−2.81°C",
+      "−5.62°C",
+      "−8.44°C"
+    ],
+    "answer": 3
+  },
+
+
+
+  //55=59
+  
+  {
+    "q": "Assuming complete dissociation of electrolytes, which of the following solutions would have the lowest boiling point?",
+    "options": [
+      "120.0 g of \\( \\text{C}_6\\text{H}_{12}\\text{O}_6 \\) in 1.0 L of \\( \\text{H}_2\\text{O} \\)",
+      "100.0 g of \\( \\text{C}_3\\text{H}_8\\text{O}_3 \\) in 1.0 L of \\( \\text{H}_2\\text{O} \\)",
+      "80.0 g of \\( \\text{ZnSO}_4 \\) in 1.0 L of \\( \\text{H}_2\\text{O} \\)",
+      "60.0 g of \\( \\text{NH}_4\\text{Cl} \\) in 1.0 L of \\( \\text{H}_2\\text{O} \\)"
+    ],
+    "answer": 0
+  },
+  {
+    "q": "<b>Use the graph below to answer the question that follows.</b><br><br><img src='./Practice Test _ Chemistry_files/MA067_q57.png' style='max-width:100%;' alt='Solubility curve of a gas'><br>Based on the gas solubility curve shown, which of the following changes will cause gas to be evolved?",
+    "options": [
+      "cooling a 0.50 m\\(M\\) solution from 25°C to 10°C at constant pressure",
+      "warming a 2.0 m\\(M\\) solution from 5°C to 20°C at constant pressure",
+      "cooling a 1.5 m\\(M\\) solution from 10°C to 5°C at constant pressure",
+      "warming a 1.0 m\\(M\\) solution from 5°C to 15°C at constant pressure"
+    ],
+    "answer": 1
+  },
+  {
+    "q": "Which of the following statements explains the differences in properties between ice and liquid water?",
+    "options": [
+      "\\( \\text{H}_2\\text{O} \\) molecules in solid phase have no fixed volume but are spread far apart in constant, random movement.",
+      "\\( \\text{H}_2\\text{O} \\) molecules in liquid phase have no fixed volume but are spread far apart in constant, random movement.",
+      "\\( \\text{H}_2\\text{O} \\) molecules in liquid phase are in an ordered arrangement of a fixed position with small vibrations.",
+      "\\( \\text{H}_2\\text{O} \\) molecules in solid phase are in an ordered arrangement of a fixed position with small vibrations."
+    ],
+    "answer": 3
+  },
+  {
+    "q": "<b>Use the graph below to answer the question that follows.</b><br><br><img src='./Practice Test _ Chemistry_files/MA067_q59.png' style='max-width:100%;' alt='Heating curve'><br>The graph represents a pure material that is heated at a constant rate and goes from a solid to a liquid and then from a liquid to a gas under normal atmospheric pressure. Which of the following time intervals represents a liquid-gas phase transition?",
+    "options": [
+      "\\( t_1 \\)–\\( t_2 \\)",
+      "\\( t_2 \\)–\\( t_3 \\)",
+      "\\( t_3 \\)–\\( t_5 \\)",
+      "\\( t_4 \\)–\\( t_5 \\)"
+    ],
+    "answer": 3
+  },
+  {
+    "q": "<b>Use the diagram below to answer the question that follows.</b><br><br><img src='./Practice Test _ Chemistry_files/MA067_q60.png' style='max-width:100%;' alt='Heating curve regions'><br>Which of the following regions of the heating curve is accurately paired with a description of what is taking place at the molecular level?",
+    "options": [
+      "Region E: breaking molecular interactions in a gas",
+      "Region B: increasing molecular kinetic energy in a solid",
+      "Region C: increasing molecular kinetic energy of a liquid",
+      "Region A: breaking intermolecular interactions in a solid"
+    ],
+    "answer": 2
+  },
+
+
+
+
+//61-70
+  {
+    "q": "A 1.25 L balloon is taken from a location where it was held at 273.00 K and 1.00 atm to the top of a mountain where the pressure is 0.330 atm and the temperature is 259.11 K. What is the volume of the balloon at the mountain's summit?",
+    "options": [
+      "0.435 L",
+      "0.750 L",
+      "3.59 L",
+      "3.99 L"
+    ],
+    "answer": 2
+  },
+  {
+    "q": "The constituent particles in a substance in its solid state tend to:",
+    "options": [
+      "remain motionless.",
+      "vibrate about fixed positions.",
+      "slide freely past one another.",
+      "move constantly in straight lines."
+    ],
+    "answer": 1
+  },
+  {
+    "q": "<b>Use the phase diagram below to answer the question that follows.</b><br><br><img src='./Practice Test _ Chemistry_files/MA067_q63.png' style='max-width:100%;' alt='Phase diagram'><br>Based on the phase diagram shown, which of the following pressures in combination with temperature \\( T \\) would result in the substance being present only as a gas?",
+    "options": [
+      "\\( P_1 \\)",
+      "\\( P_2 \\)",
+      "\\( P_3 \\)",
+      "\\( P_4 \\)"
+    ],
+    "answer": 0
+  },
+  {
+    "q": "A 20.0 L cylinder of oxygen gas is at a temperature of 27.0°C and a pressure of 5.00 atm. What is the density of the oxygen gas in the cylinder?",
+    "options": [
+      "72.0 g/L",
+      "6.50 g/L",
+      "3.25 g/L",
+      "0.203 g/L"
+    ],
+    "answer": 1
+  },
+  {
+    "q": "Which of the following statements best explains why ethanol (\\( \\text{CH}_3\\text{CH}_2\\text{OH} \\)) completely dissolves in water, while ethane (\\( \\text{CH}_3\\text{CH}_3 \\)) is largely insoluble in water?",
+    "options": [
+      "Ethanol is ionic and ethane is only slightly polar, so ethanol has stronger ion-dipole interactions with water.",
+      "The molecular size of ethanol is larger than that of ethane, so the ethanol molecules are more readily dispersed in water.",
+      "Ethanol is polar and ethane is nonpolar, so ethanol has stronger polar interactions with water.",
+      "Intermolecular forces in ethanol are weaker than intermolecular forces in ethane, so ethanol is more readily dispersed in water."
+    ],
+    "answer": 2
+  },
+  {
+    "q": "For which of the following interactions is the ion-dipole force the strongest intermolecular force present?",
+    "options": [
+      "an interaction between two water (\\( \\text{H}_2\\text{O} \\)) molecules",
+      "an interaction between a lithium cation (\\( \\text{Li}^+ \\)) and a chloride anion (\\( \\text{Cl}^- \\)) in lithium chloride (\\( \\text{LiCl} \\)) salt",
+      "an interaction between a water (\\( \\text{H}_2\\text{O} \\)) molecule and sodium (\\( \\text{Na}^+ \\)) cation in aqueous sodium chloride solution",
+      "an interaction between an octane (\\( \\text{C}_8\\text{H}_{18} \\)) molecule and a decane (\\( \\text{C}_{10}\\text{H}_{22} \\)) molecule in a mixed hydrocarbon liquid, such as gasoline"
+    ],
+    "answer": 2
+  },
+  {
+    "q": "The magnitude of van der Waals forces increases with:",
+    "options": [
+      "decreasing atomic radii.",
+      "decreasing surface area of molecules.",
+      "increasing polarizability due to electrons.",
+      "increasing branching in molecular chains."
+    ],
+    "answer": 2
+  },
+  {
+    "q": "Which of the following molecules can form a hydrogen bond with water?",
+    "options": [
+      "HCl",
+      "\\( \\text{H}_2\\text{S} \\)",
+      "\\( \\text{CH}_3\\text{F} \\)",
+      "\\( \\text{NH}_3 \\)"
+    ],
+    "answer": 3
+  },
+  {
+    "q": "In which of the following substances are dipole-dipole forces the primary intermolecular force?",
+    "options": [
+      "\\( \\text{PCl}_5 \\)",
+      "\\( \\text{CCl}_4 \\)",
+      "\\( \\text{BeCl}_2 \\)",
+      "\\( \\text{NCl}_3 \\)"
+    ],
+    "answer": 3
+  },
+  {
+    "q": "Methanol is considerably more soluble in water than 1-hexanol. Which of the following best explains this difference in solubility?",
+    "options": [
+      "Methanol contains fewer hydroxyl groups than 1-hexanol.",
+      "The alkyl group is longer in 1-hexanol than in methanol.",
+      "1-hexanol is a significantly more polar molecule than methanol.",
+      "The greater number of hydrogen atoms in 1-hexanol increases the amount of hydrogen bonding."
+    ],
+    "answer": 1
+  },
+
+  {
+    "q": "<b>Use the chemical equation below to answer the question that follows.</b><br><br>\\( \\text{NH}_4\\text{HS}(s) \\rightleftharpoons \\text{H}_2\\text{S}(g) + \\text{NH}_3(g) \\)<br><br>At a particular temperature, ammonium bisulfide (\\( \\text{NH}_4\\text{HS} \\)) decomposes to form hydrogen sulfide (\\( \\text{H}_2\\text{S} \\)) and ammonia (\\( \\text{NH}_3 \\)) and comes to equilibrium in a container where both concentrations are 0.261 \\( M \\). What is the value of the equilibrium constant, \\( K_{eq} \\), at the given temperature?",
+    "options": [
+      "0.068",
+      "0.100",
+      "0.531",
+      "0.675"
+    ],
+    "answer": 0
+  },
+  {
+    "q": "<b>Use the chemical equation below to answer the question that follows.</b><br><br>\\( 2\\text{HI}(g) \\rightleftharpoons \\text{H}_2(g) + \\text{I}_2(g) \\)<br><br>A closed 1 L vessel contains 2 mol \\( \\text{HI} \\). The \\( \\text{HI} \\) partially decomposes... If \\( x \\) represents the equilibrium concentration of \\( \\text{H}_2 \\), which of the following equations can be used to calculate \\( x \\)?",
+    "options": [
+      "\\( 0.02 = \\frac{x}{2 - x} \\)",
+      "\\( 0.02 = \\frac{x}{(2 - x)^2} \\)",
+      "\\( 0.02 = \\frac{x^2}{2 - x} \\)",
+      "\\( 0.02 = \\frac{x^2}{(2 - x)^2} \\)"
+    ],
+    "answer": 3
+  },
+  {
+    "q": "At a given instant, the reaction quotient (\\( Q \\)) for a reversible reaction is calculated as 0.74 and the equilibrium constant (\\( K_{eq} \\)) is 14.5. Which of the following claims is accurate based on these experimental calculations?",
+    "options": [
+      "The reaction mixture is at equilibrium.",
+      "The reaction mixture has only products.",
+      "The rate of the forward reaction is faster.",
+      "The rate of the reverse reaction is faster."
+    ],
+    "answer": 2
+  },
+  {
+    "q": "Which of the following statements is true for a buffer mixture made up of 250 mL of 0.1 \\( M \\) acetic acid and 125 mL of 0.1 \\( M \\) sodium acetate solution?",
+    "options": [
+      "Addition of HCl will decrease the equilibrium constant of the system.",
+      "The pH value of the mixture will remain constant after an increase in temperature.",
+      "The equilibrium constant will remain the same if the buffer mixture is diluted.",
+      "At equilibrium, the species in the mixture are acetic acid molecules and acetate ions."
+    ],
+    "answer": 2
+  },
+  {
+    "q": "<b>Use the chemical equation below to answer the question that follows.</b><br><br>\\( 2\\text{CO}_2(g) \\rightleftharpoons 2\\text{CO}(g) + \\text{O}_2(g) \\)<br><br>Which of the following changes would affect the value of the equilibrium constant for the reaction shown?",
+    "options": [
+      "increasing the pressure",
+      "removing \\( \\text{O}_2 \\) as it is formed",
+      "adding a catalyst to the reaction",
+      "decreasing the temperature"
+    ],
+    "answer": 3
+  },
+  {
+    "q": "<b>Use the chemical equation below to answer the question that follows.</b><br><br>\\( 2\\text{N}_2(g) + 6\\text{H}_2\\text{O}(l) \\rightleftharpoons 4\\text{NH}_3(g) + 3\\text{O}_2(g) \\quad \\Delta H = 1530 \\text{ kJ} \\)<br><br>Which of the following changes would cause the equilibrium reaction shown to shift to the right?",
+    "options": [
+      "removing \\( \\text{NH}_3(g) \\)",
+      "increasing the pressure",
+      "decreasing the temperature",
+      "adding \\( \\text{H}_2\\text{O}(l) \\)"
+    ],
+    "answer": 0
+  },
+  {
+    "q": "A student measures the rate of a chemical reaction between two aqueous solutions. Which of the following changes the student could make would be most likely to increase the rate of reaction between the compounds in solution?",
+    "options": [
+      "decreasing the temperature of the solutions so that the particles are less likely to fly past each other",
+      "grinding each solute to a powder before dissolving it to increase the surface area and allow more particles to interact",
+      "mixing a larger volume of each solution so that there are more total particles available to collide with each other",
+      "increasing the concentration of the solutions so that the particles are more likely to encounter each other"
+    ],
+    "answer": 3
+  },
+  {
+    "q": "<b>Use the information below to answer the question that follows.</b><br><br><img src='./Practice Test _ Chemistry_files/MA067_q78.png' style='max-width:100%;' alt='Concentration vs Time Graph'><br>Which of the following conclusions about this chemical reaction is best supported by the data provided?",
+    "options": [
+      "Equilibrium is established at about \\( t = 5 \\) minutes.",
+      "The speed of the forward reaction is equal to the speed of the reverse reaction at about \\( t = 25 \\) minutes.",
+      "The rate law of the reaction is first order with respect to each molecule.",
+      "The activation energy of the forward reaction is greater than that of the reverse direction."
+    ],
+    "answer": 1
+  },
+  {
+    "q": "<b>Use the information below to answer the question that follows.</b><br><br><img src='./Practice Test _ Chemistry_files/MA067_q79.png' style='max-width:100%;' alt='Reaction Rate Graph'><br>The graph shows the forward and reverse rates... Which of the following changes to the system would most likely cause the effect observed at time \\( t = 50 \\) minutes?",
+    "options": [
+      "an increase in temperature",
+      "an increase in pressure",
+      "use of a catalyst",
+      "change in surface area"
+    ],
+    "answer": 2
+  },
+  {
+    "q": "<b>Use the table below to answer the question that follows.</b><br><br><table border='1' style='width:100%; text-align:center; border-collapse: collapse;'><thead><tr><th>Experiment</th><th>Initial [A₂] (M)</th><th>Initial [B] (M)</th><th>Initial Rate (M/s)</th></tr></thead><tbody><tr><td>1</td><td>0.25</td><td>0.10</td><td>2.8 × 10⁻²</td></tr><tr><td>2</td><td>0.25</td><td>0.30</td><td>8.3 × 10⁻²</td></tr><tr><td>3</td><td>0.25</td><td>0.40</td><td>1.1 × 10⁻¹</td></tr><tr><td>4</td><td>0.50</td><td>0.10</td><td>5.5 × 10⁻²</td></tr><tr><td>5</td><td>0.75</td><td>0.30</td><td>2.5 × 10⁻¹</td></tr></tbody></table><br>Using these data, which of the following is the rate law for this reaction?",
+    "options": [
+      "rate = \\( k[\\text{A}_2] \\)",
+      "rate = \\( k[\\text{A}_2][\\text{B}]^2 \\)",
+      "rate = \\( k[\\text{A}_2][\\text{B}] \\)",
+      "rate = \\( k[\\text{A}_2]^3[\\text{B}] \\)"
+    ],
+    "answer": 2
+  }
+,
+
+
+
+
+  {
+    "q": "<b>Use the table below to answer the question that follows.</b><br><br><table border='1' style='width:100%; text-align:center; border-collapse: collapse;'><thead><tr><th>Experiment</th><th>Initial [H₂O₂] (M)</th><th>Initial Rate (M/min.)</th></tr></thead><tbody><tr><td>1</td><td>1.50 × 10⁻²</td><td>1.59 × 10⁻⁵</td></tr><tr><td>2</td><td>3.00 × 10⁻²</td><td>3.18 × 10⁻⁵</td></tr><tr><td>3</td><td>4.50 × 10⁻¹</td><td>4.77 × 10⁻⁵</td></tr><tr><td>4</td><td>7.50 × 10⁻²</td><td>7.95 × 10⁻⁵</td></tr></tbody></table><br>Using the data for the decomposition of \\( \\text{H}_2\\text{O}_2 \\) shown, what is the reaction rate when \\( [\\text{H}_2\\text{O}_2] = 6.50 \\times 10^{-1} \\)?",
+    "options": [
+      "\\( 6.36 \\times 10^{-5} \\text{ M/min.} \\)",
+      "\\( 6.89 \\times 10^{-4} \\text{ M/min.} \\)",
+      "\\( 4.60 \\times 10^{-2} \\text{ M/min.} \\)",
+      "\\( 6.50 \\times 10^{-1} \\text{ M/min.} \\)"
+    ],
+    "answer": 1
+  },
+  {
+    "q": "<b>Use the information below to answer the question that follows.</b><br><br>The proposed mechanism for the reaction between \\( \\text{NO}_2 \\) and \\( \\text{CO} \\) at temperatures less than 600 K is shown below.<br><br>step 1: \\( 2\\text{NO}_2(g) \\rightleftharpoons \\text{NO}_3(g) + \\text{NO}(g) \\) (slow)<br>step 2: \\( \\text{NO}_3(g) + \\text{CO}(g) \\rightarrow \\text{NO}_2(g) + \\text{CO}_2(g) \\) (fast)<br>overall: \\( \\text{NO}_2(g) + \\text{CO}(g) \\rightarrow \\text{NO}(g) + \\text{CO}_2(g) \\)<br><br>Given this information, which of the following rate laws best represents this reaction mechanism?",
+    "options": [
+      "rate = \\( k[\\text{CO}] \\)",
+      "rate = \\( k[\\text{NO}_2]^2 \\)",
+      "rate = \\( k[\\text{NO}_3][\\text{CO}] \\)",
+      "rate = \\( k[\\text{NO}_2]^2[\\text{CO}] \\)"
+    ],
+    "answer": 1
+  },
+  {
+    "q": "<b>Use the information below to answer the two questions that follow.</b><br><br>Students are using the experimental setup shown below to investigate the enthalpy change of the combustion of ethanol...<br><br><img src='./Practice Test _ Chemistry_files/MA067_q83.png' style='max-width:100%;' alt='Calorimeter setup'><br>The accepted experimental enthalpy change of the reaction is −1368 kJ/mol. Which of the following experimental modifications would most likely decrease the percent error?",
+    "options": [
+      "decreasing the number of data points used in the calculation",
+      "decreasing the heat loss from the calorimeter to the environment",
+      "increasing the precision of the thermometer",
+      "increasing the amount of ethanol used in the spirit burner"
+    ],
+    "answer": 1
+  },
+  {
+    "q": "If ethanol (\\( \\text{C}_2\\text{H}_5\\text{OH} \\)) in the burner is replaced with the same number of moles of 1-pentanol (\\( \\text{C}_5\\text{H}_{11}\\text{OH} \\)), which of the following statements will be true?",
+    "options": [
+      "The measured temperature difference will remain the same.",
+      "The percent error of the experiment will be decreased.",
+      "More energy will be released.",
+      "The fuel will burn for a longer time."
+    ],
+    "answer": 2
+  },
+  {
+    "q": "For which of the following reactions would \\( \\Delta S \\) be positive?",
+    "options": [
+      "\\( \\text{H}_2\\text{O}(l) \\rightarrow \\text{H}_2\\text{O}(s) \\)",
+      "\\( \\text{H}_2(g) + \\text{I}_2(g) \\rightarrow 2\\text{HI}(g) \\)",
+      "\\( \\text{Ag}^+(aq) + \\text{Cl}^-(aq) \\rightarrow \\text{AgCl}(s) \\)",
+      "\\( \\text{C}_6\\text{H}_{12}\\text{O}_2(s) + 6\\text{O}_2(g) \\rightarrow 6\\text{CO}_2(g) + 6\\text{H}_2\\text{O}(g) \\)"
+    ],
+    "answer": 3
+  },
+  {
+    "q": "Given that the specific heat of copper is 0.385 J/(g•K), how much heat is required to raise the temperature of 50.0 g of copper from 25.0°C to 100°C?",
+    "options": [
+      "1.44 kJ",
+      "1.93 kJ",
+      "6.70 kJ",
+      "7.18 kJ"
+    ],
+    "answer": 0
+  },
+  {
+    "q": "When \\( 1.0 \\times 10^2 \\text{ g} \\) of an unknown metal at 80.0°C is placed in a calorimeter containing \\( 1.0 \\times 10^2 \\text{ g} \\) of water, the temperature of the water rises from 20.0°C to 25.0°C. Given that the specific heat of water is 4.184 J/(g•K), what is the specific heat of the metal?",
+    "options": [
+      "0.26 J/(g•K)",
+      "0.38 J/(g•K)",
+      "1.52 J/(g•K)",
+      "1.90 J/(g•K)"
+    ],
+    "answer": 1
+  },
+  {
+    "q": "A constant pressure calorimeter with negligible heat capacity contains 200.0 g of \\( \\text{H}_2\\text{O} \\) at 25.00°C. When 12.3 g of \\( \\text{KClO}_3 \\) is dissolved in the \\( \\text{H}_2\\text{O} \\), the temperature of the solution in the calorimeter drops to 20.05°C. Assuming that the specific heat of the solution is 4.184 J/(g•K), what is the heat of solution of \\( \\text{KClO}_3 \\)?",
+    "options": [
+      "0.255 kJ/mol",
+      "0.337 kJ/mol",
+      "44.0 kJ/mol",
+      "168 kJ/mol"
+    ],
+    "answer": 2
+  },
+  {
+    "q": "A reaction at 750 K has a \\( \\Delta H^\\circ = -150 \\text{ kJ/mol} \\), and a \\( \\Delta S^\\circ = +200 \\text{ J/(mol•K)} \\). Which of the following statements is true?",
+    "options": [
+      "The reaction is spontaneous at all temperatures.",
+      "The reaction is spontaneous at all temperatures above 750 K.",
+      "The reaction is not spontaneous at any temperatures.",
+      "The reaction is spontaneous at all temperatures below 750 K."
+    ],
+    "answer": 0
+  },
+  {
+    "q": "Given the relationship between standard free energy change (\\( \\Delta G^\\circ \\)) and the equilibrium constant (\\( K \\)), which of the following claims is true when \\( K = 6 \\times 10^5 \\) at a particular temperature \\( T \\)?",
+    "options": [
+      "The equilibrium favors products, and decreasing temperature will decrease \\( K \\).",
+      "\\( \\Delta G^\\circ \\) is less than zero, and the equilibrium favors products.",
+      "The equilibrium favors reactants, and increasing temperature will increase \\( K \\).",
+      "\\( \\Delta G^\\circ \\) is greater than zero, and the equilibrium favors reactants."
+    ],
+    "answer": 1
+  },
+
+  {
+    "q": "<b>Use the table and chemical equation below to answer the question that follows.</b><br><br><table border='1' style='width:100%; text-align:center; border-collapse: collapse;'><thead><tr><th>Bond</th><th>Bond Enthalpy kJ/mol</th></tr></thead><tbody><tr><td>H—H</td><td>432</td></tr><tr><td>H—I</td><td>295</td></tr></tbody></table><br>\\( \\text{H}_2(g) + \\text{I}_2(g) \\rightarrow 2\\text{HI}(g) \\quad \\Delta H = -9 \\text{ kJ/mol} \\)<br><br>Based on the bond enthalpies and chemical equation shown, what is the best estimate for the I—I bond in the equation?",
+    "options": [
+      "−286 kJ/mol",
+      "−9 kJ/mol",
+      "149 kJ/mol",
+      "286 kJ/mol"
+    ],
+    "answer": 2
+  },
+  {
+    "q": "<b>Use the table and chemical equation below to answer the question that follows.</b><br><br><table border='1' style='width:100%; text-align:center; border-collapse: collapse;'><thead><tr><th>Bond</th><th>Bond Enthalpy kJ/mol</th></tr></thead><tbody><tr><td>O—O</td><td>138</td></tr><tr><td>O=O</td><td>498</td></tr><tr><td>Cl—Cl</td><td>243</td></tr></tbody></table><br>\\( \\frac{1}{2}\\text{O}_2(g) + \\text{Cl}_2(g) \\rightarrow \\text{OCl}_2(g) \\)<br><br>The standard enthalpy of formation of \\( \\text{OCl}_2 \\) is 105 kJ/mol. Based on the bond enthalpies and chemical equation shown, what is the best estimate for the bond enthalpy for an O—Cl bond?",
+    "options": [
+      "104 kJ/mol",
+      "194 kJ/mol",
+      "318 kJ/mol",
+      "387 kJ/mol"
+    ],
+    "answer": 1
+  },
+  {
+    "q": "The bond energy for oxygen gas (\\( \\text{O}_2 \\)) is 499 kJ/mol. Based on this information, what is the standard enthalpy of formation of gaseous oxygen atoms (O)?",
+    "options": [
+      "0.00 kJ/mol",
+      "250 kJ/mol",
+      "499 kJ/mol",
+      "998 kJ/mol"
+    ],
+    "answer": 1
+  },
+  {
+    "q": "<b>Use the table below to answer the question that follows.</b><br><br><table border='1' style='width:100%; text-align:center; border-collapse: collapse;'><thead><tr><th>Reaction</th><th>Chemical Equation</th><th>ΔH° (kJ)</th><th>ΔS° (J/K)</th></tr></thead><tbody><tr><td>1</td><td>\\( 2\\text{SO}_3(g) \\rightarrow 2\\text{SO}_2(g) + \\text{O}_2(g) \\)</td><td>198</td><td>188</td></tr><tr><td>2</td><td>\\( 2\\text{AsF}_3(l) \\rightarrow 2\\text{As}(s) + 3\\text{F}_2(g) \\)</td><td>−1643</td><td>316</td></tr><tr><td>3</td><td>\\( \\text{N}_2\\text{O}(g) + 2\\text{H}_2\\text{O}(l) \\rightarrow \\text{NH}_4\\text{NO}_3(s) \\)</td><td>36</td><td>−446</td></tr><tr><td>4</td><td>\\( 4\\text{Fe}(s) + 3\\text{O}_2(g) \\rightarrow 2\\text{Fe}_2\\text{O}_3(s) \\)</td><td>−1650</td><td>−549</td></tr></tbody></table><br>Which of the reactions shown in the table is spontaneous only at sufficiently high temperatures?",
+    "options": [
+      "reaction 1",
+      "reaction 2",
+      "reaction 3",
+      "reaction 4"
+    ],
+    "answer": 0
+  },
+  {
+    "q": "<b>Use the diagram below to answer the question that follows.</b><br><br><img src='./Practice Test _ Chemistry_files/MA067_q95.png' style='max-width:100%;' alt='Potential energy diagram'><br>Which of the following expressions best represents the change in enthalpy for the reaction in the potential energy diagram shown?",
+    "options": [
+      "\\( b - c \\)",
+      "\\( c - b \\)",
+      "\\( a - d \\)",
+      "\\( d - a \\)"
+    ],
+    "answer": 3
+  },
+  {
+    "q": "<b>Use the table below to answer the question that follows.</b><br><br><b>Standard Reduction Potentials</b><br>[Table of reduction potentials provided in original text]<br><br>An electrochemical cell is being designed for a particular application, and it needs to produce as closely as possible a voltage of 3.00 V. The substances listed in the table are available for the project. Which of the following pairs of half-cells will be the best choice to meet the specifications for the electrochemical cell?",
+    "options": [
+      "\\( \\text{Pb} | \\text{Pb}^{2+} \\) and \\( \\text{K} | \\text{K}^+ \\)",
+      "\\( \\text{Al} | \\text{Al}^{3+} \\) and \\( \\text{Cl}^- | \\text{Cl}_2 \\)",
+      "\\( \\text{Hg} | \\text{Hg}^{2+} \\) and \\( \\text{Au} | \\text{Au}^{3+} \\)",
+      "\\( \\text{Mg} | \\text{Mg}^{2+} \\) and \\( \\text{Sn} | \\text{Sn}^{2+} \\)"
+    ],
+    "answer": 1
+  },
+  {
+    "q": "<b>Use the information below to answer the two questions that follow.</b><br><br>Copper and zinc can undergo an electrochemical reaction... The table represents these experimental data.<br><br><table border='1' style='width:100%; text-align:center; border-collapse: collapse;'><thead><tr><th>Trial</th><th>[Zn²⁺] (M)</th><th>[Cu²⁺] (M)</th><th>Cell Potential (V)</th></tr></thead><tbody><tr><td>1</td><td>1.00</td><td>0.0010</td><td>0.950</td></tr><tr><td>2</td><td>1.00</td><td>0.010</td><td>0.920</td></tr><tr><td>3</td><td>1.00</td><td>0.10</td><td>1.05</td></tr><tr><td>4</td><td>1.00</td><td>1.0</td><td>1.10</td></tr></tbody></table><br><img src='./Practice Test _ Chemistry_files/MA067_q97.png' style='max-width:100%;' alt='Cell Potential Graph'><br>Which of the following changes would most increase the precision of this experiment?",
+    "options": [
+      "replacing the voltmeter and rerunning the experiment",
+      "repeating trial 2",
+      "preparing a fresh stock solution with 1 M concentration",
+      "conducting trials with concentrations below 0.005 M"
+    ],
+    "answer": 1
+  },
+  {
+    "q": "Which of the following conclusions is best supported by the data shown in the table?",
+    "options": [
+      "Cell potential under nonstandard conditions is directly proportional to solution concentration.",
+      "Cell potential depends on the concentration of the anode half-cell.",
+      "The number of moles of electrons transferred between cells is constant.",
+      "Decreasing the concentration of the cathode half-cell decreases the cell potential."
+    ],
+    "answer": 3
+  },
+
+
+  {
+    "q": "<b>Use the table and diagram below to answer the question that follows.</b><br><br><b>Standard Reduction Potentials</b><br><table border='1' style='width:100%; text-align:center; border-collapse: collapse;'><thead><tr><th>Half-reaction</th><th>E° (V)</th></tr></thead><tbody><tr><td>Zn²⁺ + 2e⁻ → Zn</td><td>−0.76</td></tr><tr><td>Cu²⁺ + 2e⁻ → Cu</td><td>+0.34</td></tr></tbody></table><br><img src='./Practice Test _ Chemistry_files/MA067_q99.png' style='max-width:100%;' alt='Voltaic Cell Diagram'><br>Which of the following lists describes the characteristics of the voltaic cell shown in the diagram?",
+    "options": [
+      "I = anode, II = cathode, III = direction of electron flow",
+      "I = anode, II = cathode, IV = direction of electron flow",
+      "I = cathode, II = anode, III = direction of electron flow",
+      "I = cathode, II = anode, IV = direction of electron flow"
+    ],
+    "answer": 0
+  },
+  {
+    "q": "<b>Use the table below to answer the question that follows.</b><br><br><b>Standard Reduction Potentials (1.0 M at 25°C)</b><br><table border='1' style='width:100%; text-align:center; border-collapse: collapse;'><thead><tr><th>Half-reaction</th><th>E° (V)</th></tr></thead><tbody><tr><td>Ba²⁺(aq) + 2e⁻ → Ba(s)</td><td>−2.91</td></tr><tr><td>Na⁺(aq) + e⁻ → Na(s)</td><td>−2.71</td></tr><tr><td>Mn²⁺(aq) + 2e⁻ → Mn(s)</td><td>−1.18</td></tr><tr><td>Tl⁺(aq) + e⁻ → Tl(s)</td><td>−0.34</td></tr><tr><td>Ag⁺(aq) + e⁻ → Ag(s)</td><td>+0.80</td></tr><tr><td>Au³⁺(aq) + 3e⁻ → Au(s)</td><td>+1.50</td></tr></tbody></table><br>Using the standard reduction potentials shown, which of the following cells is spontaneous at standard conditions?",
+    "options": [
+      "\\( \\text{Mn} | \\text{Mn}^{2+} || \\text{Tl}^+ | \\text{Tl} \\)",
+      "\\( \\text{Ag} | \\text{Ag}^{+} || \\text{Mn}^{2+} | \\text{Mn} \\)",
+      "\\( \\text{Ag} | \\text{Ag}^{+} || \\text{Na}^{+} | \\text{Na} \\)",
+      "\\( \\text{Na} | \\text{Na}^{+} || \\text{Ba}^{2+} | \\text{Ba} \\)"
+    ],
+    "answer": 0
+  }
+
+
+
+       ];
+
+
+
+        // --- State Management ---
+        let state = {
+            currentIndex: 0,
+            mode: 'normal',
+            wrongAnswers: [],
+            shuffledQuestions: []
+        };
+
+        const KEY_LABELS = ['A', 'B', 'C', 'D', 'E', 'F'];
+
+        // --- Initialization ---
+        function init() {
+            if(localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark-mode');
+            
+            const savedWrong = localStorage.getItem('wrongAnswers');
+            if(savedWrong) state.wrongAnswers = JSON.parse(savedWrong);
+            updateReviewButton();
+
+            const savedIndex = localStorage.getItem('lastQuestionIndex');
+            state.shuffledQuestions = fullQuestionData.map((q, index) => ({...q, originalIndex: index}));
+            
+            if (savedIndex && !isNaN(savedIndex)) {
+                let idx = parseInt(savedIndex);
+                if(idx >= 0 && idx < state.shuffledQuestions.length) {
+                    state.currentIndex = idx;
+                }
+            }
+            
+            renderQuestion();
+            setupPanelInteractions();
+            setupKeyboardControls();
+            setupTouchControls();
+        }
+
+        function getShuffledOptions(questionObj) {
+            let opts = questionObj.options.map((opt, i) => ({
+                text: opt,
+                isCorrect: i === questionObj.answer
+            }));
+            for (let i = opts.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [opts[i], opts[j]] = [opts[j], opts[i]];
+            }
+            return opts;
+        }
+
+        // --- Rendering ---
+        function renderQuestion() {
+            const qData = state.shuffledQuestions[state.currentIndex];
+            const originalIdx = qData.originalIndex;
+            
+            document.getElementById('question-text').innerHTML = qData.q;
+            document.getElementById('progress-text').innerText = 
+                `${state.mode === 'review' ? 'Review' : 'Q'} ${state.currentIndex + 1}/${state.shuffledQuestions.length}`;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            
+            const displayOptions = getShuffledOptions(qData);
+
+            displayOptions.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                const letter = KEY_LABELS[index] || '?';
+                btn.innerHTML = `<span class="key-hint">${letter}</span> ${opt.text}`;
+                btn.dataset.isCorrect = opt.isCorrect;
+                
+                btn.addEventListener('click', function() {
+                    const allBtns = container.querySelectorAll('.option-btn');
+                    allBtns.forEach(b => b.classList.add('disabled'));
+
+                    if(opt.isCorrect) {
+                        btn.classList.add('correct');
+                        removeFromWrong(originalIdx);
+                        document.getElementById('feedback-area').innerHTML = "<span style='color:var(--correct)'>Correct!</span>";
+                    } else {
+                        btn.classList.add('wrong');
+                        addToWrong(originalIdx);
+                        document.getElementById('feedback-area').innerHTML = "<span style='color:var(--wrong)'>Incorrect. Reviewing later.</span>";
+                        allBtns.forEach(b => {
+                            if(b.dataset.isCorrect === 'true') b.classList.add('correct');
+                        });
+                    }
+                });
+                container.appendChild(btn);
+            });
+            document.getElementById('feedback-area').innerText = "";
+            if(window.MathJax) MathJax.typesetPromise();
+            
+            if(state.mode === 'normal') {
+                localStorage.setItem('lastQuestionIndex', state.currentIndex);
+            }
+        }
+
+        // --- Wrong Answers Logic ---
+        function addToWrong(idx) {
+            if(!state.wrongAnswers.includes(idx)) {
+                state.wrongAnswers.push(idx);
+                state.wrongAnswers.sort((a,b) => a - b); // Keep sorted
+                saveWrong();
+            }
+        }
+        function removeFromWrong(idx) {
+            if(state.wrongAnswers.includes(idx)) {
+                state.wrongAnswers = state.wrongAnswers.filter(id => id !== idx);
+                saveWrong();
+            }
+        }
+        function saveWrong() {
+            localStorage.setItem('wrongAnswers', JSON.stringify(state.wrongAnswers));
+            updateReviewButton();
+        }
+        function updateReviewButton() {
+            const btn = document.getElementById('review-btn');
+            btn.innerText = `Review (${state.wrongAnswers.length})`;
+            
+            // If in review mode and user answers correctly (removing the last wrong item)
+            if (state.wrongAnswers.length === 0 && state.mode === 'review') {
+                alert("Review complete! Returning to normal mode.");
+                returnToNormalMode();
+            }
+        }
+
+        // --- Review Modal Logic ---
+        function openReviewMenu() {
+            if(state.wrongAnswers.length === 0) {
+                alert("No wrong answers saved to review!");
+                return;
+            }
+            
+            const list = document.getElementById('review-list');
+            list.innerHTML = '';
+            
+            state.wrongAnswers.forEach(originalIdx => {
+                const btn = document.createElement('button');
+                btn.className = 'review-btn-item';
+                btn.innerText = 'Q' + (originalIdx + 1);
+                btn.onclick = () => startReviewAt(originalIdx);
+                list.appendChild(btn);
+            });
+            
+            document.getElementById('review-modal').classList.add('active');
+        }
+
+        function closeReviewModal() {
+            document.getElementById('review-modal').classList.remove('active');
+        }
+
+        function startReviewAt(targetOriginalIdx) {
+            closeReviewModal();
+            state.mode = 'review';
+            
+            // Build the review deck
+            state.shuffledQuestions = fullQuestionData
+                .map((q, i) => ({...q, originalIndex: i}))
+                .filter(q => state.wrongAnswers.includes(q.originalIndex));
+            
+            // Find the index of the clicked question within the *review deck*
+            const newIndex = state.shuffledQuestions.findIndex(q => q.originalIndex === targetOriginalIdx);
+            
+            state.currentIndex = (newIndex !== -1) ? newIndex : 0;
+            renderQuestion();
+        }
+
+        function returnToNormalMode() {
+            state.mode = 'normal';
+            state.shuffledQuestions = fullQuestionData.map((q, i) => ({...q, originalIndex: i}));
+            state.currentIndex = 0;
+            renderQuestion();
+        }
+
+        // --- Navigation ---
+        function nextQuestion() {
+            if (state.currentIndex < state.shuffledQuestions.length - 1) {
+                state.currentIndex++;
+                renderQuestion();
+            } else {
+                alert("You've reached the last question!");
+            }
+        }
+        function prevQuestion() {
+            if (state.currentIndex > 0) {
+                state.currentIndex--;
+                renderQuestion();
+            }
+        }
+
+        // --- Controls ---
+        function setupKeyboardControls() {
+            document.addEventListener('keydown', (e) => {
+                const key = e.key.toLowerCase();
+                
+                if (key === 'e' || key === 'j') nextQuestion();
+                if (key === 'w' || key === 'k') prevQuestion();
+
+                const charCode = key.charCodeAt(0);
+                if (charCode >= 97 && charCode <= 100) { 
+                    const index = charCode - 97;
+                    const buttons = document.querySelectorAll('.option-btn');
+                    if (buttons[index] && !buttons[index].classList.contains('disabled')) {
+                        buttons[index].click();
+                    }
+                }
+            });
+        }
+
+        function setupTouchControls() {
+            let touchStartX = 0;
+            let touchEndX = 0;
+            let touchStartY = 0;
+            const threshold = 50;
+
+            document.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+                touchStartY = e.changedTouches[0].screenY;
+            }, false);
+
+            document.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                let touchEndY = e.changedTouches[0].screenY;
+                
+                if (e.target.closest('button') || e.target.closest('#bottom-panel') || e.target.closest('.modal-content')) {
+                    return;
+                }
+                
+                if (Math.abs(touchEndY - touchStartY) > 50) return;
+
+                handleSwipe();
+            }, false);
+
+            function handleSwipe() {
+                const distance = touchEndX - touchStartX;
+                if (Math.abs(distance) > threshold) {
+                    if (distance < 0) nextQuestion();
+                    else prevQuestion();
+                }
+            }
+        }
+
+        // --- UI Toggles ---
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        }
+        function toggleFocusMode() {
+            document.body.classList.toggle('focus-mode');
+        }
+        
+        function togglePanel(hide) {
+            const panel = document.getElementById('bottom-panel');
+            const zone = document.getElementById('trigger-zone');
+            
+            if(hide) {
+                panel.classList.add('hidden');
+                zone.classList.add('active');
+            } else {
+                panel.classList.remove('hidden');
+                zone.classList.remove('active');
+            }
+        }
+
+        function setupPanelInteractions() {
+            const zone = document.getElementById('trigger-zone');
+            zone.addEventListener('mouseenter', () => togglePanel(false));
+            document.addEventListener('mousemove', (e) => {
+                if (e.clientY > window.innerHeight - 50 && !document.body.classList.contains('focus-mode')) {
+                    togglePanel(false);
+                }
+            });
+            zone.addEventListener('touchstart', (e) => {
+                e.preventDefault(); 
+                togglePanel(false);
+            });
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
