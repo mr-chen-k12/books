@@ -1,5 +1,3 @@
-       
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -38,6 +36,16 @@
         * { box-sizing: border-box; transition: background 0.3s, color 0.3s; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
+        /* --- Prevent Hover Flashing during Zoom/Ctrl Press --- */
+        body.ctrl-held .option-btn:hover {
+            background: transparent !important;
+            color: var(--text-color) !important;
+        }
+        body.ctrl-held .option-btn:hover .key-hint {
+            background: var(--key-hint-bg) !important;
+            color: var(--key-hint-text) !important;
+        }
+
         /* --- Main Content --- */
         #app-container {
             flex: 1;
@@ -61,6 +69,8 @@
             width: 100%;
             margin-bottom: 20px;
             touch-action: pan-y; 
+            /* Fix for content jumping */
+            transform: translateZ(0); 
         }
 
         .question-text { font-size: 1.2rem; margin-bottom: 1.5rem; line-height: 1.6; }
@@ -82,7 +92,9 @@
             position: relative;
             touch-action: manipulation;
         }
-        .option-btn:hover { background: var(--accent); color: white; }
+        
+        /* Only allow hover if not disabled and Ctrl not held */
+        .option-btn:not(.disabled):hover { background: var(--accent); color: white; }
         
         .key-hint {
             background: var(--key-hint-bg);
@@ -96,13 +108,14 @@
             text-align: center;
             transition: inherit;
         }
-        .option-btn:hover .key-hint { background: rgba(255,255,255,0.3); color: white; }
+        .option-btn:not(.disabled):hover .key-hint { background: rgba(255,255,255,0.3); color: white; }
 
-        .option-btn.correct { background: var(--correct); border-color: var(--correct); color: white; }
-        .option-btn.correct .key-hint { background: rgba(255,255,255,0.3); color: white; }
+        /* Specific states override everything */
+        .option-btn.correct { background: var(--correct) !important; border-color: var(--correct) !important; color: white !important; }
+        .option-btn.correct .key-hint { background: rgba(255,255,255,0.3) !important; color: white !important; }
         
-        .option-btn.wrong { background: var(--wrong); border-color: var(--wrong); color: white; }
-        .option-btn.wrong .key-hint { background: rgba(255,255,255,0.3); color: white; }
+        .option-btn.wrong { background: var(--wrong) !important; border-color: var(--wrong) !important; color: white !important; }
+        .option-btn.wrong .key-hint { background: rgba(255,255,255,0.3) !important; color: white !important; }
         
         .option-btn.disabled { pointer-events: none; opacity: 0.8; }
 
@@ -226,9 +239,6 @@
     </div>
 
     <script>
-        // --- Data ---
-
-
 const fullQuestionData = [
 
 
@@ -1325,7 +1335,7 @@ const fullQuestionData = [
         function addToWrong(idx) {
             if(!state.wrongAnswers.includes(idx)) {
                 state.wrongAnswers.push(idx);
-                state.wrongAnswers.sort((a,b) => a - b); // Keep sorted
+                state.wrongAnswers.sort((a,b) => a - b);
                 saveWrong();
             }
         }
@@ -1343,7 +1353,6 @@ const fullQuestionData = [
             const btn = document.getElementById('review-btn');
             btn.innerText = `Review (${state.wrongAnswers.length})`;
             
-            // If in review mode and user answers correctly (removing the last wrong item)
             if (state.wrongAnswers.length === 0 && state.mode === 'review') {
                 alert("Review complete! Returning to normal mode.");
                 returnToNormalMode();
@@ -1379,14 +1388,11 @@ const fullQuestionData = [
             closeReviewModal();
             state.mode = 'review';
             
-            // Build the review deck
             state.shuffledQuestions = fullQuestionData
                 .map((q, i) => ({...q, originalIndex: i}))
                 .filter(q => state.wrongAnswers.includes(q.originalIndex));
             
-            // Find the index of the clicked question within the *review deck*
             const newIndex = state.shuffledQuestions.findIndex(q => q.originalIndex === targetOriginalIdx);
-            
             state.currentIndex = (newIndex !== -1) ? newIndex : 0;
             renderQuestion();
         }
@@ -1414,11 +1420,20 @@ const fullQuestionData = [
             }
         }
 
-        // --- Controls ---
+        // --- Controls: Keyboard & Touch ---
         function setupKeyboardControls() {
+            // FIX for zooming revealing answers: 
+            // Detect Control Key Hold to disable hover effects
             document.addEventListener('keydown', (e) => {
+                if (e.key === 'Control' || e.key === 'Meta') {
+                    document.body.classList.add('ctrl-held');
+                }
+                
                 const key = e.key.toLowerCase();
                 
+                // Block input if Control is held (prevents accidental answer selection while zooming)
+                if (e.ctrlKey || e.metaKey) return;
+
                 if (key === 'e' || key === 'j') nextQuestion();
                 if (key === 'w' || key === 'k') prevQuestion();
 
@@ -1430,6 +1445,17 @@ const fullQuestionData = [
                         buttons[index].click();
                     }
                 }
+            });
+
+            document.addEventListener('keyup', (e) => {
+                if (e.key === 'Control' || e.key === 'Meta') {
+                    document.body.classList.remove('ctrl-held');
+                }
+            });
+            
+            // Backup: Clear ctrl-held if window loses focus (e.g. alt-tab)
+            window.addEventListener('blur', () => {
+                document.body.classList.remove('ctrl-held');
             });
         }
 
@@ -1506,3 +1532,5 @@ const fullQuestionData = [
     </script>
 </body>
 </html>
+
+
