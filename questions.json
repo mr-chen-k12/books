@@ -1,4 +1,4 @@
-const fullQuestionData = [
+[
 
 
     {
@@ -989,5 +989,5 @@ const fullQuestionData = [
     ],
     "answer": 0
   }
-
+]
 
