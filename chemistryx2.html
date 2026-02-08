@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chemistry Study App</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --bg-color: #f4f4f9;
+            --text-color: #333;
+            --card-bg: #ffffff;
+            --accent: #3498db;
+            --accent-hover: #2980b9;
+            --correct: #2ecc71;
+            --wrong: #e74c3c;
+            --panel-bg: rgba(255, 255, 255, 0.98);
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --key-hint-bg: #eee;
+            --key-hint-text: #555;
+        }
+
+        body.dark-mode {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --card-bg: #2d2d2d;
+            --accent: #5dade2;
+            --accent-hover: #3498db;
+            --panel-bg: rgba(45, 45, 45, 0.98);
+            --shadow: 0 4px 6px rgba(0,0,0,0.5);
+            --key-hint-bg: #444;
+            --key-hint-text: #ccc;
+        }
+
+        * { box-sizing: border-box; transition: background 0.3s, color 0.3s; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+        /* --- Prevent Hover Flashing during Zoom/Ctrl/Alt Press --- */
+        body.modifier-held .option-btn:hover {
+            background: transparent !important;
+            color: var(--text-color) !important;
+        }
+        body.modifier-held .option-btn:hover .key-hint {
+            background: var(--key-hint-bg) !important;
+            color: var(--key-hint-text) !important;
+        }
+
+        /* --- Main Content --- */
+        #app-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding-bottom: 140px;
+        }
+
+        .question-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            margin-bottom: 20px;
+            touch-action: pan-y; 
+            transform: translateZ(0); 
+        }
+
+        .question-text { font-size: 1.2rem; margin-bottom: 1.5rem; line-height: 1.6; }
+        .question-text img { max-width: 100%; height: auto; border-radius: 8px; margin-top: 10px; }
+
+        .options-grid { display: grid; gap: 10px; }
+        .option-btn {
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--text-color);
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            position: relative;
+            touch-action: manipulation;
+        }
+        
+        .option-btn:not(.disabled):hover { background: var(--accent); color: white; }
+        
+        .key-hint {
+            background: var(--key-hint-bg);
+            color: var(--key-hint-text);
+            font-weight: bold;
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-right: 15px;
+            min-width: 30px;
+            text-align: center;
+            transition: inherit;
+        }
+        .option-btn:not(.disabled):hover .key-hint { background: rgba(255,255,255,0.3); color: white; }
+
+        /* Specific states override everything */
+        .option-btn.correct { background: var(--correct) !important; border-color: var(--correct) !important; color: white !important; }
+        .option-btn.correct .key-hint { background: rgba(255,255,255,0.3) !important; color: white !important; }
+        
+        .option-btn.wrong { background: var(--wrong) !important; border-color: var(--wrong) !important; color: white !important; }
+        .option-btn.wrong .key-hint { background: rgba(255,255,255,0.3) !important; color: white !important; }
+        
+        .option-btn.disabled { pointer-events: none; opacity: 0.8; }
+
+        /* --- Modal Styles --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 2000;
+            display: flex; justify-content: center; align-items: center;
+            backdrop-filter: blur(3px);
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        .modal-content {
+            background: var(--card-bg); padding: 25px; border-radius: 15px;
+            width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center;
+            transform: scale(0.9); transition: transform 0.3s;
+        }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        
+        .review-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 10px; margin-top: 20px;
+        }
+        .review-btn-item {
+            background: var(--wrong); color: white; padding: 12px;
+            border-radius: 8px; border: none; font-weight: bold;
+            cursor: pointer; font-size: 1rem;
+        }
+        .review-btn-item:hover { opacity: 0.8; transform: scale(1.05); }
+
+        .modal-close {
+            margin-top: 20px; background: transparent; border: 1px solid var(--text-color);
+            color: var(--text-color); padding: 8px 16px; border-radius: 20px; cursor: pointer;
+        }
+
+        /* --- Bottom Control Panel --- */
+        #bottom-panel {
+            position: fixed;
+            bottom: 0; left: 0; width: 100%;
+            background: var(--panel-bg);
+            padding: 15px 20px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            display: flex; justify-content: space-between; align-items: center;
+            transform: translateY(0); transition: transform 0.3s ease-in-out;
+            z-index: 1001;
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        }
+
+        #bottom-panel.hidden { transform: translateY(100%); }
+
+        .control-group { display: flex; gap: 10px; align-items: center; }
+        
+        button { touch-action: manipulation; }
+
+        button.icon-btn {
+            background: var(--accent); color: white; border: none;
+            padding: 12px 16px; border-radius: 6px; cursor: pointer;
+            font-weight: bold; font-size: 0.95rem; white-space: nowrap;
+        }
+        button.icon-btn.secondary { background: transparent; border: 1px solid var(--accent); color: var(--text-color); }
+        button.icon-btn:hover { opacity: 0.9; }
+
+        body.focus-mode #bottom-panel { transform: translateY(100%); } 
+
+        /* --- Trigger Zone --- */
+        #trigger-zone {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 40px;
+            z-index: 1000; background: transparent; pointer-events: none;
+        }
+        #trigger-zone.active { pointer-events: auto; }
+
+        .hidden-el { display: none !important; }
+        .stat-badge { font-size: 0.9rem; margin-right: 15px; font-weight: bold; }
+
+        @media (max-width: 600px) {
+            .question-card { padding: 1.5rem; }
+            #bottom-panel { flex-direction: column; gap: 15px; padding-bottom: 30px; }
+            .control-group { width: 100%; justify-content: space-between; flex-wrap: wrap; }
+            button.icon-btn { flex: 1; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        <div id="quiz-area" class="question-card">
+            <div id="question-text" class="question-text">Loading questions...</div>
+            <div id="options-container" class="options-grid"></div>
+        </div>
+        
+        <div id="feedback-area" style="margin-top: 15px; text-align: center; min-height: 24px;"></div>
+    </div>
+
+    <div id="review-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="margin: 0 0 10px 0;">Select Question to Review</h3>
+            <p style="font-size: 0.9rem; opacity: 0.7; margin-bottom: 0;">Tap a number to jump to it.</p>
+            <div id="review-list" class="review-grid"></div>
+            <button class="modal-close" onclick="closeReviewModal()">Cancel</button>
+        </div>
+    </div>
+
+    <div id="trigger-zone"></div>
+
+    <div id="bottom-panel">
+        <div class="control-group">
+            <span id="progress-text" class="stat-badge">Loading...</span>
+            <button class="icon-btn secondary" onclick="toggleDarkMode()">&#9790; Dark</button>
+            <button class="icon-btn secondary" onclick="toggleFocusMode()">&#128065; Focus</button>
+            <button class="icon-btn secondary" onclick="togglePanel(true)">&#9660; Hide</button>
+        </div>
+        
+        <div class="control-group">
+            <button class="icon-btn" style="background-color: #e67e22;" onclick="openReviewMenu()" id="review-btn">Review (0)</button>
+            <button class="icon-btn" onclick="prevQuestion()">&larr; Prev</button>
+            <button class="icon-btn" onclick="nextQuestion()">Next &rarr;</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Data ---
+        let fullQuestionData = []; // Data will be loaded from JSON
+
+        // --- State Management ---
+        let state = {
+            currentIndex: 0,
+            mode: 'normal',
+            wrongAnswers: [],
+            shuffledQuestions: []
+        };
+
+        const KEY_LABELS = ['A', 'B', 'C', 'D', 'E', 'F'];
+
+        // --- Initialization ---
+        async function init() {
+            // Restore settings
+            if(localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark-mode');
+            const savedWrong = localStorage.getItem('wrongAnswers');
+            if(savedWrong) state.wrongAnswers = JSON.parse(savedWrong);
+
+            // Fetch Data
+            try {
+                const response = await fetch('questions.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                fullQuestionData = await response.json();
+                
+                // Initialize Game Loop
+                finalizeInit();
+            } catch (error) {
+                console.error('Error loading questions:', error);
+                document.getElementById('question-text').innerHTML = `
+                    <div style="color: red; font-weight: bold;">
+                        Error loading questions.json
+                    </div>
+                    <p>If you are running this locally, you must use a Local Server.</p>
+                    <p><small>Error details: ${error.message}</small></p>
+                `;
+            }
+        }
+
+        function finalizeInit() {
+            updateReviewButton();
+            const savedIndex = localStorage.getItem('lastQuestionIndex');
+            state.shuffledQuestions = fullQuestionData.map((q, index) => ({...q, originalIndex: index}));
+            
+            if (savedIndex && !isNaN(savedIndex)) {
+                let idx = parseInt(savedIndex);
+                if(idx >= 0 && idx < state.shuffledQuestions.length) {
+                    state.currentIndex = idx;
+                }
+            }
+            
+            renderQuestion();
+            setupPanelInteractions();
+            setupKeyboardControls();
+            setupTouchControls();
+        }
+
+        function getShuffledOptions(questionObj) {
+            let opts = questionObj.options.map((opt, i) => ({
+                text: opt,
+                isCorrect: i === questionObj.answer
+            }));
+            for (let i = opts.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [opts[i], opts[j]] = [opts[j], opts[i]];
+            }
+            return opts;
+        }
+
+        // --- Rendering ---
+        function renderQuestion() {
+            if (fullQuestionData.length === 0) return;
+
+            const qData = state.shuffledQuestions[state.currentIndex];
+            const originalIdx = qData.originalIndex;
+            
+            document.getElementById('question-text').innerHTML = qData.q;
+            document.getElementById('progress-text').innerText = 
+                `${state.mode === 'review' ? 'Review' : 'Q'} ${state.currentIndex + 1}/${state.shuffledQuestions.length}`;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            
+            const displayOptions = getShuffledOptions(qData);
+
+            displayOptions.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                const letter = KEY_LABELS[index] || '?';
+                btn.innerHTML = `<span class="key-hint">${letter}</span> ${opt.text}`;
+                btn.dataset.isCorrect = opt.isCorrect;
+                
+                btn.addEventListener('click', function() {
+                    const allBtns = container.querySelectorAll('.option-btn');
+                    allBtns.forEach(b => b.classList.add('disabled'));
+
+                    if(opt.isCorrect) {
+                        btn.classList.add('correct');
+                        removeFromWrong(originalIdx);
+                        document.getElementById('feedback-area').innerHTML = "<span style='color:var(--correct)'>Correct!</span>";
+                    } else {
+                        btn.classList.add('wrong');
+                        addToWrong(originalIdx);
+                        document.getElementById('feedback-area').innerHTML = "<span style='color:var(--wrong)'>Incorrect. Reviewing later.</span>";
+                        allBtns.forEach(b => {
+                            if(b.dataset.isCorrect === 'true') b.classList.add('correct');
+                        });
+                    }
+                });
+                container.appendChild(btn);
+            });
+            document.getElementById('feedback-area').innerText = "";
+            if(window.MathJax) MathJax.typesetPromise();
+            
+            if(state.mode === 'normal') {
+                localStorage.setItem('lastQuestionIndex', state.currentIndex);
+            }
+        }
+
+        // --- Wrong Answers Logic ---
+        function addToWrong(idx) {
+            if(!state.wrongAnswers.includes(idx)) {
+                state.wrongAnswers.push(idx);
+                state.wrongAnswers.sort((a,b) => a - b);
+                saveWrong();
+            }
+        }
+        function removeFromWrong(idx) {
+            if(state.wrongAnswers.includes(idx)) {
+                state.wrongAnswers = state.wrongAnswers.filter(id => id !== idx);
+                saveWrong();
+            }
+        }
+        function saveWrong() {
+            localStorage.setItem('wrongAnswers', JSON.stringify(state.wrongAnswers));
+            updateReviewButton();
+        }
+        function updateReviewButton() {
+            const btn = document.getElementById('review-btn');
+            btn.innerText = `Review (${state.wrongAnswers.length})`;
+            
+            if (state.wrongAnswers.length === 0 && state.mode === 'review') {
+                alert("Review complete! Returning to normal mode.");
+                returnToNormalMode();
+            }
+        }
+
+        // --- Review Modal Logic ---
+        function openReviewMenu() {
+            if(state.wrongAnswers.length === 0) {
+                alert("No wrong answers saved to review!");
+                return;
+            }
+            
+            const list = document.getElementById('review-list');
+            list.innerHTML = '';
+            
+            state.wrongAnswers.forEach(originalIdx => {
+                const btn = document.createElement('button');
+                btn.className = 'review-btn-item';
+                btn.innerText = 'Q' + (originalIdx + 1);
+                btn.onclick = () => startReviewAt(originalIdx);
+                list.appendChild(btn);
+            });
+            
+            document.getElementById('review-modal').classList.add('active');
+        }
+
+        function closeReviewModal() {
+            document.getElementById('review-modal').classList.remove('active');
+        }
+
+        function startReviewAt(targetOriginalIdx) {
+            closeReviewModal();
+            state.mode = 'review';
+            
+            state.shuffledQuestions = fullQuestionData
+                .map((q, i) => ({...q, originalIndex: i}))
+                .filter(q => state.wrongAnswers.includes(q.originalIndex));
+            
+            const newIndex = state.shuffledQuestions.findIndex(q => q.originalIndex === targetOriginalIdx);
+            state.currentIndex = (newIndex !== -1) ? newIndex : 0;
+            renderQuestion();
+        }
+
+        function returnToNormalMode() {
+            state.mode = 'normal';
+            state.shuffledQuestions = fullQuestionData.map((q, i) => ({...q, originalIndex: i}));
+            state.currentIndex = 0;
+            renderQuestion();
+        }
+
+        // --- Navigation ---
+        function nextQuestion() {
+            if (state.currentIndex < state.shuffledQuestions.length - 1) {
+                state.currentIndex++;
+                renderQuestion();
+            } else {
+                alert("You've reached the last question!");
+            }
+        }
+        function prevQuestion() {
+            if (state.currentIndex > 0) {
+                state.currentIndex--;
+                renderQuestion();
+            }
+        }
+
+        // --- Controls: Keyboard & Touch ---
+        function setupKeyboardControls() {
+            // Detect Alt, Ctrl, or Cmd keys to disable interaction
+            document.addEventListener('keydown', (e) => {
+                if (e.altKey || e.ctrlKey || e.metaKey) {
+                    document.body.classList.add('modifier-held');
+                    return; 
+                }
+                
+                const key = e.key.toLowerCase();
+                
+                if (key === 'e' || key === 'j') nextQuestion();
+                if (key === 'w' || key === 'k') prevQuestion();
+
+                const charCode = key.charCodeAt(0);
+                if (charCode >= 97 && charCode <= 100) { 
+                    const index = charCode - 97;
+                    const buttons = document.querySelectorAll('.option-btn');
+                    if (buttons[index] && !buttons[index].classList.contains('disabled')) {
+                        buttons[index].click();
+                    }
+                }
+            });
+
+            document.addEventListener('keyup', (e) => {
+                if (!e.altKey && !e.ctrlKey && !e.metaKey) {
+                    document.body.classList.remove('modifier-held');
+                }
+            });
+            
+            window.addEventListener('blur', () => {
+                document.body.classList.remove('modifier-held');
+            });
+            
+            window.addEventListener('focus', () => {
+                document.body.classList.remove('modifier-held');
+            });
+        }
+
+        function setupTouchControls() {
+            let touchStartX = 0;
+            let touchEndX = 0;
+            let touchStartY = 0;
+            const threshold = 50;
+
+            document.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+                touchStartY = e.changedTouches[0].screenY;
+            }, false);
+
+            document.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                let touchEndY = e.changedTouches[0].screenY;
+                
+                if (e.target.closest('button') || e.target.closest('#bottom-panel') || e.target.closest('.modal-content')) {
+                    return;
+                }
+                
+                if (Math.abs(touchEndY - touchStartY) > 50) return;
+
+                handleSwipe();
+            }, false);
+
+            function handleSwipe() {
+                const distance = touchEndX - touchStartX;
+                if (Math.abs(distance) > threshold) {
+                    if (distance < 0) nextQuestion();
+                    else prevQuestion();
+                }
+            }
+        }
+
+        // --- UI Toggles ---
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        }
+        function toggleFocusMode() {
+            document.body.classList.toggle('focus-mode');
+        }
+        
+        function togglePanel(hide) {
+            const panel = document.getElementById('bottom-panel');
+            const zone = document.getElementById('trigger-zone');
+            
+            if(hide) {
+                panel.classList.add('hidden');
+                zone.classList.add('active');
+            } else {
+                panel.classList.remove('hidden');
+                zone.classList.remove('active');
+            }
+        }
+
+        function setupPanelInteractions() {
+            const zone = document.getElementById('trigger-zone');
+            zone.addEventListener('mouseenter', () => togglePanel(false));
+            document.addEventListener('mousemove', (e) => {
+                if (e.clientY > window.innerHeight - 50 && !document.body.classList.contains('focus-mode')) {
+                    togglePanel(false);
+                }
+            });
+            zone.addEventListener('touchstart', (e) => {
+                e.preventDefault(); 
+                togglePanel(false);
+            });
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
