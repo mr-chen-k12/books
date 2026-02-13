@@ -82,10 +82,10 @@
     {
         "q": "Which of the following is the correct electron configuration for a neutral iron (Fe) atom?",
         "options": [
-            "\\( 1s^2 2s^2 2p^6 3s^2 3p^6 4s^2 4d^6 \\)",
-            "\\( 1s^2 2s^2 2p^6 3s^2 3p^6 4s^2 3d^6 \\)",
-            "\\( 1s^2 2s^2 2p^6 3s^2 3p^6 4s^2 4p^6 \\)",
-            "\\( 1s^2 2s^2 2p^6 3s^2 3p^6 4s^2 3f^6 \\)"
+            "\\( [Ar] 4s^1 3d^7 \\)",
+      "\\( 1s^2 2s^2 2p^6 3s^2 3p^6 4s^2 3d^6 \\)",
+      "\\( 1s^2 2s^2 2p^6 3s^2 3p^6 4s^2 4d^6 \\)",
+      "\\( [Kr] 5s^2 4d^6 \\)"
         ],
         "answer": 1
     },
@@ -312,10 +312,10 @@
     {
         "q": "<b>Use the chemical equation below to answer the question that follows.</b><br><br><p style='text-align:center; font-size:1.2em;'>NaOH + HNO₃ → NaNO₃ + H₂O</p><br>Which of the following types of reactions is represented by the equation?",
         "options": [
-            "redox reaction",
-            "combustion reaction",
-            "precipitation reaction",
-            "neutralization reaction"
+           "single replacement reaction",
+         "double replacement reaction",
+         "decomposition reaction",
+         "acid-base reaction"
         ],
         "answer": 3
     },
