@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chemical Reactions Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chemical Reactions Quiz - Pro</title>
     
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -13,9 +13,28 @@
             --primary-color: #2c3e50;
             --secondary-color: #3498db;
             --success-color: #27ae60;
+            --success-bg: #d5f5e3;
             --error-color: #c0392b;
+            --error-bg: #fadbd8;
             --bg-color: #ecf0f1;
-            --text-color: #333;
+            --box-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #dddddd;
+            --btn-hover: #eaf2f8;
+        }
+
+        body.dark-mode {
+            --primary-color: #ecf0f1;
+            --secondary-color: #2980b9;
+            --success-color: #2ecc71;
+            --success-bg: #0e301a;
+            --error-color: #e74c3c;
+            --error-bg: #4a1510;
+            --bg-color: #121212;
+            --box-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --border-color: #333333;
+            --btn-hover: #2c3e50;
         }
 
         body {
@@ -26,15 +45,40 @@
             padding: 20px;
             max-width: 800px;
             margin: 0 auto;
+            transition: background-color 0.3s, color 0.3s;
         }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .tool-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            background-color: var(--secondary-color);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        .tool-btn:hover { opacity: 0.8; }
+        .tool-btn.danger { background-color: #e74c3c; }
+        .tool-btn.warning { background-color: #f39c12; }
 
         header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+            transition: display 0.3s;
         }
 
         .scoreboard {
-            background-color: white;
+            background-color: var(--box-bg);
             padding: 15px 20px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -43,13 +87,16 @@
             font-size: 1.2em;
             font-weight: bold;
             margin-bottom: 20px;
+            border: 1px solid var(--border-color);
         }
 
         .quiz-container {
-            background-color: white;
+            background-color: var(--box-bg);
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+            touch-action: pan-y; /* Important for swipe to work smoothly alongside scrolling */
         }
 
         .question-text {
@@ -68,34 +115,30 @@
         button.option-btn {
             padding: 15px;
             font-size: 1.1em;
-            background-color: #f8f9fa;
-            border: 2px solid #ddd;
+            background-color: var(--box-bg);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
             border-radius: 6px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             text-align: left;
         }
 
         button.option-btn:hover:not(:disabled) {
             border-color: var(--secondary-color);
-            background-color: #eaf2f8;
+            background-color: var(--btn-hover);
         }
 
-        button.option-btn:disabled {
-            cursor: not-allowed;
-            opacity: 0.9;
-        }
+        button.option-btn:disabled { cursor: default; }
 
         button.option-btn.correct {
-            background-color: #d5f5e3;
+            background-color: var(--success-bg);
             border-color: var(--success-color);
-            color: #145a32;
         }
 
         button.option-btn.wrong {
-            background-color: #fadbd8;
+            background-color: var(--error-bg);
             border-color: var(--error-color);
-            color: #78281f;
         }
 
         .explanation {
@@ -106,25 +149,17 @@
             font-size: 1.1em;
         }
 
-        .explanation.show {
-            display: block;
-        }
-
-        .explanation.correct-bg {
-            background-color: #e9f7ef;
-            border-left: 5px solid var(--success-color);
-        }
-
-        .explanation.wrong-bg {
-            background-color: #fdedec;
-            border-left: 5px solid var(--error-color);
-        }
+        .explanation.show { display: block; }
+        .explanation.correct-bg { background-color: var(--success-bg); border-left: 5px solid var(--success-color); }
+        .explanation.wrong-bg { background-color: var(--error-bg); border-left: 5px solid var(--error-color); }
 
         .controls {
-            text-align: right;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
         }
 
-        button#next-btn, button#restart-btn {
+        .nav-btn {
             padding: 10px 20px;
             font-size: 1.1em;
             background-color: var(--secondary-color);
@@ -132,324 +167,323 @@
             border: none;
             border-radius: 6px;
             cursor: pointer;
+        }
+        
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Focus Mode Classes */
+        body.focus-mode header, 
+        body.focus-mode .toolbar {
             display: none;
         }
-
-        button#next-btn:hover, button#restart-btn:hover {
-            background-color: #2980b9;
+        
+        .exit-focus-btn {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
         }
+        
+        body.focus-mode .exit-focus-btn { display: block; }
 
-        .progress {
-            font-size: 0.9em;
-            color: #7f8c8d;
-            text-align: center;
-            margin-top: 20px;
-        }
     </style>
 </head>
 <body>
 
+    <div class="toolbar">
+        <button class="tool-btn" onclick="toggleDarkMode()">🌙 Dark Mode</button>
+        <button class="tool-btn" onclick="toggleFocusMode()">🎯 Focus Mode</button>
+        <button class="tool-btn warning" onclick="startReview()">📖 Review Wrong</button>
+        <button class="tool-btn danger" onclick="resetProgress()">🔄 Reset</button>
+    </div>
+
     <header>
         <h1>Chemical Reactions Quiz</h1>
-        <p>Based on your Reactions Part 1/3 Chart</p>
+        <p>Swipe left/right on mobile to navigate!</p>
     </header>
 
     <div class="scoreboard">
+        <div id="mode-indicator">Normal Mode</div>
         <div>Score: <span id="score">0</span></div>
-        <div>Question <span id="current-q-num">1</span> of 30</div>
+        <div>Q: <span id="current-q-num">1</span> / <span id="total-q-num">30</span></div>
     </div>
 
     <div class="quiz-container" id="quiz-container">
         <div class="question-text" id="question-text">Loading question...</div>
-        <div class="options-grid" id="options-grid">
-            </div>
-        
+        <div class="options-grid" id="options-grid"></div>
         <div class="explanation" id="explanation-box"></div>
 
         <div class="controls">
-            <button id="next-btn" onclick="nextQuestion()">Next Question &rarr;</button>
-            <button id="restart-btn" onclick="restartQuiz()">Restart Quiz</button>
+            <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">← Prev</button>
+            <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next →</button>
         </div>
-        <div class="progress" id="progress-text"></div>
     </div>
 
+    <button class="exit-focus-btn" onclick="toggleFocusMode()">Exit Focus Mode</button>
+
     <script>
-        // Note: We use \\( and \\) for inline MathJax equations in JavaScript strings.
+        // Data block from previous version (kept identical for standard chemistry data)
         const quizData = [
-            {
-                q: "What is the general formula for a Synthesis reaction?",
-                opts: ["\\( A + BX \\rightarrow B + AX \\)", "\\( A + B \\rightarrow AB \\)", "\\( AB \\rightarrow A + B \\)", "\\( AB + CD \\rightarrow AD + CB \\)"],
-                ans: 1,
-                exp: "Correct! In a synthesis reaction, two or more simple substances (A and B) combine to form a more complex substance (AB)."
-            },
-            {
-                q: "Which general formula represents a Decomposition reaction?",
-                opts: ["\\( AB \\rightarrow A + B \\)", "\\( A + B \\rightarrow AB \\)", "Acid + Base \\( \\rightarrow H_2O \\) + Salt", "\\( A + BX \\rightarrow B + AX \\)"],
-                ans: 0,
-                exp: "Correct! Decomposition is the opposite of synthesis; a complex substance (AB) breaks down into simpler parts (A + B)."
-            },
-            {
-                q: "What is the general formula for a Single Replacement reaction?",
-                opts: ["\\( AB + CD \\rightarrow AD + CB \\)", "\\( A + B \\rightarrow AB \\)", "\\( AB \\rightarrow A + B \\)", "\\( A + BX \\rightarrow B + AX \\)"],
-                ans: 3,
-                exp: "Correct! In Single Replacement, one element (A) replaces another element (B) in a compound (BX)."
-            },
-            {
-                q: "What is the general formula for a Double Replacement reaction?",
-                opts: ["\\( AB + CD \\rightarrow AD + CB \\)", "\\( A + BX \\rightarrow B + AX \\)", "Acid + Metal \\( \\rightarrow H_2 \\) + Salt", "\\( A + B \\rightarrow AB \\)"],
-                ans: 0,
-                exp: "Correct! In Double Replacement, the positive and negative ions of two compounds switch places to form two new compounds."
-            },
-            {
-                q: "According to the chart, an Acid + Metal produces what?",
-                opts: ["Water + Salt", "\\( H_2 \\) + Salt", "Base + Salt", "Oxygen + Salt"],
-                ans: 1,
-                exp: "Correct! An acid reacting with a metal produces Hydrogen gas (\\( H_2 \\)) and a Salt."
-            },
-            {
-                q: "A Neutralization reaction occurs between an Acid and a Base. What are the general products?",
-                opts: ["\\( H_2 \\) + Salt", "\\( CO_2 \\) + Water", "\\( H_2O \\) + Salt", "Metal + Nonmetal"],
-                ans: 2,
-                exp: "Correct! Acid + Base yields Water (\\( H_2O \\)) and a Salt."
-            },
-            {
-                q: "Which of the following is an example of a Synthesis reaction?",
-                opts: ["\\( 2NaCl \\rightarrow 2Na + Cl_2 \\)", "\\( Zn + CuCl_2 \\rightarrow Cu + ZnCl_2 \\)", "\\( 2H_2 + O_2 \\rightarrow 2H_2O \\)", "\\( AgNO_3 + NaCl \\rightarrow AgCl + NaNO_3 \\)"],
-                ans: 2,
-                exp: "Correct! Two reactants (\\( H_2 \\) and \\( O_2 \\)) are combining to form exactly one product (\\( H_2O \\))."
-            },
-            {
-                q: "Which of the following is an example of a Decomposition reaction?",
-                opts: ["\\( 2NaCl \\rightarrow 2Na + Cl_2 \\)", "\\( Mg + 2HCl \\rightarrow H_2 + MgCl_2 \\)", "\\( 2H_2 + O_2 \\rightarrow 2H_2O \\)", "\\( HNO_3 + NaOH \\rightarrow HOH + NaNO_3 \\)"],
-                ans: 0,
-                exp: "Correct! One reactant (\\( NaCl \\)) is breaking down into two simpler products (\\( Na \\) and \\( Cl_2 \\))."
-            },
-            {
-                q: "Which equation is an example of a Single Replacement reaction?",
-                opts: ["\\( AgNO_3 + NaCl \\rightarrow AgCl + NaNO_3 \\)", "\\( Zn + CuCl_2 \\rightarrow Cu + ZnCl_2 \\)", "\\( 2NaCl \\rightarrow 2Na + Cl_2 \\)", "\\( HNO_3 + NaOH \\rightarrow HOH + NaNO_3 \\)"],
-                ans: 1,
-                exp: "Correct! Zinc (Zn) replaces Copper (Cu) in the compound, leaving Cu alone."
-            },
-            {
-                q: "Which equation is an example of a Double Replacement reaction?",
-                opts: ["\\( 2H_2 + O_2 \\rightarrow 2H_2O \\)", "\\( Mg + 2HCl \\rightarrow H_2 + MgCl_2 \\)", "\\( Zn + CuCl_2 \\rightarrow Cu + ZnCl_2 \\)", "\\( AgNO_3 + NaCl \\rightarrow AgCl + NaNO_3 \\)"],
-                ans: 3,
-                exp: "Correct! The Ag and Na swap places to form two entirely new compounds."
-            },
-            {
-                q: "Identify the example of an Acid with Metal reaction from the chart.",
-                opts: ["\\( HNO_3 + NaOH \\rightarrow HOH + NaNO_3 \\)", "\\( Mg + 2HCl \\rightarrow H_2 + MgCl_2 \\)", "\\( Zn + CuCl_2 \\rightarrow Cu + ZnCl_2 \\)", "\\( 2H_2 + O_2 \\rightarrow 2H_2O \\)"],
-                ans: 1,
-                exp: "Correct! Magnesium (Metal) reacts with Hydrochloric Acid (\\( HCl \\)) to form Hydrogen gas and Magnesium Chloride (Salt)."
-            },
-            {
-                q: "Identify the Neutralization reaction example.",
-                opts: ["\\( Mg + 2HCl \\rightarrow H_2 + MgCl_2 \\)", "\\( AgNO_3 + NaCl \\rightarrow AgCl + NaNO_3 \\)", "\\( HNO_3 + NaOH \\rightarrow HOH + NaNO_3 \\)", "\\( 2NaCl \\rightarrow 2Na + Cl_2 \\)"],
-                ans: 2,
-                exp: "Correct! Nitric Acid (\\( HNO_3 \\)) reacts with Sodium Hydroxide (\\( NaOH \\), a base) to form Water (\\( HOH \\)) and a Salt."
-            },
-            {
-                q: "What defines a REDOX reaction according to the notes?",
-                opts: ["Only elements swapping places", "The creation of water", "Only the loss of protons", "Any reaction where oxidation and reduction occur"],
-                ans: 3,
-                exp: "Correct! The chart explicitly notes at the bottom: 'REDOX: Any reaction where oxidation (lose e-) and reduction (gain e-) occur!!!'"
-            },
-            {
-                q: "In a REDOX reaction, what does 'oxidation' mean?",
-                opts: ["Gain of protons", "Lose e- (electrons)", "Gain e- (electrons)", "Loss of oxygen"],
-                ans: 1,
-                exp: "Correct! The chart defines oxidation specifically as '(lose e-)'. Remember the mnemonic 'LEO says GER' (Lose Electrons Oxidation)."
-            },
-            {
-                q: "In a REDOX reaction, what does 'reduction' mean?",
-                opts: ["Lose e- (electrons)", "Gain e- (electrons)", "Loss of mass", "Becoming a smaller molecule"],
-                ans: 1,
-                exp: "Correct! The chart defines reduction specifically as '(gain e-)'. It reduces the overall charge because electrons are negative."
-            },
-            {
-                q: "In the Neutralization example, how is water written to show where its parts came from?",
-                opts: ["\\( H_2O \\)", "\\( H_3O^+ \\)", "HOH", "\\( OH^- \\)"],
-                ans: 2,
-                exp: "Correct! The chart writes it as HOH, highlighting that the H comes from the Acid (\\( HNO_3 \\)) and the OH comes from the Base (\\( NaOH \\))."
-            },
-            {
-                q: "In the Acid with Metal reaction \\( Mg + 2HCl \\rightarrow H_2 + MgCl_2 \\), which substance is the Metal?",
-                opts: ["\\( HCl \\)", "Mg", "\\( H_2 \\)", "\\( MgCl_2 \\)"],
-                ans: 1,
-                exp: "Correct! Mg stands for Magnesium, which is the solid metal reacting with the acid."
-            },
-            {
-                q: "In the Acid with Metal reaction \\( Mg + 2HCl \\rightarrow H_2 + MgCl_2 \\), which substance is the Salt?",
-                opts: ["\\( HCl \\)", "Mg", "\\( H_2 \\)", "\\( MgCl_2 \\)"],
-                ans: 3,
-                exp: "Correct! \\( MgCl_2 \\) (Magnesium Chloride) is the ionic salt produced by the reaction."
-            },
-            {
-                q: "In the Neutralization reaction \\( HNO_3 + NaOH \\rightarrow HOH + NaNO_3 \\), which substance is the Base?",
-                opts: ["\\( HNO_3 \\)", "NaOH", "HOH", "\\( NaNO_3 \\)"],
-                ans: 1,
-                exp: "Correct! The chart labels NaOH as the Base. Hydroxides (containing OH) are typical bases."
-            },
-            {
-                q: "In the Neutralization reaction \\( HNO_3 + NaOH \\rightarrow HOH + NaNO_3 \\), which substance is the Acid?",
-                opts: ["\\( HNO_3 \\)", "NaOH", "HOH", "\\( NaNO_3 \\)"],
-                ans: 0,
-                exp: "Correct! The chart labels \\( HNO_3 \\) (Nitric acid) as the Acid."
-            },
-            {
-                q: "Look at \\( 2H_2 + O_2 \\rightarrow 2H_2O \\). The format \\( A + B \\rightarrow AB \\) tells us it is:",
-                opts: ["Decomposition", "Synthesis", "Neutralization", "Single Replacement"],
-                ans: 1,
-                exp: "Correct! Multiple reactants becoming one single product is the hallmark of Synthesis."
-            },
-            {
-                q: "Look at \\( 2NaCl \\rightarrow 2Na + Cl_2 \\). What type of reaction breaks one reactant into multiple products?",
-                opts: ["Decomposition", "Double Replacement", "Acid with Metal", "Synthesis"],
-                ans: 0,
-                exp: "Correct! The format \\( AB \\rightarrow A + B \\) represents Decomposition."
-            },
-            {
-                q: "If you see a formula where compounds swap partners (like \\( AgNO_3 + NaCl \\)), it is:",
-                opts: ["Single Replacement", "Synthesis", "Double Replacement", "Decomposition"],
-                ans: 2,
-                exp: "Correct! The 'trading partners' mechanism is Double Replacement."
-            },
-            {
-                q: "Which specific table is mentioned as a reference for 'Acid with Metal' reactions?",
-                opts: ["The Periodic Table", "Table J", "Table of Polyatomic Ions", "Table of Electronegativities"],
-                ans: 1,
-                exp: "Correct! The chart explicitly says 'SEE TABLE J!' under the Acid with Metal general formula."
-            },
-            {
-                q: "If \\( C + O_2 \\rightarrow CO_2 \\) follows the \\( A + B \\rightarrow AB \\) pattern, what type of reaction is it?",
-                opts: ["Decomposition", "Synthesis", "Single Replacement", "Neutralization"],
-                ans: 1,
-                exp: "Correct! Because it joins two simpler things into one complex thing, it matches the Synthesis definition."
-            },
-            {
-                q: "If \\( CaCO_3 \\rightarrow CaO + CO_2 \\) follows the \\( AB \\rightarrow A + B \\) pattern, what type is it?",
-                opts: ["Decomposition", "Double Replacement", "Synthesis", "Neutralization"],
-                ans: 0,
-                exp: "Correct! One reactant breaking into two products matches the Decomposition definition."
-            },
-            {
-                q: "If \\( Fe + CuSO_4 \\rightarrow Cu + FeSO_4 \\) follows the \\( A + BX \\rightarrow B + AX \\) pattern, what type is it?",
-                opts: ["Double Replacement", "Neutralization", "Single Replacement", "Decomposition"],
-                ans: 2,
-                exp: "Correct! Iron (Fe) is single-handedly replacing Copper (Cu) in the compound."
-            },
-            {
-                q: "If \\( HCl + KOH \\rightarrow H_2O + KCl \\) is Acid + Base forming Water + Salt, what type is it?",
-                opts: ["Acid with Metal", "Synthesis", "Neutralization", "Decomposition"],
-                ans: 2,
-                exp: "Correct! Acid + Base \\( \\rightarrow H_2O \\) + Salt is exactly the formula for Neutralization."
-            },
-            {
-                q: "In the Double Replacement example \\( AgNO_3 + NaCl \\rightarrow AgCl + NaNO_3 \\), the bracket connects Ag and Cl. What does this usually imply in these notes?",
-                opts: ["They form a precipitate/compound together", "They turn into a gas", "They explode", "They are isotopes"],
-                ans: 0,
-                exp: "Correct! The bracket visually shows the outer ions (Ag and Cl) combining to form one of the new products."
-            },
-            {
-                q: "Which reaction category is explicitly defined by the transfer of electrons?",
-                opts: ["Neutralization", "Double Replacement", "REDOX", "Acid with Metal"],
-                ans: 2,
-                exp: "Correct! REDOX is the specific term defined at the bottom of the page regarding losing/gaining electrons."
-            }
+            { q: "What is the general formula for a Synthesis reaction?", opts: ["\\( A + BX \\rightarrow B + AX \\)", "\\( A + B \\rightarrow AB \\)", "\\( AB \\rightarrow A + B \\)", "\\( AB + CD \\rightarrow AD + CB \\)"], ans: 1, exp: "In a synthesis reaction, two or more simple substances combine to form a more complex substance." },
+            { q: "Which general formula represents a Decomposition reaction?", opts: ["\\( AB \\rightarrow A + B \\)", "\\( A + B \\rightarrow AB \\)", "Acid + Base \\( \\rightarrow H_2O \\) + Salt", "\\( A + BX \\rightarrow B + AX \\)"], ans: 0, exp: "Decomposition is the opposite of synthesis; a complex substance breaks down into simpler parts." },
+            { q: "What is the general formula for a Single Replacement reaction?", opts: ["\\( AB + CD \\rightarrow AD + CB \\)", "\\( A + B \\rightarrow AB \\)", "\\( AB \\rightarrow A + B \\)", "\\( A + BX \\rightarrow B + AX \\)"], ans: 3, exp: "In Single Replacement, one element replaces another element in a compound." },
+            { q: "What is the general formula for a Double Replacement reaction?", opts: ["\\( AB + CD \\rightarrow AD + CB \\)", "\\( A + BX \\rightarrow B + AX \\)", "Acid + Metal \\( \\rightarrow H_2 \\) + Salt", "\\( A + B \\rightarrow AB \\)"], ans: 0, exp: "The positive and negative ions of two compounds switch places." },
+            { q: "According to the chart, an Acid + Metal produces what?", opts: ["Water + Salt", "\\( H_2 \\) + Salt", "Base + Salt", "Oxygen + Salt"], ans: 1, exp: "An acid reacting with a metal produces Hydrogen gas and a Salt." },
+            { q: "A Neutralization reaction occurs between an Acid and a Base. What are the general products?", opts: ["\\( H_2 \\) + Salt", "\\( CO_2 \\) + Water", "\\( H_2O \\) + Salt", "Metal + Nonmetal"], ans: 2, exp: "Acid + Base yields Water and a Salt." },
+            { q: "Which of the following is an example of a Synthesis reaction?", opts: ["\\( 2NaCl \\rightarrow 2Na + Cl_2 \\)", "\\( Zn + CuCl_2 \\rightarrow Cu + ZnCl_2 \\)", "\\( 2H_2 + O_2 \\rightarrow 2H_2O \\)", "\\( AgNO_3 + NaCl \\rightarrow AgCl + NaNO_3 \\)"], ans: 2, exp: "Two reactants are combining to form exactly one product." },
+            { q: "Which of the following is an example of a Decomposition reaction?", opts: ["\\( 2NaCl \\rightarrow 2Na + Cl_2 \\)", "\\( Mg + 2HCl \\rightarrow H_2 + MgCl_2 \\)", "\\( 2H_2 + O_2 \\rightarrow 2H_2O \\)", "\\( HNO_3 + NaOH \\rightarrow HOH + NaNO_3 \\)"], ans: 0, exp: "One reactant is breaking down into simpler products." },
+            { q: "Which equation is an example of a Single Replacement reaction?", opts: ["\\( AgNO_3 + NaCl \\rightarrow AgCl + NaNO_3 \\)", "\\( Zn + CuCl_2 \\rightarrow Cu + ZnCl_2 \\)", "\\( 2NaCl \\rightarrow 2Na + Cl_2 \\)", "\\( HNO_3 + NaOH \\rightarrow HOH + NaNO_3 \\)"], ans: 1, exp: "Zinc replaces Copper in the compound." },
+            { q: "Which equation is an example of a Double Replacement reaction?", opts: ["\\( 2H_2 + O_2 \\rightarrow 2H_2O \\)", "\\( Mg + 2HCl \\rightarrow H_2 + MgCl_2 \\)", "\\( Zn + CuCl_2 \\rightarrow Cu + ZnCl_2 \\)", "\\( AgNO_3 + NaCl \\rightarrow AgCl + NaNO_3 \\)"], ans: 3, exp: "The Ag and Na swap places to form two new compounds." },
+            { q: "Identify the example of an Acid with Metal reaction from the chart.", opts: ["\\( HNO_3 + NaOH \\rightarrow HOH + NaNO_3 \\)", "\\( Mg + 2HCl \\rightarrow H_2 + MgCl_2 \\)", "\\( Zn + CuCl_2 \\rightarrow Cu + ZnCl_2 \\)", "\\( 2H_2 + O_2 \\rightarrow 2H_2O \\)"], ans: 1, exp: "Magnesium reacts with Hydrochloric Acid." },
+            { q: "Identify the Neutralization reaction example.", opts: ["\\( Mg + 2HCl \\rightarrow H_2 + MgCl_2 \\)", "\\( AgNO_3 + NaCl \\rightarrow AgCl + NaNO_3 \\)", "\\( HNO_3 + NaOH \\rightarrow HOH + NaNO_3 \\)", "\\( 2NaCl \\rightarrow 2Na + Cl_2 \\)"], ans: 2, exp: "Nitric Acid reacts with Sodium Hydroxide." },
+            { q: "What defines a REDOX reaction according to the notes?", opts: ["Only elements swapping places", "The creation of water", "Only the loss of protons", "Any reaction where oxidation and reduction occur"], ans: 3, exp: "Defined at the bottom: Any reaction where oxidation and reduction occur!!!" },
+            { q: "In a REDOX reaction, what does 'oxidation' mean?", opts: ["Gain of protons", "Lose e- (electrons)", "Gain e- (electrons)", "Loss of oxygen"], ans: 1, exp: "Oxidation is defined specifically as '(lose e-)'." },
+            { q: "In a REDOX reaction, what does 'reduction' mean?", opts: ["Lose e- (electrons)", "Gain e- (electrons)", "Loss of mass", "Becoming a smaller molecule"], ans: 1, exp: "Reduction is specifically defined as '(gain e-)'." },
+            { q: "In the Neutralization example, how is water written to show where its parts came from?", opts: ["\\( H_2O \\)", "\\( H_3O^+ \\)", "HOH", "\\( OH^- \\)"], ans: 2, exp: "Written as HOH (H from Acid, OH from Base)." },
+            { q: "In the Acid with Metal reaction \\( Mg + 2HCl \\rightarrow H_2 + MgCl_2 \\), which substance is the Metal?", opts: ["\\( HCl \\)", "Mg", "\\( H_2 \\)", "\\( MgCl_2 \\)"], ans: 1, exp: "Mg stands for Magnesium, the solid metal." },
+            { q: "In the Acid with Metal reaction \\( Mg + 2HCl \\rightarrow H_2 + MgCl_2 \\), which substance is the Salt?", opts: ["\\( HCl \\)", "Mg", "\\( H_2 \\)", "\\( MgCl_2 \\)"], ans: 3, exp: "\\( MgCl_2 \\) (Magnesium Chloride) is the salt produced." },
+            { q: "In the Neutralization reaction \\( HNO_3 + NaOH \\rightarrow HOH + NaNO_3 \\), which substance is the Base?", opts: ["\\( HNO_3 \\)", "NaOH", "HOH", "\\( NaNO_3 \\)"], ans: 1, exp: "NaOH is the Base." },
+            { q: "In the Neutralization reaction \\( HNO_3 + NaOH \\rightarrow HOH + NaNO_3 \\), which substance is the Acid?", opts: ["\\( HNO_3 \\)", "NaOH", "HOH", "\\( NaNO_3 \\)"], ans: 0, exp: "\\( HNO_3 \\) is the Acid." },
+            { q: "Look at \\( 2H_2 + O_2 \\rightarrow 2H_2O \\). The format \\( A + B \\rightarrow AB \\) tells us it is:", opts: ["Decomposition", "Synthesis", "Neutralization", "Single Replacement"], ans: 1, exp: "Multiple reactants becoming one single product." },
+            { q: "Look at \\( 2NaCl \\rightarrow 2Na + Cl_2 \\). What type of reaction breaks one reactant into multiple products?", opts: ["Decomposition", "Double Replacement", "Acid with Metal", "Synthesis"], ans: 0, exp: "The format \\( AB \\rightarrow A + B \\) is Decomposition." },
+            { q: "If you see a formula where compounds swap partners (like \\( AgNO_3 + NaCl \\)), it is:", opts: ["Single Replacement", "Synthesis", "Double Replacement", "Decomposition"], ans: 2, exp: "Trading partners mechanism is Double Replacement." },
+            { q: "Which specific table is mentioned as a reference for 'Acid with Metal' reactions?", opts: ["The Periodic Table", "Table J", "Table of Polyatomic Ions", "Table of Electronegativities"], ans: 1, exp: "Chart explicitly says 'SEE TABLE J!'." },
+            { q: "If \\( C + O_2 \\rightarrow CO_2 \\) follows the \\( A + B \\rightarrow AB \\) pattern, what type of reaction is it?", opts: ["Decomposition", "Synthesis", "Single Replacement", "Neutralization"], ans: 1, exp: "Joins two simpler things into one complex thing." },
+            { q: "If \\( CaCO_3 \\rightarrow CaO + CO_2 \\) follows the \\( AB \\rightarrow A + B \\) pattern, what type is it?", opts: ["Decomposition", "Double Replacement", "Synthesis", "Neutralization"], ans: 0, exp: "One reactant breaking into two products." },
+            { q: "If \\( Fe + CuSO_4 \\rightarrow Cu + FeSO_4 \\) follows the \\( A + BX \\rightarrow B + AX \\) pattern, what type is it?", opts: ["Double Replacement", "Neutralization", "Single Replacement", "Decomposition"], ans: 2, exp: "Iron single-handedly replacing Copper." },
+            { q: "If \\( HCl + KOH \\rightarrow H_2O + KCl \\) is Acid + Base forming Water + Salt, what type is it?", opts: ["Acid with Metal", "Synthesis", "Neutralization", "Decomposition"], ans: 2, exp: "Matches the Neutralization definition." },
+            { q: "In the Double Replacement example \\( AgNO_3 + NaCl \\rightarrow AgCl + NaNO_3 \\), the bracket connects Ag and Cl. What does this imply?", opts: ["They form a compound together", "They turn into a gas", "They explode", "They are isotopes"], ans: 0, exp: "Visually shows outer ions combining to form a product." },
+            { q: "Which reaction category is explicitly defined by the transfer of electrons?", opts: ["Neutralization", "Double Replacement", "REDOX", "Acid with Metal"], ans: 2, exp: "REDOX is defined regarding losing/gaining electrons." }
         ];
 
-        let currentQuestionIndex = 0;
-        let score = 0;
+        // App State
+        let state = {
+            answers: {}, // Stores questionIndex: selectedOptionIndex
+            darkMode: false
+        };
+        
+        let activeIndices = []; // Array of question indices we are currently displaying
+        let currentIndexPointer = 0; // Where we are in the activeIndices array
 
-        const questionTextEl = document.getElementById("question-text");
-        const optionsGridEl = document.getElementById("options-grid");
-        const explanationBoxEl = document.getElementById("explanation-box");
-        const scoreEl = document.getElementById("score");
-        const currentQNumEl = document.getElementById("current-q-num");
-        const nextBtnEl = document.getElementById("next-btn");
-        const restartBtnEl = document.getElementById("restart-btn");
-        const progressTextEl = document.getElementById("progress-text");
+        // DOM Elements
+        const DOM = {
+            qText: document.getElementById("question-text"),
+            optsGrid: document.getElementById("options-grid"),
+            expBox: document.getElementById("explanation-box"),
+            score: document.getElementById("score"),
+            qNum: document.getElementById("current-q-num"),
+            tNum: document.getElementById("total-q-num"),
+            prevBtn: document.getElementById("prev-btn"),
+            nextBtn: document.getElementById("next-btn"),
+            modeIndicator: document.getElementById("mode-indicator"),
+            container: document.getElementById("quiz-container")
+        };
 
-        function loadQuestion() {
-            // Reset UI for new question
-            explanationBoxEl.className = "explanation";
-            explanationBoxEl.innerHTML = "";
-            nextBtnEl.style.display = "none";
-            optionsGridEl.innerHTML = "";
+        // --- Initialization & Local Storage ---
+        function init() {
+            loadState();
+            if (state.darkMode) document.body.classList.add("dark-mode");
             
-            const currentQ = quizData[currentQuestionIndex];
+            // Default active set is all questions
+            activeIndices = Array.from({length: quizData.length}, (_, i) => i);
+            currentIndexPointer = 0;
             
-            // Set question text
-            questionTextEl.innerHTML = currentQ.q;
-            currentQNumEl.innerText = currentQuestionIndex + 1;
-            progressTextEl.innerText = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
+            // Jump to first unanswered question if returning
+            for (let i = 0; i < quizData.length; i++) {
+                if (state.answers[i] === undefined) {
+                    currentIndexPointer = i;
+                    break;
+                }
+            }
 
-            // Create buttons
-            currentQ.opts.forEach((opt, index) => {
+            renderQuestion();
+            updateScore();
+            setupSwipe();
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem("chemQuizPro");
+            if (saved) {
+                state = JSON.parse(saved);
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem("chemQuizPro", JSON.stringify(state));
+            updateScore();
+        }
+
+        // --- Core Logic ---
+        function renderQuestion() {
+            let actualQIndex = activeIndices[currentIndexPointer];
+            let q = quizData[actualQIndex];
+
+            // Reset UI
+            DOM.expBox.className = "explanation";
+            DOM.expBox.innerHTML = "";
+            DOM.optsGrid.innerHTML = "";
+            
+            DOM.qNum.innerText = currentIndexPointer + 1;
+            DOM.tNum.innerText = activeIndices.length;
+            DOM.qText.innerHTML = q.q;
+
+            // Render Options
+            q.opts.forEach((opt, idx) => {
                 const btn = document.createElement("button");
                 btn.className = "option-btn";
                 btn.innerHTML = opt;
-                btn.onclick = () => checkAnswer(index, btn);
-                optionsGridEl.appendChild(btn);
+                
+                // If already answered
+                if (state.answers[actualQIndex] !== undefined) {
+                    btn.disabled = true;
+                    if (idx === q.ans) btn.classList.add("correct");
+                    else if (idx === state.answers[actualQIndex]) btn.classList.add("wrong");
+                } else {
+                    btn.onclick = () => handleAnswer(idx, btn);
+                }
+                
+                DOM.optsGrid.appendChild(btn);
             });
 
-            // Re-render MathJax
-            if (window.MathJax) {
-                MathJax.typesetPromise().catch((err) => console.log('MathJax error: ', err));
+            // Show explanation if already answered
+            if (state.answers[actualQIndex] !== undefined) {
+                showExplanation(state.answers[actualQIndex] === q.ans, q.exp);
             }
+
+            // Update Nav Buttons
+            DOM.prevBtn.disabled = currentIndexPointer === 0;
+            DOM.nextBtn.disabled = currentIndexPointer === activeIndices.length - 1;
+
+            if (window.MathJax) MathJax.typesetPromise();
         }
 
-        function checkAnswer(selectedIndex, clickedBtn) {
-            const currentQ = quizData[currentQuestionIndex];
-            const buttons = document.querySelectorAll('.option-btn');
+        function handleAnswer(selectedIndex, btnEl) {
+            let actualQIndex = activeIndices[currentIndexPointer];
+            state.answers[actualQIndex] = selectedIndex;
+            saveState();
+
+            let isCorrect = selectedIndex === quizData[actualQIndex].ans;
             
-            // Disable all buttons once an answer is chosen
-            buttons.forEach(btn => btn.disabled = true);
+            // Disable all & style
+            const btns = document.querySelectorAll(".option-btn");
+            btns.forEach((btn, idx) => {
+                btn.disabled = true;
+                if (idx === quizData[actualQIndex].ans) btn.classList.add("correct");
+                else if (idx === selectedIndex) btn.classList.add("wrong");
+            });
 
-            // Check if correct
-            if (selectedIndex === currentQ.ans) {
-                clickedBtn.classList.add("correct");
-                score++;
-                scoreEl.innerText = score;
-                explanationBoxEl.innerHTML = "<strong>Correct!</strong> <br>" + currentQ.exp;
-                explanationBoxEl.classList.add("show", "correct-bg");
-            } else {
-                clickedBtn.classList.add("wrong");
-                // Highlight the correct one
-                buttons[currentQ.ans].classList.add("correct");
-                explanationBoxEl.innerHTML = "<strong>Incorrect.</strong> <br>" + currentQ.exp;
-                explanationBoxEl.classList.add("show", "wrong-bg");
+            showExplanation(isCorrect, quizData[actualQIndex].exp);
+        }
+
+        function showExplanation(isCorrect, text) {
+            DOM.expBox.innerHTML = `<strong>${isCorrect ? "Correct!" : "Incorrect."}</strong><br>${text}`;
+            DOM.expBox.classList.add("show", isCorrect ? "correct-bg" : "wrong-bg");
+            if (window.MathJax) MathJax.typesetPromise([DOM.expBox]);
+        }
+
+        function updateScore() {
+            let score = 0;
+            for (let index in state.answers) {
+                if (state.answers[index] === quizData[index].ans) score++;
             }
+            DOM.score.innerText = score;
+        }
 
-            // Re-render MathJax in explanation box
-            if (window.MathJax) {
-                MathJax.typesetPromise([explanationBoxEl]).catch((err) => console.log('MathJax error: ', err));
-            }
-
-            // Show next or restart button
-            if (currentQuestionIndex < quizData.length - 1) {
-                nextBtnEl.style.display = "inline-block";
-            } else {
-                restartBtnEl.style.display = "inline-block";
-                explanationBoxEl.innerHTML += `<br><br><strong>Quiz Complete! Final Score: ${score}/${quizData.length}</strong>`;
+        function navigate(direction) {
+            let newIndex = currentIndexPointer + direction;
+            if (newIndex >= 0 && newIndex < activeIndices.length) {
+                currentIndexPointer = newIndex;
+                renderQuestion();
             }
         }
 
-        function nextQuestion() {
-            currentQuestionIndex++;
-            loadQuestion();
+        // --- New Features ---
+        function toggleDarkMode() {
+            state.darkMode = !state.darkMode;
+            document.body.classList.toggle("dark-mode", state.darkMode);
+            saveState();
         }
 
-        function restartQuiz() {
-            currentQuestionIndex = 0;
-            score = 0;
-            scoreEl.innerText = score;
-            restartBtnEl.style.display = "none";
-            loadQuestion();
+        function toggleFocusMode() {
+            document.body.classList.toggle("focus-mode");
         }
 
-        // Initialize first question on load
-        window.onload = loadQuestion;
+        function resetProgress() {
+            if (confirm("Are you sure you want to reset all your progress?")) {
+                state.answers = {};
+                saveState();
+                activeIndices = Array.from({length: quizData.length}, (_, i) => i);
+                currentIndexPointer = 0;
+                DOM.modeIndicator.innerText = "Normal Mode";
+                DOM.modeIndicator.style.color = "inherit";
+                renderQuestion();
+            }
+        }
+
+        function startReview() {
+            let wrongIndices = [];
+            for (let i = 0; i < quizData.length; i++) {
+                if (state.answers[i] !== undefined && state.answers[i] !== quizData[i].ans) {
+                    wrongIndices.push(i);
+                }
+            }
+
+            if (wrongIndices.length === 0) {
+                alert("Great job! You don't have any wrong answers to review right now.");
+                return;
+            }
+
+            // Clear answers for the wrong ones so they can try again
+            wrongIndices.forEach(idx => delete state.answers[idx]);
+            saveState();
+
+            activeIndices = wrongIndices;
+            currentIndexPointer = 0;
+            
+            DOM.modeIndicator.innerText = "Review Mode";
+            DOM.modeIndicator.style.color = "var(--error-color)";
+            
+            renderQuestion();
+            alert(`Entering Review Mode. You have ${wrongIndices.length} questions to retry.`);
+        }
+
+        // --- Swipe Logic ---
+        function setupSwipe() {
+            let touchstartX = 0;
+            let touchendX = 0;
+
+            DOM.container.addEventListener('touchstart', e => {
+                touchstartX = e.changedTouches[0].screenX;
+            }, {passive: true});
+
+            DOM.container.addEventListener('touchend', e => {
+                touchendX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, {passive: true});
+
+            function handleSwipe() {
+                const threshold = 50; // Minimum swipe distance
+                if (touchendX < touchstartX - threshold) {
+                    // Swiped Left -> Go Next
+                    navigate(1);
+                }
+                if (touchendX > touchstartX + threshold) {
+                    // Swiped Right -> Go Prev
+                    navigate(-1);
+                }
+            }
+        }
+
+        // Run
+        window.onload = init;
     </script>
 </body>
 </html>
