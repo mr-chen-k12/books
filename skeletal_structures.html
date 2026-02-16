@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organic Chemistry Functional Groups Quiz</title>
+    <script src="https://unpkg.com/smiles-drawer@2.0.1/dist/smiles-drawer.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #2b2b2b;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .quiz-container {
+            background-color: #333333;
+            max-width: 500px;
+            width: 100%;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #555;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .score-board {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        .canvas-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .question-text {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .option-btn {
+            background-color: transparent;
+            color: #e0e0e0;
+            border: 2px solid #555;
+            border-radius: 8px;
+            padding: 12px 15px;
+            font-size: 1em;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        .option-btn:hover:not(:disabled) {
+            background-color: #444;
+            border-color: #777;
+        }
+        .option-btn:disabled {
+            cursor: default;
+        }
+        .option-btn.correct {
+            border-color: #4CAF50;
+            background-color: rgba(76, 175, 80, 0.1);
+        }
+        .option-btn.wrong {
+            border-color: #F44336;
+            background-color: rgba(244, 67, 54, 0.1);
+        }
+        .option-letter {
+            background-color: #555;
+            color: #fff;
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 4px;
+            margin-right: 15px;
+            font-size: 0.9em;
+        }
+        .explanation {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            line-height: 1.4;
+        }
+        .explanation.success {
+            background-color: rgba(76, 175, 80, 0.2);
+            border: 1px solid #4CAF50;
+        }
+        .explanation.error {
+            background-color: rgba(244, 67, 54, 0.2);
+            border: 1px solid #F44336;
+        }
+        .next-btn {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-top: 15px;
+            display: none;
+        }
+        .next-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="header">
+        <div>Question <span id="q-current">1</span>/30</div>
+        <div class="score-board">Score: <span id="score">0</span></div>
+    </div>
+
+    <div class="canvas-container">
+        <canvas id="molecule-canvas" width="300" height="200"></canvas>
+    </div>
+
+    <div class="question-text" id="question-text">
+        Which of the following organic functional groups does the molecule represented by the skeletal structure contain?
+    </div>
+
+    <div class="options-container" id="options-container">
+        </div>
+
+    <div id="explanation" class="explanation"></div>
+    <button id="next-btn" class="next-btn" onclick="nextQuestion()">Next Question</button>
+</div>
+
+<script>
+    // Initialize SmilesDrawer
+    let smilesDrawer = new SmilesDrawer.Drawer({ width: 300, height: 200, padding: 10 });
+
+    const questions = [
+        { smiles: "OC(=O)c1ccccc1O", q: "Which of the following organic functional groups does this molecule (Salicylic Acid) contain?", options: ["ether", "ketone", "carboxylic acid", "ester"], answer: 2, exp: "Correct! The structure has a -COOH group attached to the ring, which is a carboxylic acid." },
+        { smiles: "CCO", q: "What functional group is present in this structure?", options: ["aldehyde", "alcohol", "ether", "ketone"], answer: 1, exp: "The -OH (hydroxyl) group attached to an alkyl carbon makes this an alcohol (ethanol)." },
+        { smiles: "CC(=O)C", q: "Identify the primary functional group.", options: ["ketone", "aldehyde", "ester", "amide"], answer: 0, exp: "The carbonyl group (C=O) is bonded to two other carbon atoms, defining a ketone (acetone)." },
+        { smiles: "COC", q: "Which functional group does this represent?", options: ["ether", "ester", "alcohol", "ketone"], answer: 0, exp: "An oxygen atom bonded to two alkyl/aryl groups (R-O-R') is an ether." },
+        { smiles: "CCOC(=O)C", q: "What functional group is featured here?", options: ["ether", "carboxylic acid", "ester", "anhydride"], answer: 2, exp: "The -COO- linkage connecting two carbon chains identifies this as an ester (ethyl acetate)." },
+        { smiles: "CN", q: "What functional group is present?", options: ["amine", "amide", "nitrile", "nitro"], answer: 0, exp: "A nitrogen atom attached directly to a carbon skeleton (without a carbonyl) is an amine." },
+        { smiles: "CC(=O)N", q: "Identify the functional group.", options: ["amine", "amide", "ketone", "nitrile"], answer: 1, exp: "A carbonyl group (C=O) bonded directly to a nitrogen atom forms an amide." },
+        { smiles: "CCC=O", q: "What is the functional group in this molecule?", options: ["ketone", "alcohol", "aldehyde", "ether"], answer: 2, exp: "The carbonyl group (C=O) at the end of a chain, bonded to at least one hydrogen, is an aldehyde." },
+        { smiles: "Cc1ccccc1", q: "Which class of compounds does this belong to?", options: ["alkane", "alkene", "arene (aromatic)", "alkyne"], answer: 2, exp: "The six-membered ring with alternating double bonds represents an arene or aromatic ring (toluene)." },
+        { smiles: "CC#CC", q: "What type of bond defines this functional group?", options: ["alkane", "alkene", "alkyne", "diene"], answer: 2, exp: "The carbon-carbon triple bond makes this an alkyne." },
+        { smiles: "CC=C", q: "Identify the main functional group.", options: ["alkane", "alkene", "alkyne", "aromatic"], answer: 1, exp: "The carbon-carbon double bond identifies this as an alkene." },
+        { smiles: "C(=O)O", q: "What is this simple molecule known as (Formic acid)?", options: ["aldehyde", "alcohol", "carboxylic acid", "ester"], answer: 2, exp: "The -COOH group is the defining characteristic of a carboxylic acid." },
+        { smiles: "CCOCC", q: "What functional group connects the two ethyl groups?", options: ["ester", "ketone", "ether", "anhydride"], answer: 2, exp: "The central oxygen atom bonded to two separate carbon chains (R-O-R) is an ether." },
+        { smiles: "C1CCCC1", q: "This molecule is an example of a...", options: ["cycloalkane", "cycloalkene", "aromatic ring", "alkyne"], answer: 0, exp: "A closed ring of carbons with only single bonds is a cycloalkane." },
+        { smiles: "O=C1CCCC1", q: "What functional group is in this ring?", options: ["aldehyde", "ketone", "epoxide", "ether"], answer: 1, exp: "The carbonyl (C=O) is within the carbon ring, bonded to two carbons, making it a ketone." },
+        { smiles: "Oc1ccccc1", q: "What functional group is attached to the aromatic ring?", options: ["alcohol", "phenol", "ether", "ketone"], answer: 1, exp: "An -OH group attached directly to an aromatic (benzene) ring specifically classifies it as a phenol." },
+        { smiles: "CC(C)O", q: "What functional group is shown here?", options: ["alcohol", "aldehyde", "ether", "carboxylic acid"], answer: 0, exp: "The -OH attached to an sp3 hybridized carbon makes this an alcohol (isopropanol)." },
+        { smiles: "CCOC=O", q: "Identify the functional group.", options: ["carboxylic acid", "ester", "ether", "aldehyde"], answer: 1, exp: "The carbonyl carbon is bonded to a hydrogen and an alkoxy group (-OR), which is a formate ester." },
+        { smiles: "NC=O", q: "What functional group does this molecule (formamide) contain?", options: ["amine", "amide", "ketone", "aldehyde"], answer: 1, exp: "The nitrogen attached directly to a carbonyl carbon (C=O) makes it an amide." },
+        { smiles: "O=C(O)c1ccccc1", q: "What is the primary functional group here?", options: ["phenol", "ketone", "carboxylic acid", "ester"], answer: 2, exp: "The -COOH group attached to the benzene ring is a carboxylic acid (benzoic acid)." },
+        { smiles: "O=Cc1ccccc1", q: "Identify the functional group on the ring.", options: ["ketone", "aldehyde", "alcohol", "ether"], answer: 1, exp: "The carbonyl group bonded to a hydrogen atom makes it an aldehyde (benzaldehyde)." },
+        { smiles: "Nc1ccccc1", q: "What functional group is attached to this aromatic ring?", options: ["amine", "amide", "nitrile", "nitro"], answer: 0, exp: "The -NH2 group attached to the ring makes it an amine (specifically, aniline)." },
+        { smiles: "COc1ccccc1", q: "What functional group connects the methyl group to the ring?", options: ["ester", "ether", "ketone", "phenol"], answer: 1, exp: "The oxygen atom linking the methyl group and the benzene ring (R-O-R) forms an ether (anisole)." },
+        { smiles: "CC(C)C", q: "Which class of hydrocarbons is this?", options: ["alkane", "alkene", "alkyne", "arene"], answer: 0, exp: "The molecule contains only carbon-carbon single bonds, making it an alkane." },
+        { smiles: "NC(=O)N", q: "What functional group is present in urea?", options: ["amine", "amide", "ketone", "imine"], answer: 1, exp: "The nitrogens are attached to a central carbonyl group, making it an amide." },
+        { smiles: "CC(N)C", q: "Identify the functional group.", options: ["amide", "amine", "nitrile", "nitro"], answer: 1, exp: "The nitrogen is attached to an alkyl carbon without a carbonyl, which makes it an amine." },
+        { smiles: "CC(=O)CC(=O)C", q: "What functional groups are present here?", options: ["diketone", "diester", "dialdehyde", "carboxylic acid"], answer: 0, exp: "There are two separate carbonyl groups, each bonded to two carbons, making it a diketone." },
+        { smiles: "C1CC1", q: "What type of molecule is this 3-membered ring?", options: ["alkene", "cycloalkane", "epoxide", "alkyne"], answer: 1, exp: "A closed ring of 3 carbons with only single bonds is a cycloalkane (cyclopropane)." },
+        { smiles: "O1CC1", q: "What specific functional group is this 3-membered ring with an oxygen?", options: ["ether", "epoxide", "ketone", "ester"], answer: 1, exp: "A three-membered cyclic ether is specifically called an epoxide." },
+        { smiles: "CC#N", q: "Identify the functional group.", options: ["amine", "amide", "nitrile", "imine"], answer: 2, exp: "A carbon triply bonded to a nitrogen atom represents a nitrile group." }
+    ];
+
+    let currentQ = 0;
+    let score = 0;
+
+    function renderMolecule(smiles) {
+        SmilesDrawer.parse(smiles, function(tree) {
+            smilesDrawer.draw(tree, 'molecule-canvas', 'light', false);
+        });
+    }
+
+    function loadQuestion() {
+        const q = questions[currentQ];
+        document.getElementById('q-current').innerText = currentQ + 1;
+        document.getElementById('question-text').innerText = q.q;
+        document.getElementById('explanation').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        
+        renderMolecule(q.smiles);
+
+        const optionsHtml = q.options.map((opt, index) => {
+            const letter = String.fromCharCode(65 + index); // A, B, C, D
+            return `<button class="option-btn" onclick="checkAnswer(${index}, this)">
+                        <span class="option-letter">${letter}</span> ${opt}
+                    </button>`;
+        }).join('');
+        
+        document.getElementById('options-container').innerHTML = optionsHtml;
+    }
+
+    function checkAnswer(selectedIndex, btnElement) {
+        const q = questions[currentQ];
+        const buttons = document.querySelectorAll('.option-btn');
+        const expDiv = document.getElementById('explanation');
+        
+        // Disable all buttons
+        buttons.forEach(btn => btn.disabled = true);
+
+        if (selectedIndex === q.answer) {
+            btnElement.classList.add('correct');
+            score++;
+            document.getElementById('score').innerText = score;
+            expDiv.className = 'explanation success';
+        } else {
+            btnElement.classList.add('wrong');
+            buttons[q.answer].classList.add('correct'); // Show correct answer
+            expDiv.className = 'explanation error';
+        }
+
+        expDiv.innerText = q.exp;
+        expDiv.style.display = 'block';
+        
+        // Change next button text if it's the last question
+        const nextBtn = document.getElementById('next-btn');
+        if (currentQ === questions.length - 1) {
+            nextBtn.innerText = "Finish Quiz";
+        }
+        nextBtn.style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentQ++;
+        if (currentQ < questions.length) {
+            loadQuestion();
+        } else {
+            document.querySelector('.quiz-container').innerHTML = `
+                <div style="text-align:center; padding: 40px 0;">
+                    <h2>Quiz Complete!</h2>
+                    <p style="font-size: 1.5em; color: #4CAF50;">Your Final Score: ${score} / 30</p>
+                    <button class="next-btn" style="display:inline-block; margin-top: 20px;" onclick="location.reload()">Restart Quiz</button>
+                </div>`;
+        }
+    }
+
+    // Initialize first question
+    window.onload = loadQuestion;
+</script>
+
+</body>
+</html>
