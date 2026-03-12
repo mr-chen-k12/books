@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom TV Display - Packed</title>
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* Modern, Packed CSS Design */
+        :root {
+            --bg-color: #ffffff;
+            --text-main: #222222;
+            --highlight-obj: #ffeb3b; /* Yellow */
+            --highlight-hw: #00bcd4;  /* Cyan */
+            --highlight-lang: #4caf50; /* Green */
+        }
+
+        html {
+            font-size: 22px; /* Base size bumped up for default TV viewing */
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0.5rem; /* Almost no margin to maximize screen real estate */
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            box-sizing: border-box;
+            overflow: hidden; /* Prevents scrollbars unless slider makes it huge */
+        }
+
+        /* Main Unified Board */
+        .main-board {
+            flex-grow: 1;
+            width: 100%;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem; /* Tightly packed */
+        }
+
+        /* Header Styling */
+        header {
+            text-align: center;
+            padding: 0.5rem;
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            border-radius: 8px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            letter-spacing: 1px;
+        }
+
+        /* Section Layout */
+        .content-section {
+            padding: 0 0.5rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+        }
+
+        /* Highlight Colors */
+        .badge-obj { background-color: var(--highlight-obj); color: #000; }
+        .badge-agenda { background-color: #e0e0e0; color: #333; }
+        .badge-hw { background-color: var(--highlight-hw); color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+        .badge-lang { background-color: var(--highlight-lang); color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+
+        p {
+            display: inline;
+            font-size: 1.2rem;
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        ul {
+            margin: 0.2rem 0 0.5rem 0; /* Tightly packed lists */
+            padding-left: 2rem;
+        }
+
+        li {
+            font-size: 1.2rem;
+            line-height: 1.3;
+            margin-bottom: 0.2rem;
+        }
+
+        /* --- CONFIGURATION PANEL CSS --- */
+        .config-zone {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            z-index: 1000;
+        }
+
+        .config-panel {
+            background: rgba(44, 62, 80, 0.95);
+            color: white;
+            padding: 20px;
+            border-radius: 12px 0 0 12px;
+            box-shadow: -4px 0 15px rgba(0,0,0,0.2);
+            opacity: 0;
+            transform: translateX(30px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            pointer-events: none;
+            text-align: center;
+        }
+
+        .config-zone:hover .config-panel {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+        .config-panel label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            font-family: sans-serif;
+        }
+
+        .config-panel input[type="range"] {
+            width: 120px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="config-zone">
+        <div class="config-panel">
+            <label for="font-slider">⚙️ Font Size</label>
+            <input type="range" id="font-slider" min="10" max="50" value="22" step="1">
+        </div>
+    </div>
+
+    <div class="main-board">
+        <header>
+            <h1 id="display-week">Loading Week...</h1>
+        </header>
+
+        <div class="content-section">
+            <span class="badge badge-obj">Objectives</span>
+            <p id="display-objectives"></p>
+        </div>
+
+        <div class="content-section">
+            <span class="badge badge-agenda">Agenda</span>
+            <ul id="display-agenda"></ul>
+        </div>
+
+        <div class="content-section">
+            <span class="badge badge-hw">Homework</span>
+            <p id="display-homework"></p>
+        </div>
+
+        <div class="content-section">
+            <span class="badge badge-lang">Language Objectives</span>
+            <ul id="display-language"></ul>
+        </div>
+    </div>
+
+    <script>
+        // 1. YOUR JSON DATA
+        const weeklyData = {
+            "weekTitle": "Week 27 – March 16 to March 20, 2026",
+            "objectives": "By the end of the week, students will be able to describe the relationship between the size of the divisor and the size of the quotient in division problems. They will represent division situations using equations like $a \\div b = \\frac{a}{b}$ and diagrams to answer two fundamental questions: \"How many groups?\" and \"How much in each group?\". Finally, students will begin to apply these division concepts to situations involving fractional divisors and whole-number quotients.",
+            "agenda": [
+                "<strong>Delta Math Warm-Up</strong> > <strong>Notebook & Pencil</strong> > <strong>Launch Question</strong> (Conceptual Division Challenge)",
+                "<strong>Lesson 1:</strong> Size of Divisor and Size of Quotient",
+                "<strong>Lesson 2:</strong> Meanings of Division (How many groups? vs. How much in a group?)",
+                "<strong>Lesson 3:</strong> Interpreting Division Situations",
+                "<strong>Lesson 4:</strong> How Many Groups? (Part 1 - Fractional Divisors)",
+                "<em>> Share & Compare Strategies</em>"
+            ],
+            "homework": "Delta Math Week 27",
+            "languageObjectives": [
+                "Students will use the terms <strong>dividend</strong>, <strong>divisor</strong>, and <strong>quotient</strong> to describe parts of a division equation.",
+                "Students will interpret and represent division situations by creating tape diagrams and writing corresponding multiplication or division equations.",
+                "Students will justify their reasoning about division by explaining how a diagram represents either the number of groups or the size of each group."
+            ]
+        };
+
+        // 2. INJECT JSON AND SETUP SLIDER
+        function initPage() {
+            // Set text elements
+            document.getElementById('display-week').innerText = weeklyData.weekTitle;
+            document.getElementById('display-objectives').innerHTML = weeklyData.objectives;
+            document.getElementById('display-homework').innerText = weeklyData.homework;
+
+            // Set Agenda List
+            const agendaList = document.getElementById('display-agenda');
+            weeklyData.agenda.forEach(item => {
+                let li = document.createElement('li');
+                li.innerHTML = item;
+                agendaList.appendChild(li);
+            });
+
+            // Set Language Objectives List
+            const languageList = document.getElementById('display-language');
+            weeklyData.languageObjectives.forEach(item => {
+                let li = document.createElement('li');
+                li.innerHTML = item;
+                languageList.appendChild(li);
+            });
+
+            // Render MathJax equations
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+
+            // --- FONT SLIDER LOGIC ---
+            const fontSlider = document.getElementById('font-slider');
+            fontSlider.addEventListener('input', function() {
+                document.documentElement.style.fontSize = this.value + 'px';
+            });
+        }
+
+        // Run on load
+        window.onload = initPage;
+    </script>
+</body>
+</html>
