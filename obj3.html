@@ -1,38 +1,280 @@
-[
-  {
-    "weekTitle": "Week 28 – March 23 to March 27, 2026",
-    "objectives": "By the end of the week, students will be able to solve problems involving the division of fractions by using diagrams, writing equations, and reasoning about the relationship between multiplication and division. They will represent problems involving fractional divisors to answer questions like \"How many groups?\" and \"How much in one group?\".",
-    "agenda": [
-      "Delta Math Warm-Up > Notebook & Pencil > Launch Question",
-      "Lesson 5: How Many Groups? (Part 2)",
-      "Lesson 6: Using Diagrams to Find the Number of Groups",
-      "Lesson 7: What Fraction of a Group?",
-      "Lesson 8: How Much in Each Group? (Part 1)",
-      "Lesson 9: How Much in Each Group? (Part 2) (Optional)",
-      "<em>> Share & Compare Strategies</em>"
-    ],
-    "homework": "Delta Math Week 28",
-    "languageObjectives": [
-      "Students will justify their reasoning about division and tape diagrams orally and in writing.",
-      "Students will explain how to create and make sense of division diagrams.",
-      "Students will use precise terminology—including whole, equal-size, fraction of, and unknown—to interpret and represent division situations."
-    ]
-  },
-  {
-    "weekTitle": "Week 27 – March 16 to March 20, 2026",
-    "objectives": "By the end of the week, students will be able to describe the relationship between the size of the divisor and the size of the quotient in division problems. They will represent division situations using equations like $a \\div b = \\frac{a}{b}$ and diagrams to answer two fundamental questions: \"How many groups?\" and \"How much in each group?\".",
-    "agenda": [
-      "Delta Math Warm-Up > Notebook & Pencil > Launch Question",
-      "Lesson 1: Size of Divisor and Size of Quotient",
-      "Lesson 2: Meanings of Division",
-      "Lesson 3: Interpreting Division Situations",
-      "Lesson 4: How Many Groups?"
-    ],
-    "homework": "Delta Math Week 27",
-    "languageObjectives": [
-      "Students will use the terms dividend, divisor, and quotient.",
-      "Students will interpret division situations by creating tape diagrams.",
-      "Students will justify their reasoning about division."
-    ]
-  }
-]
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom TV Display - Dynamic</title>
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* Modern, Packed CSS Design */
+        :root {
+            --bg-color: #ffffff;
+            --text-main: #222222;
+            --highlight-obj: #ffeb3b; /* Yellow */
+            --highlight-hw: #00bcd4;  /* Cyan */
+            --highlight-lang: #4caf50; /* Green */
+        }
+
+        html {
+            font-size: 22px; 
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-main);
+            margin: 0;
+            padding: 0.5rem 2%; 
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            box-sizing: border-box;
+            font-weight: bold; 
+            /* Let the page scroll for multiple weeks */
+            overflow-y: auto; 
+            overflow-x: hidden;
+        }
+
+        /* FADED FIXED BACKGROUND LOGO */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh;
+            background-image: url('image_573374.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 50%; /* Adjust size of the logo here */
+            opacity: 0.15; /* 15% opacity for faded effect */
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Container for all the fetched weeks */
+        #all-weeks-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem; /* Space between different weeks */
+            padding-bottom: 2rem;
+        }
+
+        /* Main Unified Board for a Single Week */
+        .main-board {
+            width: 100%;
+            /* Semi-transparent white so the text is readable but logo shows through */
+            background: rgba(255, 255, 255, 0.85); 
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem; 
+            padding-bottom: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        header {
+            text-align: center;
+            padding: 0.5rem;
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            border-radius: 8px 8px 0 0;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            letter-spacing: 1px;
+            font-weight: 900; 
+        }
+
+        .content-section {
+            padding: 0 0.5rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 900; 
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+        }
+
+        .badge-obj { background-color: var(--highlight-obj); color: #000; }
+        .badge-agenda { background-color: #e0e0e0; color: #333; }
+        .badge-hw { background-color: var(--highlight-hw); color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+        .badge-lang { background-color: var(--highlight-lang); color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+
+        p {
+            display: inline;
+            font-size: 1.2rem;
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        ul {
+            margin: 0.2rem 0 0.5rem 0; 
+            padding-left: 2rem;
+        }
+
+        li {
+            font-size: 1.2rem;
+            line-height: 1.3;
+            margin-bottom: 0.2rem;
+        }
+
+        /* CONFIGURATION PANEL */
+        .config-zone {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            z-index: 1000;
+        }
+
+        .config-panel {
+            background: rgba(44, 62, 80, 0.95);
+            color: white;
+            padding: 20px;
+            border-radius: 12px 0 0 12px;
+            box-shadow: -4px 0 15px rgba(0,0,0,0.2);
+            opacity: 0;
+            transform: translateX(30px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            pointer-events: none;
+            text-align: center;
+        }
+
+        .config-zone:hover .config-panel {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+        .config-panel label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            font-family: sans-serif;
+        }
+
+        .config-panel input[type="range"] {
+            width: 120px;
+            cursor: pointer;
+        }
+        
+        .loading-text {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="config-zone">
+        <div class="config-panel">
+            <label for="font-slider">⚙️ Font Size</label>
+            <input type="range" id="font-slider" min="10" max="50" value="22" step="1">
+        </div>
+    </div>
+
+    <div id="all-weeks-container">
+        <div class="loading-text">Loading Objectives from GitHub...</div>
+    </div>
+
+    <script>
+        // Use HTTPS to prevent Mixed Content blocking
+        const JSON_URL = 'https://mr-chen-k12.github.io/books/objectives.json';
+
+        async function loadWeeklyData() {
+            try {
+                // Add a cache-busting query parameter so it always grabs the latest version from GitHub
+                const response = await fetch(JSON_URL + '?t=' + new Date().getTime());
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const data = await response.json();
+                renderWeeks(data);
+            } catch (error) {
+                console.error("Failed to load JSON:", error);
+                document.getElementById('all-weeks-container').innerHTML = 
+                    `<div class="loading-text" style="color: red;">Failed to load data. Make sure objectives.json exists on GitHub and is formatted correctly.</div>`;
+            }
+        }
+
+        function renderWeeks(weeksArray) {
+            const container = document.getElementById('all-weeks-container');
+            container.innerHTML = ''; // Clear loading text
+
+            // Loop through the array and create a board for each week
+            weeksArray.forEach(week => {
+                const weekBoard = document.createElement('div');
+                weekBoard.className = 'main-board';
+
+                // Map lists into HTML list items
+                const agendaHTML = week.agenda.map(item => `<li>${item}</li>`).join('');
+                const langHTML = week.languageObjectives.map(item => `<li>${item}</li>`).join('');
+
+                // Build the inner HTML for this specific week
+                weekBoard.innerHTML = `
+                    <header>
+                        <h1>${week.weekTitle}</h1>
+                    </header>
+                    <div class="content-section">
+                        <span class="badge badge-obj">Objectives</span>
+                        <p>${week.objectives}</p>
+                    </div>
+                    <div class="content-section">
+                        <span class="badge badge-agenda">Agenda</span>
+                        <ul>${agendaHTML}</ul>
+                    </div>
+                    <div class="content-section">
+                        <span class="badge badge-hw">Homework</span>
+                        <p>${week.homework}</p>
+                    </div>
+                    <div class="content-section">
+                        <span class="badge badge-lang">Language Objectives</span>
+                        <ul>${langHTML}</ul>
+                    </div>
+                `;
+                
+                container.appendChild(weekBoard);
+            });
+
+            // Tell MathJax to typeset equations now that new HTML is on the page
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        // Font Slider Setup
+        function setupSlider() {
+            const fontSlider = document.getElementById('font-slider');
+            fontSlider.addEventListener('input', function() {
+                document.documentElement.style.fontSize = this.value + 'px';
+            });
+        }
+
+        // Initialize Page
+        window.onload = () => {
+            setupSlider();
+            loadWeeklyData();
+        };
+    </script>
+</body>
+</html>
