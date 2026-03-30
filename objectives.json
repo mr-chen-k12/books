@@ -1,17 +1,35 @@
 [
   {
-    "weekTitle": "Week 30 – March 23 to March 27, 2026",
-    "objectives": "By the end of the week, students will be able to solve problems involving the division of fractions by using diagrams, writing equations, and reasoning about the relationship between multiplication and division. They will represent problems involving fractional divisors to answer questions like \"How many groups?\" and \"How much in one group?\".",
+    "weekTitle": "Week 31 – March 30 to April 2, 2026",
+    "objectives": "By the end of the week, students will generalize a process for dividing a number by a fraction and use the fraction division algorithm to calculate quotients. They will also apply these concepts to solve geometric problems involving fractional lengths.",
     "agenda": [
-      "Delta Math Warm-Up > Notebook & Pencil > Launch Question",
-      "Lesson 5: How Many Groups? (Part 2)",
-      "Lesson 6: Using Diagrams to Find the Number of Groups",
-      "Lesson 7: What Fraction of a Group?",
-      "Lesson 8: How Much in Each Group? (Part 1)",
-      "Lesson 9: How Much in Each Group? (Part 2) (Optional)",
+      "<strong>Delta Math Warm-Up</strong> > <strong>Notebook & Pencil</strong> > <strong>Launch Question</strong>",
+      "<strong>Lesson 9:</strong> How Much in Each Group? (Part 2) (Optional)",
+      "<strong>Lesson 10:</strong> Dividing by Unit and Non-Unit Fractions",
+      "<strong>Lesson 11:</strong> Using an Algorithm to Divide Fractions",
+      "<strong>Lesson 12:</strong> Fractional Lengths",
       "<em>> Share & Compare Strategies</em>"
     ],
-    "homework": "Delta Math Week 30",
+    "homework": "Delta Math Week 31",
+    "languageObjectives": [
+      "Students will interpret and explain how to represent situations involving division.",
+      "Students will justify their mathematical strategies for dividing fractions.",
+      "Students will use precise terminology—including <strong>numerator</strong>, <strong>denominator</strong>, and <strong>reciprocal</strong>—to explain their reasoning."
+    ]
+  },
+  {
+    "weekTitle": "Week 28 – March 23 to March 27, 2026",
+    "objectives": "By the end of the week, students will be able to solve problems involving the division of fractions by using diagrams, writing equations, and reasoning about the relationship between multiplication and division. They will represent problems involving fractional divisors to answer questions like \"How many groups?\" and \"How much in one group?\".",
+    "agenda": [
+      "<strong>Delta Math Warm-Up</strong> > <strong>Notebook & Pencil</strong> > <strong>Launch Question</strong>",
+      "<strong>Lesson 5:</strong> How Many Groups? (Part 2)",
+      "<strong>Lesson 6:</strong> Using Diagrams to Find the Number of Groups",
+      "<strong>Lesson 7:</strong> What Fraction of a Group?",
+      "<strong>Lesson 8:</strong> How Much in Each Group? (Part 1)",
+      "<strong>Lesson 9:</strong> How Much in Each Group? (Part 2) (Optional)",
+      "<em>> Share & Compare Strategies</em>"
+    ],
+    "homework": "Delta Math Week 28",
     "languageObjectives": [
       "Students will justify their reasoning about division and tape diagrams orally and in writing.",
       "Students will explain how to create and make sense of division diagrams.",
@@ -22,17 +40,18 @@
     "weekTitle": "Week 27 – March 16 to March 20, 2026",
     "objectives": "By the end of the week, students will be able to describe the relationship between the size of the divisor and the size of the quotient in division problems. They will represent division situations using equations like $a \\div b = \\frac{a}{b}$ and diagrams to answer two fundamental questions: \"How many groups?\" and \"How much in each group?\".",
     "agenda": [
-      "Delta Math Warm-Up > Notebook & Pencil > Launch Question",
-      "Lesson 1: Size of Divisor and Size of Quotient",
-      "Lesson 2: Meanings of Division",
-      "Lesson 3: Interpreting Division Situations",
-      "Lesson 4: How Many Groups?"
+      "<strong>Delta Math Warm-Up</strong> > <strong>Notebook & Pencil</strong> > <strong>Launch Question</strong>",
+      "<strong>Lesson 1:</strong> Size of Divisor and Size of Quotient",
+      "<strong>Lesson 2:</strong> Meanings of Division (How many groups? vs. How much in a group?)",
+      "<strong>Lesson 3:</strong> Interpreting Division Situations",
+      "<strong>Lesson 4:</strong> How Many Groups? (Part 1 - Fractional Divisors)",
+      "<em>> Share & Compare Strategies</em>"
     ],
     "homework": "Delta Math Week 27",
     "languageObjectives": [
-      "Students will use the terms dividend, divisor, and quotient.",
-      "Students will interpret division situations by creating tape diagrams.",
-      "Students will justify their reasoning about division."
+      "Students will use the terms <strong>dividend</strong>, <strong>divisor</strong>, and <strong>quotient</strong> to describe parts of a division equation.",
+      "Students will interpret and represent division situations by creating tape diagrams and writing corresponding multiplication or division equations.",
+      "Students will justify their reasoning about division by explaining how a diagram represents either the number of groups or the size of each group."
     ]
   }
 ]
