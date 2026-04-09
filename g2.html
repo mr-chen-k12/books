@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Student Group Organizer</title>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --primary: #4a90e2;
+            --text-main: #333;
+            --border-radius: 6px;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 10px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .header-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            margin: 0;
+        }
+
+        button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* Side-by-side layout */
+        .layout-container {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            min-height: 0; /* Important for flexbox scrolling */
+        }
+
+        .left-column {
+            flex: 0 0 45%; /* Takes up 45% of the screen width */
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .right-column {
+            flex: 1; /* Takes up remaining space */
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto; /* Independent scrolling for the groups */
+            padding-right: 2px;
+        }
+
+        .group-container {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Make the unassigned list fill its column and scroll */
+        #unassigned-wrapper {
+            padding: 0;
+            box-shadow: none;
+            height: 100%;
+        }
+        
+        #unassigned-header-box {
+            padding: 10px;
+            background: #fafafa;
+            border-bottom: 2px solid #eee;
+            margin: 0;
+        }
+
+        #unassigned {
+            padding: 10px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+            margin-top: 0;
+            font-size: 1rem;
+        }
+
+        .counter {
+            font-size: 0.75rem;
+            color: #666;
+            background: #eee;
+            padding: 2px 6px;
+            border-radius: 10px;
+            white-space: nowrap;
+        }
+
+        .full .counter {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .sortable-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            min-height: 40px; /* Empty area to drop into */
+        }
+
+        .sortable-list li {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            margin-bottom: 6px;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 0.85rem; /* Smaller font for mobile fit */
+            line-height: 1.2;
+            cursor: grab;
+            display: flex;
+            align-items: flex-start;
+            touch-action: none;
+            word-break: break-word; /* Allows long names to wrap nicely */
+        }
+        
+        .sortable-list li:active {
+            cursor: grabbing;
+        }
+
+        /* A small visual handle to indicate draggability */
+        .sortable-list li::before {
+            content: '⋮';
+            color: #aaa;
+            margin-right: 6px;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .sortable-ghost {
+            opacity: 0.4;
+            background-color: #e3f2fd;
+        }
+        
+        .sortable-drag {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-controls">
+        <h1>Group Organizer</h1>
+        <button onclick="resetData()">Reset Data</button>
+    </div>
+
+    <div class="layout-container">
+        
+        <div class="left-column">
+            <div class="group-container" id="unassigned-wrapper">
+                <div id="unassigned-header-box">
+                    <h3 class="group-header">Unassigned <span class="counter">11</span></h3>
+                </div>
+                <ul id="unassigned" class="sortable-list">
+                    <li>Pineda, Adrian Zyair</li>
+                    <li>Ritter, Vivian Orion</li>
+                    <li>Rodriguez, Alexa Isabella</li>
+                    <li>Sanden, Ryerson James</li>
+                    <li>Teka, Rakeb Yohanes Afework</li>
+                    <li>Tran, Jacqueline KhanhAn</li>
+                    <li>Tran, Phuong Nghi Hoang</li>
+                    <li>Uong, Anthony</li>
+                    <li>Vo, Christine</li>
+                    <li>Yediel</li>
+                    <li>Kashieph</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="right-column">
+            
+            <div class="group-container" id="group1-wrapper">
+                <h3 class="group-header">Grp 1 <span class="counter">4 / 10</span></h3>
+                <ul id="group1" class="sortable-list">
+                    <li>Brandao, Zain Travers</li>
+                    <li>Burke, Scarlett Maeve</li>
+                    <li>Cho, Madeleine Lee</li>
+                    <li>Cook, Eleanor Miriam</li>
+                </ul>
+            </div>
+
+            <div class="group-container" id="group2-wrapper">
+                <h3 class="group-header">Grp 2 <span class="counter">4 / 10</span></h3>
+                <ul id="group2" class="sortable-list">
+                    <li>Dao, Peter Thanh</li>
+                    <li>Delgado, Liana Maria</li>
+                    <li>Do, Cao Van</li>
+                    <li>Doan, Benjamin Minh</li>
+                </ul>
+            </div>
+            
+            <div class="group-container" id="group3-wrapper">
+                <h3 class="group-header">Grp 3 <span class="counter">4 / 10</span></h3>
+                <ul id="group3" class="sortable-list">
+                    <li>Hoang, Dat Manh</li>
+                    <li>Huynh, Benjamin Gia</li>
+                    <li>Huynh, Jessica</li>
+                    <li>Lopes Gomes, Jennifer Lismara</li>
+                </ul>
+            </div>
+
+            <div class="group-container" id="group4-wrapper">
+                <h3 class="group-header">Grp 4 <span class="counter">4 / 10</span></h3>
+                <ul id="group4" class="sortable-list">
+                    <li>Mendez Pena, Geralis</li>
+                    <li>Nguyen, Minh Anh</li>
+                    <li>Nguyen, Uyen Hoang Thao</li>
+                    <li>Nguyen, Vu Hung</li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Updated key so previous layouts don't break this new structure
+        const STORAGE_KEY = 'studentGroupsData_v3';
+        const MAX_PER_GROUP = 10; // Updated limit to 10
+
+        // 1. Load Data from Local Storage
+        function loadState() {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const state = JSON.parse(savedData);
+                document.querySelectorAll('.sortable-list').forEach(list => {
+                    list.innerHTML = ''; 
+                    if (state[list.id]) {
+                        state[list.id].forEach(studentName => {
+                            const li = document.createElement('li');
+                            li.textContent = studentName;
+                            list.appendChild(li);
+                        });
+                    }
+                });
+            }
+        }
+
+        // 2. Save Data to Local Storage
+        function saveState() {
+            const state = {};
+            document.querySelectorAll('.sortable-list').forEach(list => {
+                const students = [];
+                list.querySelectorAll('li').forEach(li => {
+                    students.push(li.textContent.trim());
+                });
+                state[list.id] = students;
+            });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+
+        // 3. Reset Data
+        function resetData() {
+            if(confirm("Are you sure you want to reset all groups?")) {
+                localStorage.removeItem(STORAGE_KEY);
+                location.reload(); 
+            }
+        }
+
+        // 4. Update UI Counters
+        function updateCounters() {
+            const lists = document.querySelectorAll('.sortable-list');
+            lists.forEach(list => {
+                const count = list.children.length;
+                // The wrapper logic is slightly different for unassigned due to the scroll layout
+                let wrapper = list.closest('.group-container');
+                let counterSpan = wrapper.querySelector('.counter');
+                
+                if (list.id === 'unassigned') {
+                    counterSpan.innerText = count;
+                } else {
+                    counterSpan.innerText = count + ' / ' + MAX_PER_GROUP;
+                    if (count >= MAX_PER_GROUP) {
+                        wrapper.classList.add('full');
+                    } else {
+                        wrapper.classList.remove('full');
+                    }
+                }
+            });
+        }
+
+        // --- Initialization ---
+        loadState();
+
+        const sortableLists = document.querySelectorAll('.sortable-list');
+        sortableLists.forEach(list => {
+            new Sortable(list, {
+                group: {
+                    name: 'students',
+                    put: function (to) {
+                        if (to.el.id === 'unassigned') return true;
+                        // Limit groups to MAX_PER_GROUP (10)
+                        return to.el.children.length < MAX_PER_GROUP;
+                    }
+                },
+                animation: 150,
+                delay: 100, // Important for touch screens so you can scroll without dragging
+                delayOnTouchOnly: true,
+                ghostClass: 'sortable-ghost',
+                dragClass: 'sortable-drag',
+                onSort: function (evt) {
+                    updateCounters();
+                    saveState(); 
+                }
+            });
+        });
+
+        updateCounters();
+    </script>
+</body>
+</html>
