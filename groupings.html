@@ -141,6 +141,7 @@
     </div>
 
     <div class="container">
+        
         <div class="group-container" id="group1-wrapper">
             <h3 class="group-header">Group 1 <span class="counter">4 / 4</span></h3>
             <ul id="group1" class="sortable-list">
@@ -152,18 +153,33 @@
         </div>
 
         <div class="group-container" id="group2-wrapper">
-            <h3 class="group-header">Group 2 <span class="counter">0 / 4</span></h3>
-            <ul id="group2" class="sortable-list"></ul>
+            <h3 class="group-header">Group 2 <span class="counter">4 / 4</span></h3>
+            <ul id="group2" class="sortable-list">
+                <li>Dao, Peter Thanh</li>
+                <li>Delgado, Liana Maria</li>
+                <li>Do, Cao Van</li>
+                <li>Doan, Benjamin Minh</li>
+            </ul>
         </div>
         
         <div class="group-container" id="group3-wrapper">
-            <h3 class="group-header">Group 3 <span class="counter">0 / 4</span></h3>
-            <ul id="group3" class="sortable-list"></ul>
+            <h3 class="group-header">Group 3 <span class="counter">4 / 4</span></h3>
+            <ul id="group3" class="sortable-list">
+                <li>Hoang, Dat Manh</li>
+                <li>Huynh, Benjamin Gia</li>
+                <li>Huynh, Jessica</li>
+                <li>Lopes Gomes, Jennifer Lismara</li>
+            </ul>
         </div>
 
         <div class="group-container" id="group4-wrapper">
-            <h3 class="group-header">Group 4 <span class="counter">0 / 4</span></h3>
-            <ul id="group4" class="sortable-list"></ul>
+            <h3 class="group-header">Group 4 <span class="counter">4 / 4</span></h3>
+            <ul id="group4" class="sortable-list">
+                <li>Mendez Pena, Geralis</li>
+                <li>Nguyen, Minh Anh</li>
+                <li>Nguyen, Uyen Hoang Thao</li>
+                <li>Nguyen, Vu Hung</li>
+            </ul>
         </div>
         
         <div class="group-container" id="group5-wrapper">
@@ -182,20 +198,8 @@
         </div>
 
         <div class="group-container" id="unassigned-container">
-            <h3 class="group-header">Unassigned <span class="counter">0</span></h3>
+            <h3 class="group-header">Unassigned <span class="counter">11</span></h3>
             <ul id="unassigned" class="sortable-list">
-                <li>Dao, Peter Thanh</li>
-                <li>Delgado, Liana Maria</li>
-                <li>Do, Cao Van</li>
-                <li>Doan, Benjamin Minh</li>
-                <li>Hoang, Dat Manh</li>
-                <li>Huynh, Benjamin Gia</li>
-                <li>Huynh, Jessica</li>
-                <li>Lopes Gomes, Jennifer Lismara</li>
-                <li>Mendez Pena, Geralis</li>
-                <li>Nguyen, Minh Anh</li>
-                <li>Nguyen, Uyen Hoang Thao</li>
-                <li>Nguyen, Vu Hung</li>
                 <li>Pineda, Adrian Zyair</li>
                 <li>Ritter, Vivian Orion</li>
                 <li>Rodriguez, Alexa Isabella</li>
@@ -205,12 +209,15 @@
                 <li>Tran, Phuong Nghi Hoang</li>
                 <li>Uong, Anthony</li>
                 <li>Vo, Christine</li>
+                <li>Yediel</li>
+                <li>Kashieph</li>
             </ul>
         </div>
     </div>
 
     <script>
-        const STORAGE_KEY = 'studentGroupsData';
+        // Changed key name so old data doesn't override the new added students
+        const STORAGE_KEY = 'studentGroupsData_v2';
 
         // 1. Load Data from Local Storage
         function loadState() {
