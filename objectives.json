@@ -1,5 +1,21 @@
 [
-
+  {
+    "weekTitle": "Week 33 – April 13 to April 17, 2026",
+    "objectives": "By the end of the week, students will apply their understanding of fraction division and volume to solve real-world problems. They will also successfully complete their Math MCAS testing.",
+    "agenda": [
+      "<strong>Monday:</strong> Lesson 16: Solving Problems Involving Fractions",
+      "<strong>Tuesday:</strong> MCAS Testing",
+      "<strong>Wednesday:</strong> MCAS Testing",
+      "<strong>Thursday:</strong> Lesson 17: Fitting Boxes into Boxes",
+      "<strong>Friday:</strong> Unit 4 Review / Culminating Activity"
+    ],
+    "homework": "Delta Math Week 33 (Light week due to MCAS!)",
+    "languageObjectives": [
+      "Students will read and comprehend multi-step word problems to identify the necessary mathematical operations.",
+      "Students will explain their problem-solving strategies and justify their solutions.",
+      "Students will use precise terminology to describe dimensions and volume in real-world contexts."
+    ]
+  },
   {
     "weekTitle": "Week 32 – April 6 to April 10, 2026",
     "objectives": "By the end of the week, students will solve problems about the side lengths and area of rectangles, and the edge lengths and volume of rectangular prisms using fraction division. They will determine the volume of a rectangular prism by packing it with unit cubes with appropriate unit-fraction edge lengths and by multiplying the edge lengths.",
@@ -10,7 +26,7 @@
       "<strong>Lesson 15:</strong> Volume of Prisms",
       "<em>> Share & Compare Strategies</em>"
     ],
-    "homework": "Delta Math Week 32. MCAS ELA 4/14 (Tue) and 4/15 (Wed).  Math is 5-5 (Tue) and 5-6 (Wed)" ,
+    "homework": "Delta Math Week 32",
     "languageObjectives": [
       "Students will explain their mathematical strategies for finding missing lengths.",
       "Students will justify their reasoning about volume calculations.",
