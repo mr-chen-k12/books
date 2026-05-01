@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vietnamese Flashcards</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+
+        /* Card Styling - No transitions/animations */
+        #flashcard {
+            width: 350px;
+            height: 220px;
+            background-color: white;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        #speakBtn {
+            background-color: #28a745;
+        }
+
+        #speakBtn:hover {
+            background-color: #1e7e34;
+        }
+
+        .instructions {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="flashcard">Loading...</div>
+
+    <div class="controls">
+        <button id="prevBtn">Previous</button>
+        <button id="speakBtn">🔊 Speak</button>
+        <button id="nextBtn">Next</button>
+    </div>
+
+    <div class="instructions">
+        Click the card to flip it instantly.
+    </div>
+
+    <script>
+        // JSON data storing the English and Vietnamese index cards
+        const cardData = [
+            { "en": "One", "vi": "Một" },
+            { "en": "Two", "vi": "Hai" },
+            { "en": "Three", "vi": "Ba" },
+            { "en": "Four", "vi": "Bốn" },
+            { "en": "Five", "vi": "Năm" },
+            { "en": "Six", "vi": "Sáu" },
+            { "en": "Seven", "vi": "Bảy" },
+            { "en": "Eight", "vi": "Tám" },
+            { "en": "Nine", "vi": "Chín" },
+            { "en": "Ten", "vi": "Mười" },
+            { "en": "Hello", "vi": "Xin chào" },
+            { "en": "Thank you", "vi": "Cảm ơn" },
+            { "en": "My name is...", "vi": "Tên tôi là..." },
+            { "en": "Yes", "vi": "Vâng" },
+            { "en": "No", "vi": "Không" }
+        ];
+
+        let currentIndex = 0;
+        let isShowingEnglish = true;
+
+        const flashcardElement = document.getElementById('flashcard');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const speakBtn = document.getElementById('speakBtn');
+
+        // Function to update the card text and button states
+        function updateCard() {
+            const currentCard = cardData[currentIndex];
+            flashcardElement.innerText = isShowingEnglish ? currentCard.en : currentCard.vi;
+            
+            // Disable/Enable navigation buttons at the ends of the deck
+            prevBtn.disabled = currentIndex === 0;
+            nextBtn.disabled = currentIndex === cardData.length - 1;
+        }
+
+        // Flip the card instantly on click
+        flashcardElement.addEventListener('click', () => {
+            isShowingEnglish = !isShowingEnglish;
+            updateCard();
+        });
+
+        // Navigate to previous card
+        prevBtn.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                isShowingEnglish = true; // Always reset to English when moving to a new card
+                updateCard();
+            }
+        });
+
+        // Navigate to next card
+        nextBtn.addEventListener('click', () => {
+            if (currentIndex < cardData.length - 1) {
+                currentIndex++;
+                isShowingEnglish = true; // Always reset to English when moving to a new card
+                updateCard();
+            }
+        });
+
+        // Web Speech API for sounding out the words
+        speakBtn.addEventListener('click', () => {
+            const currentCard = cardData[currentIndex];
+            const textToSpeak = isShowingEnglish ? currentCard.en : currentCard.vi;
+            
+            // Create a new speech utterance
+            const utterance = new SpeechSynthesisUtterance(textToSpeak);
+            
+            // Set language based on which side of the card is showing
+            // vi-VN = Vietnamese (Vietnam), en-US = English (United States)
+            utterance.lang = isShowingEnglish ? 'en-US' : 'vi-VN';
+            
+            // Speak the word
+            window.speechSynthesis.speak(utterance);
+        });
+
+        // Initialize the first card
+        updateCard();
+    </script>
+</body>
+</html>
