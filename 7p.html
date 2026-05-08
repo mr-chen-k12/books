@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The 7 Principles for Making Marriage Work</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Chart.js for Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #e74c3c;
+            --accent: #f39c12;
+            --light: #fdfbf7;
+            --dark: #34495e;
+            --gray: #ecf0f1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light);
+            color: var(--primary);
+            line-height: 1.6;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary);
+        }
+
+        /* Navigation */
+        nav {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        nav a:hover {
+            color: var(--accent);
+        }
+
+        /* Hero Section */
+        header {
+            text-align: center;
+            padding: 4rem 1rem;
+            background: linear-gradient(135deg, #fdfbf7 0%, #faebd7 100%);
+            border-bottom: 2px solid var(--gray);
+        }
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+        }
+        header p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background-color: var(--secondary);
+            margin: 10px auto 0;
+            border-radius: 2px;
+        }
+
+        /* The Four Horsemen */
+        .horsemen-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        .horseman-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-top: 5px solid var(--secondary);
+            transition: transform 0.3s ease;
+        }
+        .horseman-card:hover {
+            transform: translateY(-5px);
+        }
+        .horseman-card h3 {
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+        .antidote {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px dashed var(--gray);
+            font-weight: 500;
+            color: #27ae60;
+        }
+
+        /* Flashcards */
+        .flashcards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .flashcard {
+            background-color: transparent;
+            width: 100%;
+            height: 250px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .flashcard.is-flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        }
+        .flashcard-front {
+            background-color: white;
+            color: var(--primary);
+            border: 2px solid var(--gray);
+        }
+        .flashcard-front h2 {
+            font-size: 3rem;
+            color: var(--gray);
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            opacity: 0.5;
+        }
+        .flashcard-front h3 {
+            font-size: 1.5rem;
+        }
+        .flashcard-back {
+            background-color: var(--primary);
+            color: white;
+            transform: rotateY(180deg);
+        }
+        .flashcard-back p {
+            font-size: 0.95rem;
+        }
+        
+        .click-hint {
+            font-size: 0.8rem;
+            color: #95a5a6;
+            margin-top: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Chart Section */
+        .chart-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+            margin: 4rem auto;
+            max-width: 800px;
+        }
+        .chart-controls {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .slider-group {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .slider-group label {
+            flex: 1;
+            text-align: left;
+            font-weight: 500;
+        }
+        .slider-group input {
+            flex: 2;
+        }
+
+        /* Quiz Section */
+        .quiz-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .question {
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .option {
+            padding: 1rem;
+            background: var(--gray);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        .option:hover {
+            background: #e0e6ed;
+        }
+        .option.selected {
+            background: #d4e6f1;
+            border-color: #3498db;
+        }
+        .option.correct {
+            background: #d5f5e3;
+            border-color: #2ecc71;
+        }
+        .option.incorrect {
+            background: #fadbd8;
+            border-color: #e74c3c;
+        }
+        #quiz-btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 2rem;
+            transition: background 0.3s;
+        }
+        #quiz-btn:hover {
+            background: #c0392b;
+        }
+        #quiz-result {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <ul>
+            <li><a href="#intro">Intro</a></li>
+            <li><a href="#horsemen">The Four Horsemen</a></li>
+            <li><a href="#principles">The 7 Principles</a></li>
+            <li><a href="#visualization">Self-Assessment</a></li>
+            <li><a href="#quiz">Interactive Quiz</a></li>
+        </ul>
+    </nav>
+
+    <header id="intro">
+        <h1>Making Marriage Work</h1>
+        <p>An interactive exploration of Dr. John Gottman's 7 Principles, designed to strengthen relationships, avoid the predictors of divorce, and build a meaningful future together.</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- Four Horsemen Section -->
+        <section id="horsemen" style="margin-bottom: 6rem;">
+            <h2 class="section-title">The Four Horsemen</h2>
+            <p style="text-align: center; margin-bottom: 3rem; max-width: 800px; margin-left: auto; margin-right: auto;">
+                In his research, Dr. Gottman identified four negative communication styles that can predict the end of a relationship. By learning to identify these "Horsemen" and applying their antidotes, couples can resolve conflict productively.
+            </p>
+            <div class="horsemen-grid">
+                <div class="horseman-card">
+                    <h3>1. Criticism</h3>
+                    <p>Attacking your partner's character or personality rather than focusing on the specific behavior.</p>
+                    <div class="antidote">
+                        <strong>Antidote:</strong> Gentle Start-up. Talk about your feelings using "I" statements and express a positive need.
+                    </div>
+                </div>
+                <div class="horseman-card">
+                    <h3>2. Contempt</h3>
+                    <p>Assuming a position of moral superiority over your partner (sarcasm, cynicism, name-calling, eye-rolling).</p>
+                    <div class="antidote">
+                        <strong>Antidote:</strong> Build a Culture of Appreciation. Remind yourself of your partner's positive qualities.
+                    </div>
+                </div>
+                <div class="horseman-card">
+                    <h3>3. Defensiveness</h3>
+                    <p>Self-protection in the form of righteous indignation or innocent victimhood to ward off a perceived attack.</p>
+                    <div class="antidote">
+                        <strong>Antidote:</strong> Take Responsibility. Accept your partner's perspective and offer an apology for any wrongdoing.
+                    </div>
+                </div>
+                <div class="horseman-card">
+                    <h3>4. Stonewalling</h3>
+                    <p>Withdrawing from the interaction, shutting down, and simply stopping responding to your partner.</p>
+                    <div class="antidote">
+                        <strong>Antidote:</strong> Physiological Self-Soothing. Take a 20-minute break to calm down before returning to the conversation.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Principles Flashcards Section -->
+        <section id="principles" style="margin-bottom: 6rem;">
+            <h2 class="section-title">The 7 Principles (Flashcards)</h2>
+            <p style="text-align: center; margin-bottom: 3rem;">Click on any card to flip it and read the summary of the principle.</p>
+            
+            <div class="flashcards-container">
+                <!-- Card 1 -->
+                <div class="flashcard" onclick="this.classList.toggle('is-flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h2>1</h2>
+                            <h3>Enhance Your Love Maps</h3>
+                            <div class="click-hint">Click to flip</div>
+                        </div>
+                        <div class="flashcard-back">
+                            <p>A "love map" is the part of your brain where you store all the relevant information about your partner's life. Know their worries, hopes, goals, and history. Happy couples are intimately familiar with each other's worlds.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="flashcard" onclick="this.classList.toggle('is-flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h2>2</h2>
+                            <h3>Nurture Fondness & Admiration</h3>
+                            <div class="click-hint">Click to flip</div>
+                        </div>
+                        <div class="flashcard-back">
+                            <p>This is the antidote to contempt. It means maintaining a fundamental sense that your partner is worthy of being respected and liked. Remind yourself of their positive qualities and express your appreciation out loud.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="flashcard" onclick="this.classList.toggle('is-flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h2>3</h2>
+                            <h3>Turn Toward Each Other</h3>
+                            <div class="click-hint">Click to flip</div>
+                        </div>
+                        <div class="flashcard-back">
+                            <p>Partners constantly make "bids" for each other's attention, affection, or support. Turning toward these bids (rather than away or against) forms the basis of emotional connection, romance, and a healthy emotional bank account.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="flashcard" onclick="this.classList.toggle('is-flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h2>4</h2>
+                            <h3>Let Your Partner Influence You</h3>
+                            <div class="click-hint">Click to flip</div>
+                        </div>
+                        <div class="flashcard-back">
+                            <p>Happy couples are a team that considers each other's perspectives and feelings. Making decisions together and searching for common ground is crucial rather than exerting power over one another.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="flashcard" onclick="this.classList.toggle('is-flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h2>5</h2>
+                            <h3>Solve Your Solvable Problems</h3>
+                            <div class="click-hint">Click to flip</div>
+                        </div>
+                        <div class="flashcard-back">
+                            <p>Use a gentle startup, learn to make and receive repair attempts, soothe yourself and each other, compromise, and be tolerant of each other's faults when tackling situational conflicts.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="flashcard" onclick="this.classList.toggle('is-flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h2>6</h2>
+                            <h3>Overcome Gridlock</h3>
+                            <div class="click-hint">Click to flip</div>
+                        </div>
+                        <div class="flashcard-back">
+                            <p>For perpetual problems (the 69% of issues that never go away), the goal is not to solve them, but to move from gridlock to dialogue. Understand the underlying dreams and values fueling your partner's position.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 7 -->
+                <div class="flashcard" onclick="this.classList.toggle('is-flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h2>7</h2>
+                            <h3>Create Shared Meaning</h3>
+                            <div class="click-hint">Click to flip</div>
+                        </div>
+                        <div class="flashcard-back">
+                            <p>Marriage isn't just about fighting less; it's about building a life together. Create rituals of connection, align your roles, support each other's life goals, and build a shared culture and legacy.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Visualization -->
+        <section id="visualization" style="margin-bottom: 6rem;">
+            <h2 class="section-title">Interactive Relationship Assessment</h2>
+            <div class="chart-container">
+                <p style="text-align: center; margin-bottom: 2rem;">Use the sliders below to rate your relationship (1-10) on the 7 Principles. The radar chart will update dynamically to show your relationship's current strengths and growth areas.</p>
+                
+                <div style="display: flex; flex-wrap: wrap; gap: 2rem;">
+                    <div style="flex: 1; min-width: 300px;">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                    <div style="flex: 1; min-width: 300px; display: flex; flex-direction: column; justify-content: center;">
+                        <div class="slider-group">
+                            <label>Love Maps</label>
+                            <input type="range" id="slider0" min="1" max="10" value="7" oninput="updateChart()">
+                        </div>
+                        <div class="slider-group">
+                            <label>Fondness</label>
+                            <input type="range" id="slider1" min="1" max="10" value="8" oninput="updateChart()">
+                        </div>
+                        <div class="slider-group">
+                            <label>Turning Toward</label>
+                            <input type="range" id="slider2" min="1" max="10" value="6" oninput="updateChart()">
+                        </div>
+                        <div class="slider-group">
+                            <label>Influence</label>
+                            <input type="range" id="slider3" min="1" max="10" value="7" oninput="updateChart()">
+                        </div>
+                        <div class="slider-group">
+                            <label>Solvable Problems</label>
+                            <input type="range" id="slider4" min="1" max="10" value="5" oninput="updateChart()">
+                        </div>
+                        <div class="slider-group">
+                            <label>Overcome Gridlock</label>
+                            <input type="range" id="slider5" min="1" max="10" value="6" oninput="updateChart()">
+                        </div>
+                        <div class="slider-group">
+                            <label>Shared Meaning</label>
+                            <input type="range" id="slider6" min="1" max="10" value="8" oninput="updateChart()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz Section -->
+        <section id="quiz">
+            <h2 class="section-title">Knowledge Check</h2>
+            <div class="quiz-container">
+                <div id="quiz-content">
+                    <!-- Questions will be injected here via JS -->
+                </div>
+                <button id="quiz-btn" onclick="submitQuiz()">Submit Answers</button>
+                <div id="quiz-result"></div>
+            </div>
+        </section>
+
+    </div>
+
+    <footer>
+        <p>Interactive summary of "The 7 Principles for Making Marriage Work" by Dr. John Gottman.</p>
+        <p style="font-size: 0.8rem; margin-top: 10px; color: #bdc3c7;">Created for educational purposes.</p>
+    </footer>
+
+    <script>
+        /* --- CHART JS LOGIC --- */
+        const ctx = document.getElementById('radarChart').getContext('2d');
+        const labels = ['Love Maps', 'Fondness', 'Turning Toward', 'Influence', 'Solvable Problems', 'Gridlock', 'Shared Meaning'];
+        
+        const radarChart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Relationship Score',
+                    data: [7, 8, 6, 7, 5, 6, 8],
+                    backgroundColor: 'rgba(231, 76, 60, 0.2)',
+                    borderColor: 'rgba(231, 76, 60, 1)',
+                    pointBackgroundColor: 'rgba(231, 76, 60, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: {
+                    r: {
+                        angleLines: { color: 'rgba(0,0,0,0.1)' },
+                        suggestedMin: 0,
+                        suggestedMax: 10,
+                        ticks: { stepSize: 2 }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        function updateChart() {
+            const newData = [];
+            for (let i = 0; i < 7; i++) {
+                newData.push(document.getElementById('slider' + i).value);
+            }
+            radarChart.data.datasets[0].data = newData;
+            radarChart.update();
+        }
+
+        /* --- QUIZ LOGIC --- */
+        const questions = [
+            {
+                q: "Which of the following is considered the most destructive of the 'Four Horsemen'?",
+                options: ["Criticism", "Contempt", "Defensiveness", "Stonewalling"],
+                answer: 1 // Contempt
+            },
+            {
+                q: "What does it mean to 'Enhance your Love Maps'?",
+                options: [
+                    "Planning frequent romantic vacations together.",
+                    "Knowing the intimate details of your partner's life, worries, and hopes.",
+                    "Leaving love notes around the house.",
+                    "Navigating arguments without getting lost in anger."
+                ],
+                answer: 1
+            },
+            {
+                q: "What is a 'bid' in Gottman's terminology?",
+                options: [
+                    "An attempt to gain control in a relationship.",
+                    "A financial agreement made before marriage.",
+                    "Any attempt from one partner to another for attention, affirmation, or connection.",
+                    "A formal apology after an argument."
+                ],
+                answer: 2
+            },
+            {
+                q: "For perpetual problems (gridlock), the primary goal is:",
+                options: [
+                    "To solve them completely and permanently.",
+                    "To ignore them to avoid conflict.",
+                    "To change your partner's mind over time.",
+                    "To move from gridlock to dialogue and understand underlying dreams."
+                ],
+                answer: 3
+            }
+        ];
+
+        let selectedAnswers = new Array(questions.length).fill(null);
+
+        function renderQuiz() {
+            const quizContainer = document.getElementById('quiz-content');
+            let html = '';
+            
+            questions.forEach((question, qIndex) => {
+                html += `
+                    <div class="question-block" style="margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #ecf0f1;">
+                        <div class="question">${qIndex + 1}. ${question.q}</div>
+                        <div class="options">
+                            ${question.options.map((opt, oIndex) => `
+                                <div class="option" id="opt-${qIndex}-${oIndex}" onclick="selectOption(${qIndex}, ${oIndex})">
+                                    ${String.fromCharCode(65 + oIndex)}. ${opt}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            quizContainer.innerHTML = html;
+        }
+
+        function selectOption(qIndex, oIndex) {
+            selectedAnswers[qIndex] = oIndex;
+            
+            // Remove selected class from all options in this question
+            for (let i = 0; i < questions[qIndex].options.length; i++) {
+                document.getElementById(`opt-${qIndex}-${i}`).classList.remove('selected');
+            }
+            
+            // Add selected class to clicked option
+            document.getElementById(`opt-${qIndex}-${oIndex}`).classList.add('selected');
+        }
+
+        function submitQuiz() {
+            // Check if all answered
+            if (selectedAnswers.includes(null)) {
+                alert("Please answer all questions before submitting.");
+                return;
+            }
+
+            let score = 0;
+            
+            questions.forEach((question, qIndex) => {
+                const userAns = selectedAnswers[qIndex];
+                const correctAns = question.answer;
+                
+                // Highlight correct and incorrect
+                document.getElementById(`opt-${qIndex}-${userAns}`).classList.remove('selected');
+                
+                if (userAns === correctAns) {
+                    score++;
+                    document.getElementById(`opt-${qIndex}-${userAns}`).classList.add('correct');
+                } else {
+                    document.getElementById(`opt-${qIndex}-${userAns}`).classList.add('incorrect');
+                    document.getElementById(`opt-${qIndex}-${correctAns}`).classList.add('correct');
+                }
+                
+                // Disable further clicks
+                for (let i = 0; i < question.options.length; i++) {
+                    document.getElementById(`opt-${qIndex}-${i}`).style.pointerEvents = 'none';
+                }
+            });
+
+            document.getElementById('quiz-btn').style.display = 'none';
+            document.getElementById('quiz-result').innerHTML = `You scored ${score} out of ${questions.length}!`;
+            if (score === questions.length) {
+                document.getElementById('quiz-result').style.color = '#27ae60';
+            } else {
+                document.getElementById('quiz-result').style.color = '#e74c3c';
+            }
+        }
+
+        // Initialize quiz
+        renderQuiz();
+
+    </script>
+</body>
+</html>
