@@ -1,6 +1,23 @@
 [
   {
-    "weekTitle": "Week 36 – May 4 to May 8, 2026",
+    "weekTitle": "Week 36 – May 11 to May 15, 2026",
+    "objectives": "By the end of the week, students will apply fraction division to solve complex, multi-step problems involving volume and logistics. They will analyze real-world shipping scenarios to determine efficiency and cost-effectiveness before launching Unit 5.",
+    "agenda": [
+      "<strong>Monday:</strong> Lesson 16: Solving Problems Involving Fractions",
+      "<strong>Tuesday:</strong> Lesson 17: Fitting Boxes into Boxes (Part 1)",
+      "<strong>Wednesday:</strong> Lesson 17: Fitting Boxes into Boxes (Part 2 - Shipping Cost Analysis)",
+      "<strong>Thursday:</strong> Unit 4 Review & Wrap-up",
+      "<strong>Friday:</strong> Unit 5 Lesson Launch!"
+    ],
+    "homework": "Delta Math Week 36",
+    "languageObjectives": [
+      "Students will read and comprehend multi-step word problems to identify necessary mathematical operations (addition, subtraction, multiplication, or division).",
+      "Students will justify their choice of operations and explain their problem-solving strategies to peers.",
+      "Students will use precise terminology to describe dimensions, volume, and unit rates in real-world shipping scenarios."
+    ]
+  },
+  {
+    "weekTitle": "Week 35 – May 4 to May 8, 2026",
     "objectives": "By the end of the week, students will finalize their understanding of fraction division and volume by solving real-world problems. They will also successfully complete their Math MCAS testing before beginning our new unit.",
     "agenda": [
       "<strong>Monday:</strong> Lesson 16: Solving Problems Involving Fractions",
@@ -9,7 +26,7 @@
       "<strong>Thursday:</strong> Lesson 17: Fitting Boxes into Boxes",
       "<strong>Friday:</strong> Unit 5 Lesson Launch!"
     ],
-    "homework": "Delta Math Week 36 (Light week due to MCAS!)",
+    "homework": "Delta Math Week 35 (Light week due to MCAS!)",
     "languageObjectives": [
       "Students will read and comprehend multi-step word problems to identify the necessary mathematical operations.",
       "Students will explain their problem-solving strategies and justify their solutions.",
@@ -17,7 +34,7 @@
     ]
   },
   {
-    "weekTitle": "Week 35 – April 27 to May 1, 2026",
+    "weekTitle": "Week 34 – April 27 to May 1, 2026",
     "objectives": "By the end of the week, students will finalize their understanding of fraction division and volume by solving real-world problems. They will demonstrate their mastery of these concepts on the end-of-unit assessment before transitioning into our new unit.",
     "agenda": [
       "<strong>Monday:</strong> Lesson 16: Solving Problems Involving Fractions",
@@ -26,7 +43,7 @@
       "<strong>Thursday:</strong> Unit 4 Assessment",
       "<strong>Friday:</strong> Unit 5 Lesson Launch!"
     ],
-    "homework": "Delta Math Week 35",
+    "homework": "Delta Math Week 34",
     "languageObjectives": [
       "Students will read and comprehend multi-step word problems to identify the necessary mathematical operations.",
       "Students will explain their problem-solving strategies and justify their solutions.",
@@ -47,79 +64,4 @@
     "languageObjectives": [
       "Students will read and comprehend multi-step word problems to identify the necessary mathematical operations.",
       "Students will explain their problem-solving strategies and justify their solutions.",
-      "Students will use precise terminology to describe dimensions and volume in real-world contexts."
-    ]
-  },
-  {
-    "weekTitle": "Week 32 – April 6 to April 10, 2026",
-    "objectives": "By the end of the week, students will solve problems about the side lengths and area of rectangles, and the edge lengths and volume of rectangular prisms using fraction division. They will determine the volume of a rectangular prism by packing it with unit cubes with appropriate unit-fraction edge lengths and by multiplying the edge lengths.",
-    "agenda": [
-      "<strong>Delta Math Warm-Up</strong> > <strong>Notebook & Pencil</strong> > <strong>Launch Question</strong>",
-      "<strong>Lesson 13:</strong> Rectangles with Fractional Side Lengths",
-      "<strong>Lesson 14:</strong> Fractional Lengths in Triangles and Prisms",
-      "<strong>Lesson 15:</strong> Volume of Prisms",
-      "<em>> Share & Compare Strategies</em>"
-    ],
-    "homework": "Delta Math Week 32",
-    "languageObjectives": [
-      "Students will explain their mathematical strategies for finding missing lengths.",
-      "Students will justify their reasoning about volume calculations.",
-      "Students will use precise terminology—including <strong>gaps</strong> and <strong>packed</strong>—to describe measuring and filling prisms."
-    ]
-  },
-  {
-    "weekTitle": "Week 31 – March 30 to April 2, 2026",
-    "objectives": "By the end of the week, students will generalize a process for dividing a number by a fraction and use the fraction division algorithm to calculate quotients. They will also apply these concepts to solve geometric problems involving fractional lengths.",
-    "agenda": [
-      "<strong>Delta Math Warm-Up</strong> > <strong>Notebook & Pencil</strong> > <strong>Launch Question</strong>",
-      "<strong>Lesson 9:</strong> How Much in Each Group? (Part 2) (Optional)",
-      "<strong>Lesson 10:</strong> Dividing by Unit and Non-Unit Fractions",
-      "<strong>Lesson 11:</strong> Using an Algorithm to Divide Fractions",
-      "<strong>Lesson 12:</strong> Fractional Lengths",
-      "<em>> Share & Compare Strategies</em>"
-    ],
-    "homework": "Delta Math Week 31",
-    "languageObjectives": [
-      "Students will interpret and explain how to represent situations involving division.",
-      "Students will justify their mathematical strategies for dividing fractions.",
-      "Students will use precise terminology—including <strong>numerator</strong>, <strong>denominator</strong>, and <strong>reciprocal</strong>—to explain their reasoning."
-    ]
-  },
-  {
-    "weekTitle": "Week 28 – March 23 to March 27, 2026",
-    "objectives": "By the end of the week, students will be able to solve problems involving the division of fractions by using diagrams, writing equations, and reasoning about the relationship between multiplication and division. They will represent problems involving fractional divisors to answer questions like \"How many groups?\" and \"How much in one group?\".",
-    "agenda": [
-      "<strong>Delta Math Warm-Up</strong> > <strong>Notebook & Pencil</strong> > <strong>Launch Question</strong>",
-      "<strong>Lesson 5:</strong> How Many Groups? (Part 2)",
-      "<strong>Lesson 6:</strong> Using Diagrams to Find the Number of Groups",
-      "<strong>Lesson 7:</strong> What Fraction of a Group?",
-      "<strong>Lesson 8:</strong> How Much in Each Group? (Part 1)",
-      "<strong>Lesson 9:</strong> How Much in Each Group? (Part 2) (Optional)",
-      "<em>> Share & Compare Strategies</em>"
-    ],
-    "homework": "Delta Math Week 28",
-    "languageObjectives": [
-      "Students will justify their reasoning about division and tape diagrams orally and in writing.",
-      "Students will explain how to create and make sense of division diagrams.",
-      "Students will use precise terminology—including whole, equal-size, fraction of, and unknown—to interpret and represent division situations."
-    ]
-  },
-  {
-    "weekTitle": "Week 27 – March 16 to March 20, 2026",
-    "objectives": "By the end of the week, students will be able to describe the relationship between the size of the divisor and the size of the quotient in division problems. They will represent division situations using equations like $a \\div b = \\frac{a}{b}$ and diagrams to answer two fundamental questions: \"How many groups?\" and \"How much in each group?\".",
-    "agenda": [
-      "<strong>Delta Math Warm-Up</strong> > <strong>Notebook & Pencil</strong> > <strong>Launch Question</strong>",
-      "<strong>Lesson 1:</strong> Size of Divisor and Size of Quotient",
-      "<strong>Lesson 2:</strong> Meanings of Division (How many groups? vs. How much in a group?)",
-      "<strong>Lesson 3:</strong> Interpreting Division Situations",
-      "<strong>Lesson 4:</strong> How Many Groups? (Part 1 - Fractional Divisors)",
-      "<em>> Share & Compare Strategies</em>"
-    ],
-    "homework": "Delta Math Week 27",
-    "languageObjectives": [
-      "Students will use the terms <strong>dividend</strong>, <strong>divisor</strong>, and <strong>quotient</strong> to describe parts of a division equation.",
-      "Students will interpret and represent division situations by creating tape diagrams and writing corresponding multiplication or division equations.",
-      "Students will justify their reasoning about division by explaining how a diagram represents either the number of groups or the size of each group."
-    ]
-  }
-]
+      "Students will use precise terminology
