@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Murphy Thunder Absentee Oracle</title>
+    <style>
+        :root {
+            --murphy-blue: #0b1d4f;
+            --murphy-gold: #f2bc18;
+            --dark-bg: #070f26;
+            --text-light: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            background-image: radial-gradient(circle at center, var(--murphy-blue) 0%, var(--dark-bg) 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #ffffff;
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(242, 188, 24, 0.4);
+        }
+
+        .subtitle {
+            color: var(--murphy-gold);
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+            font-style: italic;
+            letter-spacing: 1px;
+        }
+
+        /* The 8-Ball Container */
+        .ball-outer {
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #1a357d, var(--murphy-blue) 60%, #030814 100%);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 
+                        inset 0 10px 20px rgba(255, 255, 255, 0.2),
+                        inset 0 -10px 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.1s ease;
+        }
+
+        /* 8-Ball Window Frame */
+        .ball-window {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: #040914;
+            border: 4px solid var(--murphy-gold);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Triangle Floating inside */
+        .oracle-triangle {
+            width: 0;
+            height: 0;
+            border-left: 65px solid transparent;
+            border-right: 65px solid transparent;
+            border-bottom: 110px solid rgba(242, 188, 24, 0.15);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Text Container mapped over the triangle area */
+        .answer-text {
+            position: absolute;
+            top: 35px;
+            width: 100px;
+            color: var(--murphy-gold);
+            font-size: 0.75rem;
+            font-weight: bold;
+            line-height: 1.3;
+            text-transform: uppercase;
+            text-align: center;
+            text-shadow: 0 0 8px rgba(242, 188, 24, 0.8);
+            opacity: 0;
+            transform: scale(0.6);
+            transition: opacity 2.5s ease-in-out, transform 2.5s ease-in-out;
+        }
+
+        .answer-text.reveal {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .teacher-name {
+            font-size: 1.05rem;
+            color: #ffffff;
+            display: block;
+            margin-bottom: 4px;
+            letter-spacing: 1px;
+        }
+
+        /* Shake Animation Rules */
+        .shake-animation {
+            animation: violent-shake 0.5s infinite;
+        }
+
+        @keyframes violent-shake {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            10% { transform: translate(-8px, 5px) rotate(-3deg); }
+            20% { transform: translate(7px, -6px) rotate(4deg); }
+            30% { transform: translate(-6px, -2px) rotate(-2deg); }
+            40% { transform: translate(5px, 6px) rotate(3deg); }
+            50% { transform: translate(-4px, -5px) rotate(-1deg); }
+            60% { transform: translate(6px, 3px) rotate(2deg); }
+            70% { transform: translate(-5px, 4px) rotate(-3deg); }
+            80% { transform: translate(4px, -4px) rotate(2deg); }
+            90% { transform: translate(-3px, 3px) rotate(-1deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        /* Action Buttons & Utilities */
+        .controls {
+            margin-top: 35px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+
+        button {
+            background-color: var(--murphy-gold);
+            color: var(--dark-bg);
+            border: none;
+            padding: 12px 24px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 5px 15px rgba(242, 188, 24, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        button:active {
+            transform: scale(0.96);
+        }
+
+        .hint {
+            font-size: 0.8rem;
+            color: #5a6e9c;
+            max-width: 260px;
+            line-height: 1.4;
+        }
+
+        /* Subtle Background Clouds / Lightning Vibe */
+        .thunderbolt-decor {
+            position: absolute;
+            font-size: 10rem;
+            color: rgba(242, 188, 24, 0.02);
+            z-index: -1;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="thunderbolt-decor">⚡</div>
+
+    <h1>Murphy Thunder</h1>
+    <div class="subtitle">The Omniscient Absentee Oracle v1.0</div>
+
+    <div class="ball-outer" id="ball" onclick="triggerOracle()">
+        <div class="ball-window">
+            <div class="oracle-triangle">
+                <div class="answer-text" id="answer">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="motionBtn" onclick="requestMotionPermission()">Enable Shake Sensor</button>
+        <div class="hint" id="statusHint">Tap the ball directly or shake your phone to peek into the future.</div>
+    </div>
+
+    <script>
+        // Config options given by user
+        const teachers = ['Reilly', 'Chen', 'McNamara', 'Brianna', 'McDonald', 'O\'Connor', 'Pham, J.', 'Locke'];
+        
+        // Sarcastic excuses tailored to your prompt
+        const excuses = [
+            "Is 'sick'. (Sleeping in)",
+            "Ghosted the front office.",
+            "Trapped in the coffee drive-thru.",
+            "Plotting a surprise quiz.",
+            "Left early. Enjoy your freedom.",
+            "Spotted fleeing the parking lot.",
+            "Taking a mental health decade.",
+            "Extended weekend mode engaged."
+        ];
+
+        const ball = document.getElementById('ball');
+        const answer = document.getElementById('answer');
+        const motionBtn = document.getElementById('motionBtn');
+        const statusHint = document.getElementById('statusHint');
+
+        let isShaking = false;
+        let lastX = null, lastY = null, lastZ = null;
+        const SHAKE_THRESHOLD = 15; // Sensitivity calibration for shake actions
+
+        // Fallback or Direct click trigger
+        function triggerOracle() {
+            if (isShaking) return;
+            isShaking = true;
+
+            // Clear old text instantly to simulate sinking into the ink
+            answer.classList.remove('reveal');
+            
+            // Initiate heavy visual shaking
+            ball.classList.add('shake-animation');
+
+            setTimeout(() => {
+                // Stop shaking after 1.2 seconds
+                ball.classList.remove('shake-animation');
+                
+                // Select a random teacher and pairing excuse
+                const randomTeacher = teachers[Math.floor(Math.random() * teachers.length)];
+                const randomExcuse = excuses[Math.floor(Math.random() * excuses.length)];
+
+                // Update DOM text
+                answer.innerHTML = `<span class="teacher-name">${randomTeacher}</span> ${randomExcuse}`;
+                
+                // Trigger CSS transition to slowly fade the floating triangle up
+                setTimeout(() => {
+                    answer.classList.add('reveal');
+                    isShaking = false;
+                }, 100);
+
+            }, 1200);
+        }
+
+        // Handle iOS 13+ Accelerometer requirements
+        function requestMotionPermission() {
+            if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+                DeviceMotionEvent.requestPermission()
+                    .then(permissionState => {
+                        if (permissionState === 'granted') {
+                            window.addEventListener('devicemotion', handleMotion, true);
+                            motionBtn.style.display = 'none';
+                            statusHint.innerText = "Sensor active! Give your device a firm shake.";
+                        } else {
+                            statusHint.innerText = "Permission denied. Just tap the ball instead!";
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                // Non-iOS device or browser without explicit permission barriers
+                window.addEventListener('devicemotion', handleMotion, true);
+                motionBtn.style.display = 'none';
+                statusHint.innerText = "Shake sensor ready. Give it a flip or tap the ball!";
+            }
+        }
+
+        // Device Motion Math Logic
+        function handleMotion(event) {
+            let acceleration = event.accelerationIncludingGravity;
+            if (!acceleration) return;
+
+            let x = acceleration.x;
+            let y = acceleration.y;
+            let z = acceleration.z;
+
+            if (lastX !== null) {
+                let deltaX = Math.abs(lastX - x);
+                let deltaY = Math.abs(lastY - y);
+                let deltaZ = Math.abs(lastZ - z);
+
+                // Check if changes pass threshold values on multiple axis
+                if ((deltaX > SHAKE_THRESHOLD && deltaY > SHAKE_THRESHOLD) || 
+                    (deltaX > SHAKE_THRESHOLD && deltaZ > SHAKE_THRESHOLD) || 
+                    (deltaY > SHAKE_THRESHOLD && deltaZ > SHAKE_THRESHOLD)) {
+                    triggerOracle();
+                }
+            }
+
+            lastX = x;
+            lastY = y;
+            lastZ = z;
+        }
+
+        // Hide permission button by default if standard desktop browser environment
+        window.onload = () => {
+            const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+            if (!isMobile || !(typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function')) {
+                motionBtn.style.display = 'none';
+                statusHint.innerText = "Click directly on the ball to see who ditched.";
+            }
+        };
+    </script>
+</body>
+</html>
