@@ -155,21 +155,27 @@
             align-items: center;
         }
 
-        button {
+        #shakeBtn {
             background-color: var(--murphy-gold);
             color: var(--dark-bg);
             border: none;
-            padding: 12px 24px;
-            font-size: 0.9rem;
+            padding: 14px 32px;
+            font-size: 1rem;
             font-weight: bold;
             border-radius: 25px;
             cursor: pointer;
             text-transform: uppercase;
+            letter-spacing: 1px;
             box-shadow: 0 5px 15px rgba(242, 188, 24, 0.3);
             transition: all 0.2s ease;
         }
 
-        button:active {
+        #shakeBtn:hover {
+            background-color: #ffffff;
+            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.4);
+        }
+
+        #shakeBtn:active {
             transform: scale(0.96);
         }
 
@@ -207,15 +213,15 @@
     </div>
 
     <div class="controls">
-        <button id="motionBtn" onclick="requestMotionPermission()">Enable Shake Sensor</button>
-        <div class="hint" id="statusHint">Tap the ball directly or shake your phone to peek into the future.</div>
+        <button id="shakeBtn" onclick="triggerOracle()">Shake the 8-Ball</button>
+        <div class="hint">Click the button or the ball directly to reveal today's missing staff member.</div>
     </div>
 
     <script>
         // Config options given by user
         const teachers = ['Reilly', 'Chen', 'McNamara', 'Brianna', 'McDonald', 'O\'Connor', 'Pham, J.', 'Locke'];
         
-        // Sarcastic excuses tailored to your prompt
+        // Sarcastic excuses
         const excuses = [
             "Is 'sick'. (Sleeping in)",
             "Ghosted the front office.",
@@ -229,23 +235,21 @@
 
         const ball = document.getElementById('ball');
         const answer = document.getElementById('answer');
-        const motionBtn = document.getElementById('motionBtn');
-        const statusHint = document.getElementById('statusHint');
+        const shakeBtn = document.getElementById('shakeBtn');
 
         let isShaking = false;
-        let lastX = null, lastY = null, lastZ = null;
-        const SHAKE_THRESHOLD = 15; // Sensitivity calibration for shake actions
 
-        // Fallback or Direct click trigger
         function triggerOracle() {
             if (isShaking) return;
             isShaking = true;
 
-            // Clear old text instantly to simulate sinking into the ink
+            // Clear old text instantly to simulate sinking back into the ink
             answer.classList.remove('reveal');
             
-            // Initiate heavy visual shaking
+            // Initiate heavy visual shaking animation
             ball.classList.add('shake-animation');
+            shakeBtn.disabled = true;
+            shakeBtn.innerText = "Consulting the void...";
 
             setTimeout(() => {
                 // Stop shaking after 1.2 seconds
@@ -262,68 +266,12 @@
                 setTimeout(() => {
                     answer.classList.add('reveal');
                     isShaking = false;
+                    shakeBtn.disabled = false;
+                    shakeBtn.innerText = "Shake the 8-Ball";
                 }, 100);
 
             }, 1200);
         }
-
-        // Handle iOS 13+ Accelerometer requirements
-        function requestMotionPermission() {
-            if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
-                DeviceMotionEvent.requestPermission()
-                    .then(permissionState => {
-                        if (permissionState === 'granted') {
-                            window.addEventListener('devicemotion', handleMotion, true);
-                            motionBtn.style.display = 'none';
-                            statusHint.innerText = "Sensor active! Give your device a firm shake.";
-                        } else {
-                            statusHint.innerText = "Permission denied. Just tap the ball instead!";
-                        }
-                    })
-                    .catch(console.error);
-            } else {
-                // Non-iOS device or browser without explicit permission barriers
-                window.addEventListener('devicemotion', handleMotion, true);
-                motionBtn.style.display = 'none';
-                statusHint.innerText = "Shake sensor ready. Give it a flip or tap the ball!";
-            }
-        }
-
-        // Device Motion Math Logic
-        function handleMotion(event) {
-            let acceleration = event.accelerationIncludingGravity;
-            if (!acceleration) return;
-
-            let x = acceleration.x;
-            let y = acceleration.y;
-            let z = acceleration.z;
-
-            if (lastX !== null) {
-                let deltaX = Math.abs(lastX - x);
-                let deltaY = Math.abs(lastY - y);
-                let deltaZ = Math.abs(lastZ - z);
-
-                // Check if changes pass threshold values on multiple axis
-                if ((deltaX > SHAKE_THRESHOLD && deltaY > SHAKE_THRESHOLD) || 
-                    (deltaX > SHAKE_THRESHOLD && deltaZ > SHAKE_THRESHOLD) || 
-                    (deltaY > SHAKE_THRESHOLD && deltaZ > SHAKE_THRESHOLD)) {
-                    triggerOracle();
-                }
-            }
-
-            lastX = x;
-            lastY = y;
-            lastZ = z;
-        }
-
-        // Hide permission button by default if standard desktop browser environment
-        window.onload = () => {
-            const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-            if (!isMobile || !(typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function')) {
-                motionBtn.style.display = 'none';
-                statusHint.innerText = "Click directly on the ball to see who ditched.";
-            }
-        };
     </script>
 </body>
 </html>
