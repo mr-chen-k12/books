@@ -217,7 +217,7 @@
     let gridData = [null, null, null, null]; 
     let score = 0;
     let streak = 0;
-    let isTransitioning = true; // Start true to block inputs during initial countdown
+    let isTransitioning = true; // Block input selectors during preview
 
     const wrapper = document.getElementById('grid-wrapper');
     const scoreEl = document.getElementById('score');
@@ -229,19 +229,18 @@
         return ASSETS[Math.floor(Math.random() * ASSETS.length)];
     }
 
-    // Initialize the grid with a preview countdown
+    // Initialize the grid with a full preview phase
     function initGame() {
         gridData = [];
         buttons.forEach(b => b.disabled = true);
 
-        // Populate all 4 grid spots
         for (let i = 0; i < 4; i++) {
             const asset = getRandomAsset();
             const card = document.createElement('div');
             card.className = `card ${POSITION_CLASSES[i]}`;
             
-            // MODIFICATION: At launch, BOTH Top-Right (1) and Bottom-Left (3) display face-up
-            if (i === 1 || i === 3) {
+            // MODIFICATION: At launch, reveal Top-Right (1), Bottom-Right (2), and Bottom-Left (3)
+            if (i === 1 || i === 2 || i === 3) {
                 card.innerHTML = `<div class="face-up">${asset.svg}</div>`;
             } else {
                 card.innerHTML = `<div class="face-down">?</div>`;
@@ -251,22 +250,24 @@
             gridData.push({ asset, element: card });
         }
 
-        // 3-Second Memorization Loop
+        // 3-Second Grid Memorization Loop
         let timeLeft = 3;
-        showFeedback(`Memorize the bottom-left card! (${timeLeft}s)`, "info");
+        showFeedback(`Memorize the starting sequence! (${timeLeft}s)`, "info");
 
         const countdownInterval = setInterval(() => {
             timeLeft--;
             if (timeLeft > 0) {
-                showFeedback(`Memorize the bottom-left card! (${timeLeft}s)`, "info");
+                showFeedback(`Memorize the starting sequence! (${timeLeft}s)`, "info");
             } else {
                 clearInterval(countdownInterval);
                 
-                // Flip Bottom-Left (index 3) back to face-down state
+                // MODIFICATION: Flip Bottom-Right (2) and Bottom-Left (3) back to hidden states
+                gridData[2].element.innerHTML = `<div class="face-down">?</div>`;
                 gridData[3].element.innerHTML = `<div class="face-down">?</div>`;
-                showFeedback("Go! Does the new card match your memory?", "");
                 
-                // Enable gameplay mechanics
+                showFeedback("Go! Does the target card match your memory?", "");
+                
+                // Unlock gameplay actions
                 isTransitioning = false;
                 buttons.forEach(b => b.disabled = false);
             }
@@ -319,7 +320,7 @@
         nextGridData[2] = gridData[1]; // TR -> BR
         nextGridData[3] = gridData[2]; // BR -> BL
 
-        // 3. Process structural class changes and keep BL hidden
+        // 3. Process structural class changes (only TR stays face-up)
         for (let i = 1; i < 4; i++) {
             const item = nextGridData[i];
             item.element.className = `card ${POSITION_CLASSES[i]}`;
@@ -341,7 +342,7 @@
         newElement.style.transform = 'scale(0.8)';
         wrapper.appendChild(newElement);
         
-        void newElement.offsetWidth; // Force Reflow
+        void newElement.offsetWidth; // Force CSS Reflow
         newElement.style.opacity = 1;
         newElement.style.transform = 'scale(1)';
 
