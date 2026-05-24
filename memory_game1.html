@@ -82,7 +82,6 @@
         .pos-tl { top: 10px; left: 10px; }
         .pos-tr { top: 10px; left: 170px; border-color: #00ffd2; box-shadow: 0 0 15px rgba(0, 255, 210, 0.4); }
         .pos-br { top: 170px; left: 170px; }
-        /* BL keeps a neon outline so the user knows it's the target mystery card */
         .pos-bl { top: 170px; left: 10px; border-color: #ff007f; box-shadow: 0 0 15px rgba(255, 0, 127, 0.4); }
 
         /* Card Face States */
@@ -137,7 +136,7 @@
         }
 
         button:disabled {
-            opacity: 0.5;
+            opacity: 0.3;
             cursor: not-allowed;
         }
 
@@ -154,6 +153,7 @@
         
         .correct { color: #00ffd2; }
         .wrong { color: #ff007f; }
+        .info { color: #ffca28; }
 
         /* Zone Labels */
         .zone-label {
@@ -191,7 +191,6 @@
     </div>
 
 <script>
-    // 3 custom shapes with distinct colors
     const ASSETS = [
         {
             id: 1,
@@ -213,13 +212,12 @@
         }
     ];
 
-    // Grid Positions: 0 = TL, 1 = TR, 2 = BR, 3 = BL
     const POSITION_CLASSES = ['pos-tl', 'pos-tr', 'pos-br', 'pos-bl'];
     
     let gridData = [null, null, null, null]; 
     let score = 0;
     let streak = 0;
-    let isTransitioning = false;
+    let isTransitioning = true; // Start true to block inputs during initial countdown
 
     const wrapper = document.getElementById('grid-wrapper');
     const scoreEl = document.getElementById('score');
@@ -231,38 +229,53 @@
         return ASSETS[Math.floor(Math.random() * ASSETS.length)];
     }
 
-    // Create a DOM card instance
-    function createCardElement(asset, positionIndex) {
-        const card = document.createElement('div');
-        card.className = `card ${POSITION_CLASSES[positionIndex]}`;
-        
-        // MODIFICATION: Only the Top-Right (Index 1) is revealed. 
-        // Bottom-Left (Index 3) is now face-down.
-        if (positionIndex === 1) {
-            card.innerHTML = `<div class="face-up">${asset.svg}</div>`;
-        } else {
-            card.innerHTML = `<div class="face-down">?</div>`;
-        }
-        
-        return card;
-    }
-
-    // Initialize the grid
+    // Initialize the grid with a preview countdown
     function initGame() {
         gridData = [];
+        buttons.forEach(b => b.disabled = true);
+
+        // Populate all 4 grid spots
         for (let i = 0; i < 4; i++) {
             const asset = getRandomAsset();
-            const element = createCardElement(asset, i);
-            wrapper.appendChild(element);
-            gridData.push({ asset, element });
+            const card = document.createElement('div');
+            card.className = `card ${POSITION_CLASSES[i]}`;
+            
+            // MODIFICATION: At launch, BOTH Top-Right (1) and Bottom-Left (3) display face-up
+            if (i === 1 || i === 3) {
+                card.innerHTML = `<div class="face-up">${asset.svg}</div>`;
+            } else {
+                card.innerHTML = `<div class="face-down">?</div>`;
+            }
+            
+            wrapper.appendChild(card);
+            gridData.push({ asset, element: card });
         }
+
+        // 3-Second Memorization Loop
+        let timeLeft = 3;
+        showFeedback(`Memorize the bottom-left card! (${timeLeft}s)`, "info");
+
+        const countdownInterval = setInterval(() => {
+            timeLeft--;
+            if (timeLeft > 0) {
+                showFeedback(`Memorize the bottom-left card! (${timeLeft}s)`, "info");
+            } else {
+                clearInterval(countdownInterval);
+                
+                // Flip Bottom-Left (index 3) back to face-down state
+                gridData[3].element.innerHTML = `<div class="face-down">?</div>`;
+                showFeedback("Go! Does the new card match your memory?", "");
+                
+                // Enable gameplay mechanics
+                isTransitioning = false;
+                buttons.forEach(b => b.disabled = false);
+            }
+        }, 1000);
     }
 
-    // Input evaluation
     function handleChoice(userGuessedMatch) {
         if (isTransitioning) return;
         
-        // Compares the underlying data of Top-Right (1) and Bottom-Left (3)
         const trAsset = gridData[1].asset;
         const blAsset = gridData[3].asset;
         const isActualMatch = (trAsset.id === blAsset.id);
@@ -290,29 +303,27 @@
         streakEl.innerText = streak;
     }
 
-    // Clockwise shift engine
     function rotateGrid() {
         isTransitioning = true;
         buttons.forEach(b => b.disabled = true);
 
-        // 1. Fade out and remove the card leaving Bottom-Left (Index 3)
+        // 1. Drop out Bottom-Left card
         const exitingCard = gridData[3];
         exitingCard.element.style.opacity = 0;
         exitingCard.element.style.transform = 'scale(0.5)';
         setTimeout(() => exitingCard.element.remove(), 500);
 
-        // 2. Shift references in the array clockwise
+        // 2. Shift tracking array clockwise
         const nextGridData = new Array(4);
         nextGridData[1] = gridData[0]; // TL -> TR
         nextGridData[2] = gridData[1]; // TR -> BR
         nextGridData[3] = gridData[2]; // BR -> BL
 
-        // 3. Update CSS classes and card visibility states
+        // 3. Process structural class changes and keep BL hidden
         for (let i = 1; i < 4; i++) {
             const item = nextGridData[i];
             item.element.className = `card ${POSITION_CLASSES[i]}`;
             
-            // MODIFICATION: Only show asset if it has arrived at Top-Right (Index 1)
             if (i === 1) {
                 item.element.innerHTML = `<div class="face-up">${item.asset.svg}</div>`;
             } else {
@@ -320,28 +331,30 @@
             }
         }
 
-        // 4. Spawn new mystery card at Top-Left (Index 0)
+        // 4. Inject new random card structure at Top-Left
         const newAsset = getRandomAsset();
-        const newElement = createCardElement(newAsset, 0);
+        const newElement = document.createElement('div');
+        newElement.className = `card ${POSITION_CLASSES[0]}`;
+        newElement.innerHTML = `<div class="face-down">?</div>`;
         
         newElement.style.opacity = 0;
         newElement.style.transform = 'scale(0.8)';
         wrapper.appendChild(newElement);
         
-        void newElement.offsetWidth; // Trigger reflow
+        void newElement.offsetWidth; // Force Reflow
         newElement.style.opacity = 1;
         newElement.style.transform = 'scale(1)';
 
         nextGridData[0] = { asset: newAsset, element: newElement };
         gridData = nextGridData;
 
-        // Unlock buttons after transition finishes
         setTimeout(() => {
             isTransitioning = false;
             buttons.forEach(b => b.disabled = false);
         }, 500);
     }
 
+    // Run Game Setup
     initGame();
 </script>
 
