@@ -1,617 +1,355 @@
-<!DOCTYPE html>
+l<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brain Rotation Memory Challenge</title>
+    <title>Clockwise Grid Matcher</title>
     <style>
         :root {
-            --bg-gradient: linear-gradient(135deg, #0d3d41 0%, #0a4d52 50%, #08383c 100%);
-            --panel-bg: rgba(0, 0, 0, 0.2);
-            --text-color: #e0f2f1;
-            --accent-color: #40c4ff;
-            --btn-bg: #092a2d;
-            --btn-hover: #114246;
-            --btn-text: #40c4ff;
-        }
-
-        * {
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
+            --bg-color: #1a1a2e;
+            --card-bg: #16213e;
+            --card-back: #0f3460;
+            --accent-color: #e94560;
+            --text-color: #ffffff;
         }
 
         body {
             margin: 0;
             padding: 0;
-            background: #051c1e;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            background-color: var(--bg-color);
             color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
         }
 
         #game-container {
-            width: 100%;
-            max-width: 420px;
-            height: 100vh;
-            max-height: 740px;
-            background: var(--bg-gradient);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow: hidden;
-            border-radius: 12px;
-        }
-
-        /* Header UI */
-        header {
-            padding: 20px 25px 10px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--panel-bg);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .stat-box {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .stat-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: rgba(255, 255, 255, 0.5);
-            margin-bottom: 2px;
-        }
-
-        .stat-value {
-            font-size: 22px;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        .timer-container {
-            flex-grow: 1;
-            margin: 0 25px;
-            background: rgba(255,255,255,0.1);
-            height: 6px;
-            border-radius: 3px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        #timer-bar {
-            width: 100%;
-            height: 100%;
-            background: var(--accent-color);
-            transition: width 0.1s linear;
-        }
-
-        /* Game Instruction Text */
-        #instruction-text {
             text-align: center;
-            font-size: 18px;
-            font-weight: 500;
-            margin: 25px 0 10px 0;
-            padding: 0 20px;
-            color: #ffffff;
-            letter-spacing: 0.5px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* Canvas Wrapper */
-        #canvas-wrapper {
-            flex-grow: 1;
+        h1 {
+            margin-top: 0;
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #00ffd2;
+        }
+
+        #scoreboard {
             display: flex;
-            justify-content: center;
-            align-items: center;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* 2x2 Grid Layout with Absolute Positioned Cards for Smooth Rotation */
+        #grid-wrapper {
             position: relative;
+            width: 320px;
+            height: 320px;
+            margin: 0 auto 30px auto;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
             padding: 10px;
         }
 
-        canvas {
-            background: transparent;
-            display: block;
-        }
-
-        /* Action Buttons Footer */
-        footer {
-            display: flex;
-            height: 85px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            background: var(--btn-bg);
-        }
-
-        .game-btn {
-            flex: 1;
-            border: none;
-            background: transparent;
-            color: var(--btn-text);
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: background 0.2s, color 0.2s;
-            outline: none;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .game-btn:active {
-            background: var(--btn-hover);
-        }
-
-        .game-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-
-        #btn-no {
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Screen Overlays */
-        .overlay {
+        .card {
             position: absolute;
-            top: 0;
-            left: 0;
+            width: 140px;
+            height: 140px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-sizing: border-box;
+            border: 2px solid transparent;
+        }
+
+        /* Clockwise Grid Positions */
+        .pos-tl { top: 10px; left: 10px; }
+        .pos-tr { top: 10px; left: 170px; border-color: #00ffd2; box-shadow: 0 0 15px rgba(0, 255, 210, 0.4); }
+        .pos-br { top: 170px; left: 170px; }
+        .pos-bl { top: 170px; left: 10px; border-color: #ff007f; box-shadow: 0 0 15px rgba(255, 0, 127, 0.4); }
+
+        /* Card Face States */
+        .card .face-down {
             width: 100%;
             height: 100%;
-            background: rgba(6, 28, 30, 0.95);
+            background-color: var(--card-back);
+            border-radius: 10px;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
-            z-index: 10;
-            padding: 30px;
-            text-align: center;
+            justify-content: center;
+            font-size: 32px;
+            color: rgba(255,255,255,0.2);
         }
 
-        .overlay h2 {
-            font-size: 28px;
-            margin-bottom: 10px;
-            color: #fff;
+        .card .face-up {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
         }
 
-        .overlay p {
-            font-size: 15px;
-            color: rgba(255,255,255,0.7);
-            line-height: 1.5;
-            margin-bottom: 30px;
+        svg {
+            width: 90px;
+            height: 90px;
+            filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.3));
         }
 
-        .start-btn {
-            background: var(--accent-color);
-            color: #051c1e;
-            border: none;
-            padding: 14px 40px;
+        /* Controls */
+        #controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        button {
+            padding: 12px 35px;
             font-size: 18px;
-            font-weight: 700;
-            border-radius: 25px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
             cursor: pointer;
-            box-shadow: 0 5px 15px rgba(64, 196, 255, 0.3);
-            transition: transform 0.2s, cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.1s, opacity 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .start-btn:active {
+        button:active {
             transform: scale(0.95);
         }
 
-        .hidden {
-            display: none !important;
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
+
+        .btn-yes { background-color: #00ffd2; color: #111; }
+        .btn-no { background-color: #ff007f; color: #fff; }
+
+        #feedback {
+            margin-top: 15px;
+            height: 24px;
+            font-size: 18px;
+            font-weight: bold;
+            transition: color 0.2s;
+        }
+        
+        .correct { color: #00ffd2; }
+        .wrong { color: #ff007f; }
+
+        /* Zone Labels */
+        .zone-label {
+            position: absolute;
+            font-size: 10px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+            pointer-events: none;
+        }
+        .lbl-tr { top: 15px; left: 175px; z-index: 10; color: #00ffd2;}
+        .lbl-bl { top: 175px; left: 15px; z-index: 10; color: #ff007f;}
     </style>
 </head>
 <body>
 
     <div id="game-container">
-        <header>
-            <div class="stat-box">
-                <span class="stat-label">Score</span>
-                <span id="score-val" class="stat-value">0</span>
-            </div>
-            <div class="timer-container">
-                <div id="timer-bar"></div>
-            </div>
-            <div class="stat-box" style="text-align: right;">
-                <span class="stat-label">High Score</span>
-                <span id="high-score-val" class="stat-value">0</span>
-            </div>
-        </header>
-
-        <div id="instruction-text">Do the highlighted cards match?</div>
-
-        <div id="canvas-wrapper">
-            <canvas id="gameCanvas" width="360" height="360"></canvas>
+        <h1>Grid Rotator Matcher</h1>
+        
+        <div id="scoreboard">
+            <div>Score: <span id="score">0</span></div>
+            <div>Streak: <span id="streak">0</span></div>
         </div>
 
-        <footer>
-            <button id="btn-no" class="game-btn" onclick="handleChoice(false)">NO</button>
-            <button id="btn-yes" class="game-btn" onclick="handleChoice(true)">YES</button>
-        </footer>
-
-        <div id="start-overlay" class="overlay">
-            <h2>Pipeline Recall</h2>
-            <p>Cards will shift clockwise. Remember the cards entering hidden slots, and verify if the <b>Bottom-Left</b> card matches the active <b>Top-Right</b> card.</p>
-            <button class="start-btn" onclick="startGame()">START GAME</button>
-        </div>
-
-        <div id="gameover-overlay" class="overlay hidden">
-            <h2>Time's Up!</h2>
-            <p>Great training session. Your processing accuracy score has been tallied.</p>
-            <div style="margin-bottom: 25px;">
-                <div class="stat-label">Final Score</div>
-                <div id="final-score" class="stat-value" style="font-size: 42px; color: var(--accent-color);">0</div>
+        <div id="grid-wrapper">
+            <div class="zone-label lbl-tr">Target (TR)</div>
+            <div class="zone-label lbl-bl">Match? (BL)</div>
+            
             </div>
-            <button class="start-btn" onclick="startGame()">PLAY AGAIN</button>
+
+        <div id="controls">
+            <button class="btn-no" onclick="handleChoice(false)">No</button>
+            <button class="btn-yes" onclick="handleChoice(true)">Yes</button>
         </div>
+
+        <div id="feedback"></div>
     </div>
 
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
+<script>
+    // Asset definitions (3 custom shapes with distinct colors)
+    const ASSETS = [
+        {
+            id: 1,
+            shape: 'circle',
+            color: '#FF4136',
+            svg: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="#FF4136" /></svg>`
+        },
+        {
+            id: 2,
+            shape: 'square',
+            color: '#0074D9',
+            svg: `<svg viewBox="0 0 100 100"><rect x="15" y="15" width="70" height="70" fill="#0074D9" rx="10" /></svg>`
+        },
+        {
+            id: 3,
+            shape: 'triangle',
+            color: '#2ECC40',
+            svg: `<svg viewBox="0 0 100 100"><polygon points="50,15 85,85 15,85" fill="#2ECC40" /></svg>`
+        }
+    ];
+
+    // Grid Positions: 0 = TL, 1 = TR, 2 = BR, 3 = BL
+    const POSITION_CLASSES = ['pos-tl', 'pos-tr', 'pos-br', 'pos-bl'];
+    
+    let gridData = [null, null, null, null]; 
+    let score = 0;
+    let streak = 0;
+    let isTransitioning = false;
+
+    const wrapper = document.getElementById('grid-wrapper');
+    const scoreEl = document.getElementById('score');
+    const streakEl = document.getElementById('streak');
+    const feedbackEl = document.getElementById('feedback');
+    const buttons = document.querySelectorAll('#controls button');
+
+    // Generate a completely randomized card asset
+    function getRandomAsset() {
+        return ASSETS[Math.floor(Math.random() * ASSETS.length)];
+    }
+
+    // Create a DOM card instance
+    function createCardElement(asset, positionIndex) {
+        const card = document.createElement('div');
+        card.className = `card ${POSITION_CLASSES[positionIndex]}`;
         
-        // Game UI Elements
-        const scoreValEl = document.getElementById('score-val');
-        const highScoreValEl = document.getElementById('high-score-val');
-        const finalScoreEl = document.getElementById('final-score');
-        const timerBar = document.getElementById('timer-bar');
-        const instructionText = document.getElementById('instruction-text');
-        const startOverlay = document.getElementById('start-overlay');
-        const gameoverOverlay = document.getElementById('gameover-overlay');
-        const btnYes = document.getElementById('btn-yes');
-        const btnNo = document.getElementById('btn-no');
+        // Render content based on layout position rule:
+        // Top-Right (1) and Bottom-Left (3) are Revealed/Face-Up
+        if (positionIndex === 1 || positionIndex === 3) {
+            card.innerHTML = `<div class="face-up">${asset.svg}</div>`;
+        } else {
+            card.innerHTML = `<div class="face-down">?</div>`;
+        }
+        
+        return card;
+    }
 
-        // Audio Context Synthesizer (Zero asset dependency)
-        let audioCtx = null;
-        function playTone(freq, type, duration) {
-            try {
-                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-                
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                
-                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
-                
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
-            } catch(e) { console.log("Audio not supported or blocked"); }
+    // Initialize the grid with random assets directly at launch
+    function initGame() {
+        gridData = [];
+        for (let i = 0; i < 4; i++) {
+            const asset = getRandomAsset();
+            const element = createCardElement(asset, i);
+            wrapper.appendChild(element);
+            gridData.push({ asset, element });
+        }
+    }
+
+    // Main input evaluation
+    function handleChoice(userGuessedMatch) {
+        if (isTransitioning) return;
+        
+        // Target Comparison: Top-Right (Index 1) vs Bottom-Left (Index 3)
+        const trAsset = gridData[1].asset;
+        const blAsset = gridData[3].asset;
+        const isActualMatch = (trAsset.id === blAsset.id);
+
+        // Score Calculation
+        if (userGuessedMatch === isActualMatch) {
+            score += 10;
+            streak++;
+            showFeedback("Correct!", "correct");
+        } else {
+            streak = 0;
+            showFeedback("Wrong!", "wrong");
         }
 
-        // Card Configuration Archetypes
-        const SHAPES = ['square', 'circle', 'triangle', 'diamond', 'flower'];
-        const COLORS = ['#D81B60', '#00ACC1', '#8E24AA', '#FDD835', '#43A047'];
+        updateUI();
+        rotateGrid();
+    }
 
-        // Grid Configuration Constants
-        const CARD_SIZE = 110;
-        const POSITIONS = [
-            { x: 40,  y: 40  }, // 0: Top-Left (TL)
-            { x: 210, y: 40  }, // 1: Top-Right (TR) - Always Exposed
-            { x: 210, y: 210 }, // 2: Bottom-Right (BR)
-            { x: 40,  y: 210 }  // 3: Bottom-Left (BL)
-        ];
+    function showFeedback(text, className) {
+        feedbackEl.innerText = text;
+        feedbackEl.className = className;
+    }
 
-        // Game State Variables
-        let score = 0;
-        let highScore = localStorage.getItem('highScore') || 0;
-        let gameActive = false;
-        let gameTimer = null;
-        let timeLeft = 60;
-        let isAnimating = false;
-        let gameState = 'preview'; // 'preview', 'playing'
-        let previewCountdown = 3;
+    function updateUI() {
+        scoreEl.innerText = score;
+        streakEl.innerText = streak;
+    }
 
-        // Active State Card Objects Pipeline Array
-        // Array Indexes: [0: TL, 1: TR, 2: BR, 3: BL]
-        let pipelineCards = [];
-        let upcomingCard = null; // Animating incoming element
+    // Clockwise shift routine
+    function rotateGrid() {
+        isTransitioning = true;
+        buttons.forEach(b => b.disabled = true);
 
-        // Animation Variables
-        let animProgress = 0;
-        const ANIM_SPEED = 0.07; // Control movement speed
-        let flashFeedback = null; // { type: 'correct'/'incorrect', alpha: 1.0 }
+        // 1. Remove the old exiting card from Bottom-Left (Index 3)
+        const exitingCard = gridData[3];
+        exitingCard.element.style.opacity = 0;
+        exitingCard.element.style.transform = 'scale(0.5)';
+        setTimeout(() => exitingCard.element.remove(), 500);
 
-        // High Score Initialization
-        highScoreValEl.textContent = highScore;
+        // 2. Shift remaining references clockwise inside our state tracking array
+        // Order changes: TL->TR, TR->BR, BR->BL
+        const nextGridData = new Array(4);
+        nextGridData[1] = gridData[0]; // TL moves to TR
+        nextGridData[2] = gridData[1]; // TR moves to BR
+        nextGridData[3] = gridData[2]; // BR moves to BL
 
-        function getRandomCard() {
-            const index = Math.floor(Math.random() * SHAPES.length);
-            return {
-                shape: SHAPES[index],
-                color: COLORS[index]
-            };
-        }
-
-        function createPipeline() {
-            pipelineCards = [];
-            for (let i = 0; i < 4; i++) {
-                pipelineCards.push(getRandomCard());
-            }
-        }
-
-        function startGame() {
-            startOverlay.classList.add('hidden');
-            gameoverOverlay.classList.add('hidden');
+        // 3. Update CSS Positions & visibility properties dynamically
+        for (let i = 1; i < 4; i++) {
+            const item = nextGridData[i];
+            item.element.className = `card ${POSITION_CLASSES[i]}`;
             
-            score = 0;
-            scoreValEl.textContent = score;
-            timeLeft = 60;
-            timerBar.style.width = '100%';
-            isAnimating = false;
-            flashFeedback = null;
-            
-            createPipeline();
-            
-            // Start with Preview Phase
-            gameState = 'preview';
-            previewCountdown = 3;
-            instructionText.innerHTML = `Remember the cards! <span style="color:var(--accent-color)">${previewCountdown}</span>`;
-            btnYes.disabled = true;
-            btnNo.disabled = true;
-
-            // Trigger preview countdown ticking 
-            if(gameTimer) clearInterval(gameTimer);
-            gameTimer = setInterval(() => {
-                if (gameState === 'preview') {
-                    previewCountdown--;
-                    if (previewCountdown <= 0) {
-                        gameState = 'playing';
-                        instructionText.textContent = "Do the highlighted cards match?";
-                        btnYes.disabled = false;
-                        btnNo.disabled = false;
-                    } else {
-                        instructionText.innerHTML = `Remember the cards! <span style="color:var(--accent-color)">${previewCountdown}</span>`;
-                    }
-                } else if (gameState === 'playing') {
-                    timeLeft -= 0.1;
-                    timerBar.style.width = `${(timeLeft / 60) * 100}%`;
-                    if (timeLeft <= 0) {
-                        endGame();
-                    }
-                }
-            }, 100);
-
-            gameActive = true;
-        }
-
-        function endGame() {
-            gameActive = false;
-            clearInterval(gameTimer);
-            if (score > highScore) {
-                highScore = score;
-                localStorage.setItem('highScore', highScore);
-                highScoreValEl.textContent = highScore;
-            }
-            finalScoreEl.textContent = score;
-            gameoverOverlay.classList.remove('hidden');
-            btnYes.disabled = true;
-            btnNo.disabled = true;
-        }
-
-        function handleChoice(userSaysMatch) {
-            if (!gameActive || isAnimating || gameState !== 'playing') return;
-
-            // Target Match Evaluation Logic: Top-Right (Index 1) vs Bottom-Left (Index 3)
-            const actualMatch = (pipelineCards[1].shape === pipelineCards[3].shape);
-
-            if (userSaysMatch === actualMatch) {
-                score++;
-                scoreValEl.textContent = score;
-                flashFeedback = { type: 'correct', alpha: 0.6 };
-                playTone(523.25, 'sine', 0.15); // C5 clean tone
+            // Unveil state modifications depending on target destination
+            if (i === 1 || i === 3) {
+                item.element.innerHTML = `<div class="face-up">${item.asset.svg}</div>`;
             } else {
-                flashFeedback = { type: 'incorrect', alpha: 0.6 };
-                playTone(196.00, 'triangle', 0.25); // G3 warning buzz
-            }
-
-            // Queue up next rotation step
-            isAnimating = true;
-            animProgress = 0;
-            
-            // Balanced dynamic card feed generator injection logic (40% match injection)
-            const forceMatchNextTurn = Math.random() < 0.40;
-            if (forceMatchNextTurn) {
-                // Next turn TR will be current TL. Next turn BL will be current BR.
-                // Force current TL to mimic current BR parameters.
-                pipelineCards[0] = { ...pipelineCards[2] };
-            }
-            
-            // Create the incoming dynamic canvas element
-            upcomingCard = getRandomCard();
-        }
-
-        // Vector Card Shape Render Utilities
-        function drawCardShape(ctx, shape, color, cx, cy, size) {
-            ctx.fillStyle = color;
-            ctx.strokeStyle = color;
-            ctx.lineWidth = 4;
-            ctx.lineJoin = "round";
-            ctx.lineCap = "round";
-            
-            ctx.beginPath();
-            if (shape === 'square') {
-                ctx.fillRect(cx - size/2, cy - size/2, size, size);
-            } 
-            else if (shape === 'circle') {
-                ctx.arc(cx, cy, size/2, 0, Math.PI * 2);
-                ctx.fill();
-            } 
-            else if (shape === 'triangle') {
-                ctx.moveTo(cx, cy - size/2);
-                ctx.lineTo(cx + size/2, cy + size/2);
-                ctx.lineTo(cx - size/2, cy + size/2);
-                ctx.closePath();
-                ctx.fill();
-            } 
-            else if (shape === 'diamond') {
-                ctx.moveTo(cx, cy - size/2);
-                ctx.lineTo(cx + size/2, cy);
-                ctx.lineTo(cx, cy + size/2);
-                ctx.lineTo(cx - size/2, cy);
-                ctx.closePath();
-                ctx.fill();
-            } 
-            else if (shape === 'flower') {
-                // 6 Petal Vector Geometry Flower Canvas Node mapping
-                for (let i = 0; i < 6; i++) {
-                    let angle = (i * Math.PI) / 3;
-                    let px = cx + Math.cos(angle) * (size/3);
-                    let py = cy + Math.sin(angle) * (size/3);
-                    ctx.beginPath();
-                    ctx.arc(px, py, size/4, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-                ctx.beginPath();
-                ctx.arc(cx, cy, size/4, 0, Math.PI * 2);
-                ctx.fillStyle = '#fff';
-                ctx.fill();
+                item.element.innerHTML = `<div class="face-down">?</div>`;
             }
         }
 
-        function drawCardBase(x, y, isOpen, cardData) {
-            // Smooth Rounded Rect Base
-            const radius = 14;
-            ctx.beginPath();
-            ctx.moveTo(x + radius, y);
-            ctx.lineTo(x + CARD_SIZE - radius, y);
-            ctx.quadraticCurveTo(x + CARD_SIZE, y, x + CARD_SIZE, y + radius);
-            ctx.lineTo(x + CARD_SIZE, y + CARD_SIZE - radius);
-            ctx.quadraticCurveTo(x + CARD_SIZE, y + CARD_SIZE, x + CARD_SIZE - radius, y + CARD_SIZE);
-            ctx.lineTo(x + radius, y + CARD_SIZE);
-            ctx.quadraticCurveTo(x, y + CARD_SIZE, x, y + CARD_SIZE - radius);
-            ctx.lineTo(x, y + radius);
-            ctx.quadraticCurveTo(x, y, x + radius, y);
-            ctx.closePath();
+        // 4. Generate a brand new incoming asset at Top-Left (Index 0)
+        const newAsset = getRandomAsset();
+        const newElement = createCardElement(newAsset, 0);
+        
+        // Start hidden, drop into DOM, then animate active scaling
+        newElement.style.opacity = 0;
+        newElement.style.transform = 'scale(0.8)';
+        wrapper.appendChild(newElement);
+        
+        // Force reflow to ensure entry transitions run correctly
+        void newElement.offsetWidth; 
+        newElement.style.opacity = 1;
+        newElement.style.transform = 'scale(1)';
 
-            if (isOpen) {
-                ctx.fillStyle = '#ffffff';
-                ctx.fill();
-                // Draw Inner Icon Graphics Graphic Asset
-                drawCardShape(ctx, cardData.shape, cardData.color, x + CARD_SIZE/2, y + CARD_SIZE/2, 52);
-            } else {
-                // Facedown Matte Texture
-                ctx.fillStyle = '#166870';
-                ctx.fill();
-                ctx.strokeStyle = '#1e7b85';
-                ctx.lineWidth = 3;
-                ctx.stroke();
+        nextGridData[0] = { asset: newAsset, element: newElement };
+        gridData = nextGridData;
 
-                // Detailed Crosshatch Geometric Pattern
-                ctx.save();
-                ctx.beginPath();
-                ctx.rect(x + 8, y + 8, CARD_SIZE - 16, CARD_SIZE - 16);
-                ctx.clip();
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
-                ctx.lineWidth = 2;
-                for (let i = -CARD_SIZE; i < CARD_SIZE * 2; i += 12) {
-                    ctx.moveTo(x + i, y);
-                    ctx.lineTo(x + i + CARD_SIZE, y + CARD_SIZE);
-                    ctx.moveTo(x + i + CARD_SIZE, y);
-                    ctx.lineTo(x + i, y + CARD_SIZE);
-                }
-                ctx.stroke();
-                ctx.restore();
-            }
-        }
+        // Reset control lock after physical CSS transition clears out safely
+        setTimeout(() => {
+            isTransitioning = false;
+            buttons.forEach(b => b.disabled = false);
+        }, 500);
+    }
 
-        // Render Frame Engine Loop
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Fire Up Execution Loop
+    initGame();
+</script>
 
-            // 1. Draw Dashed Active Comparison Matrix Borders
-            if (gameState === 'playing') {
-                ctx.save();
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
-                ctx.lineWidth = 3;
-                ctx.setLineDash([6, 4]);
-                
-                // Outline Top-Right Slot
-                ctx.strokeRect(POSITIONS[1].x - 6, POSITIONS[1].y - 6, CARD_SIZE + 12, CARD_SIZE + 12);
-                // Outline Bottom-Left Slot
-                ctx.strokeRect(POSITIONS[3].x - 6, POSITIONS[3].y - 6, CARD_SIZE + 12, CARD_SIZE + 12);
-                ctx.restore();
-            }
-
-            if (!isAnimating) {
-                // Static Pipeline Rendering Map
-                for (let i = 0; i < 4; i++) {
-                    // Rule Check: Index 1 (Top-Right) is ALWAYS open. 
-                    // All cards are open during the preliminary preview stage.
-                    const showFace = (gameState === 'preview' || i === 1);
-                    drawCardBase(POSITIONS[i].x, POSITIONS[i].y, showFace, pipelineCards[i]);
-                }
-            } else {
-                // Active Rotation Animation Vector Interpolator
-                animProgress += ANIM_SPEED;
-                if (animProgress >= 1) {
-                    animProgress = 1;
-                    isAnimating = false;
-
-                    // Complete Clockwise Pipeline Step Cycle shift array
-                    // Old BL exits, BR -> BL, TR -> BR, TL -> TR, Upcoming -> TL
-                    pipelineCards = [upcomingCard, pipelineCards[0], pipelineCards[1], pipelineCards[2]];
-                }
-
-                // Interpolated Position Computations
-                for (let i = 0; i < 4; i++) {
-                    let nextIdx = (i + 1) % 4;
-                    let startPos = POSITIONS[i];
-                    let endPos = POSITIONS[nextIdx];
-
-                    let currentX = startPos.x + (endPos.x - startPos.x) * animProgress;
-                    let currentY = startPos.y + (endPos.y - startPos.y) * animProgress;
-
-                    // Exiting card handles custom drop path off left screen edge
-                    if (i === 3) {
-                        currentX = startPos.x - 180 * animProgress;
-                        currentY = startPos.y;
-                    }
-
-                    // Render visibility flags mid-movement
-                    // Only display open layout configurations if moving into active Top-Right slot position index 1
-                    let showFace = (nextIdx === 1 && animProgress > 0.5);
-                    if (i === 3) showFace = false; // Exiting card remains facedown
-
-                    drawCardBase(currentX, currentY, showFace, pipelineCards[i]);
-                }
-
-                // Render incoming card path animating into Top-Left (Pos 0)
-                let incomingX = POSITIONS[0].x;
-                let incomingY = POSITIONS[0].y - 180 * (1 - animProgress);
-                drawCardBase(incomingX, incomingY, false, upcomingCard);
-            }
-
-            // 2. Performance HUD Interaction Feedback Flash
-            if (flashFeedback) {
-                ctx.save();
-                ctx.fillStyle = flashFeedback.type === 'correct' ? 'rgba(76, 175, 80, ' : 'rgba(244, 67, 54, ';
-                ctx.fillStyle += flashFeedback.alpha + ')';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.restore();
-
-                flashFeedback.alpha -= 0.04;
-                if (flashFeedback.alpha <= 0) flashFeedback = null;
-            }
-
-            requestAnimationFrame(draw);
-        }
-
-        // Start Render Loop Engine
-        requestAnimationFrame(draw);
-    </script>
 </body>
 </html>
