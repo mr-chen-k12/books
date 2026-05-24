@@ -1,9 +1,9 @@
-l<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clockwise Grid Matcher</title>
+    <title>Clockwise Memory Grid</title>
     <style>
         :root {
             --bg-color: #1a1a2e;
@@ -53,7 +53,6 @@ l<!DOCTYPE html>
             font-weight: bold;
         }
 
-        /* 2x2 Grid Layout with Absolute Positioned Cards for Smooth Rotation */
         #grid-wrapper {
             position: relative;
             width: 320px;
@@ -83,6 +82,7 @@ l<!DOCTYPE html>
         .pos-tl { top: 10px; left: 10px; }
         .pos-tr { top: 10px; left: 170px; border-color: #00ffd2; box-shadow: 0 0 15px rgba(0, 255, 210, 0.4); }
         .pos-br { top: 170px; left: 170px; }
+        /* BL keeps a neon outline so the user knows it's the target mystery card */
         .pos-bl { top: 170px; left: 10px; border-color: #ff007f; box-shadow: 0 0 15px rgba(255, 0, 127, 0.4); }
 
         /* Card Face States */
@@ -95,7 +95,8 @@ l<!DOCTYPE html>
             align-items: center;
             justify-content: center;
             font-size: 32px;
-            color: rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.3);
+            font-weight: bold;
         }
 
         .card .face-up {
@@ -159,7 +160,6 @@ l<!DOCTYPE html>
             position: absolute;
             font-size: 10px;
             text-transform: uppercase;
-            color: rgba(255,255,255,0.4);
             pointer-events: none;
         }
         .lbl-tr { top: 15px; left: 175px; z-index: 10; color: #00ffd2;}
@@ -169,7 +169,7 @@ l<!DOCTYPE html>
 <body>
 
     <div id="game-container">
-        <h1>Grid Rotator Matcher</h1>
+        <h1>Memory Grid Rotator</h1>
         
         <div id="scoreboard">
             <div>Score: <span id="score">0</span></div>
@@ -177,8 +177,8 @@ l<!DOCTYPE html>
         </div>
 
         <div id="grid-wrapper">
-            <div class="zone-label lbl-tr">Target (TR)</div>
-            <div class="zone-label lbl-bl">Match? (BL)</div>
+            <div class="zone-label lbl-tr">Visible New Card</div>
+            <div class="zone-label lbl-bl">Remembered Card?</div>
             
             </div>
 
@@ -191,7 +191,7 @@ l<!DOCTYPE html>
     </div>
 
 <script>
-    // Asset definitions (3 custom shapes with distinct colors)
+    // 3 custom shapes with distinct colors
     const ASSETS = [
         {
             id: 1,
@@ -227,7 +227,6 @@ l<!DOCTYPE html>
     const feedbackEl = document.getElementById('feedback');
     const buttons = document.querySelectorAll('#controls button');
 
-    // Generate a completely randomized card asset
     function getRandomAsset() {
         return ASSETS[Math.floor(Math.random() * ASSETS.length)];
     }
@@ -237,9 +236,9 @@ l<!DOCTYPE html>
         const card = document.createElement('div');
         card.className = `card ${POSITION_CLASSES[positionIndex]}`;
         
-        // Render content based on layout position rule:
-        // Top-Right (1) and Bottom-Left (3) are Revealed/Face-Up
-        if (positionIndex === 1 || positionIndex === 3) {
+        // MODIFICATION: Only the Top-Right (Index 1) is revealed. 
+        // Bottom-Left (Index 3) is now face-down.
+        if (positionIndex === 1) {
             card.innerHTML = `<div class="face-up">${asset.svg}</div>`;
         } else {
             card.innerHTML = `<div class="face-down">?</div>`;
@@ -248,7 +247,7 @@ l<!DOCTYPE html>
         return card;
     }
 
-    // Initialize the grid with random assets directly at launch
+    // Initialize the grid
     function initGame() {
         gridData = [];
         for (let i = 0; i < 4; i++) {
@@ -259,16 +258,15 @@ l<!DOCTYPE html>
         }
     }
 
-    // Main input evaluation
+    // Input evaluation
     function handleChoice(userGuessedMatch) {
         if (isTransitioning) return;
         
-        // Target Comparison: Top-Right (Index 1) vs Bottom-Left (Index 3)
+        // Compares the underlying data of Top-Right (1) and Bottom-Left (3)
         const trAsset = gridData[1].asset;
         const blAsset = gridData[3].asset;
         const isActualMatch = (trAsset.id === blAsset.id);
 
-        // Score Calculation
         if (userGuessedMatch === isActualMatch) {
             score += 10;
             streak++;
@@ -292,62 +290,58 @@ l<!DOCTYPE html>
         streakEl.innerText = streak;
     }
 
-    // Clockwise shift routine
+    // Clockwise shift engine
     function rotateGrid() {
         isTransitioning = true;
         buttons.forEach(b => b.disabled = true);
 
-        // 1. Remove the old exiting card from Bottom-Left (Index 3)
+        // 1. Fade out and remove the card leaving Bottom-Left (Index 3)
         const exitingCard = gridData[3];
         exitingCard.element.style.opacity = 0;
         exitingCard.element.style.transform = 'scale(0.5)';
         setTimeout(() => exitingCard.element.remove(), 500);
 
-        // 2. Shift remaining references clockwise inside our state tracking array
-        // Order changes: TL->TR, TR->BR, BR->BL
+        // 2. Shift references in the array clockwise
         const nextGridData = new Array(4);
-        nextGridData[1] = gridData[0]; // TL moves to TR
-        nextGridData[2] = gridData[1]; // TR moves to BR
-        nextGridData[3] = gridData[2]; // BR moves to BL
+        nextGridData[1] = gridData[0]; // TL -> TR
+        nextGridData[2] = gridData[1]; // TR -> BR
+        nextGridData[3] = gridData[2]; // BR -> BL
 
-        // 3. Update CSS Positions & visibility properties dynamically
+        // 3. Update CSS classes and card visibility states
         for (let i = 1; i < 4; i++) {
             const item = nextGridData[i];
             item.element.className = `card ${POSITION_CLASSES[i]}`;
             
-            // Unveil state modifications depending on target destination
-            if (i === 1 || i === 3) {
+            // MODIFICATION: Only show asset if it has arrived at Top-Right (Index 1)
+            if (i === 1) {
                 item.element.innerHTML = `<div class="face-up">${item.asset.svg}</div>`;
             } else {
                 item.element.innerHTML = `<div class="face-down">?</div>`;
             }
         }
 
-        // 4. Generate a brand new incoming asset at Top-Left (Index 0)
+        // 4. Spawn new mystery card at Top-Left (Index 0)
         const newAsset = getRandomAsset();
         const newElement = createCardElement(newAsset, 0);
         
-        // Start hidden, drop into DOM, then animate active scaling
         newElement.style.opacity = 0;
         newElement.style.transform = 'scale(0.8)';
         wrapper.appendChild(newElement);
         
-        // Force reflow to ensure entry transitions run correctly
-        void newElement.offsetWidth; 
+        void newElement.offsetWidth; // Trigger reflow
         newElement.style.opacity = 1;
         newElement.style.transform = 'scale(1)';
 
         nextGridData[0] = { asset: newAsset, element: newElement };
         gridData = nextGridData;
 
-        // Reset control lock after physical CSS transition clears out safely
+        // Unlock buttons after transition finishes
         setTimeout(() => {
             isTransitioning = false;
             buttons.forEach(b => b.disabled = false);
         }, 500);
     }
 
-    // Fire Up Execution Loop
     initGame();
 </script>
 
