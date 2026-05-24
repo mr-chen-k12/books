@@ -1,0 +1,629 @@
+Here is a complete, production-ready, single-file HTML5 game based exactly on your description and the mechanics shown in the screenshots.
+It features a premium teal-brushed background, a 60-second brain-training timer, synthesized audio feedback (using the built-in Web Audio API so it requires no external assets), smooth clockwise card rotation animations, and an optimized pipeline matchmaking algorithm.
+### How to Play
+ 1. **Preview Phase:** The game starts with a 3-second preview revealing all cards so you can build your initial memory pipeline.
+ 2. **The Goal:** Watch the cards rotate **clockwise** (Top\text{-}Left \rightarrow Top\text{-}Right \rightarrow Bottom\text{-}Right \rightarrow Bottom\text{-}Left).
+ 3. **The Challenge:** The **Top-Right** card is always open (visible). The rest are closed (facedown). Look at the hidden **Bottom-Left** card and decide if it matches the current open **Top-Right** card.
+ 4. Click **YES** or **NO**. The pipeline will immediately score your choice and rotate a new card in from the Top-Left!
+### Complete Game Code (index.html)
+Save the code below as an .html file (e.g., memory_rotation.html) and open it in any web browser to play instantly!
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Rotation Memory Challenge</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0d3d41 0%, #0a4d52 50%, #08383c 100%);
+            --panel-bg: rgba(0, 0, 0, 0.2);
+            --text-color: #e0f2f1;
+            --accent-color: #40c4ff;
+            --btn-bg: #092a2d;
+            --btn-hover: #114246;
+            --btn-text: #40c4ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #051c1e;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-color);
+        }
+
+        #game-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            max-height: 740px;
+            background: var(--bg-gradient);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+
+        /* Header UI */
+        header {
+            padding: 20px 25px 10px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--panel-bg);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .stat-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 2px;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .timer-container {
+            flex-grow: 1;
+            margin: 0 25px;
+            background: rgba(255,255,255,0.1);
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #timer-bar {
+            width: 100%;
+            height: 100%;
+            background: var(--accent-color);
+            transition: width 0.1s linear;
+        }
+
+        /* Game Instruction Text */
+        #instruction-text {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 500;
+            margin: 25px 0 10px 0;
+            padding: 0 20px;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+
+        /* Canvas Wrapper */
+        #canvas-wrapper {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 10px;
+        }
+
+        canvas {
+            background: transparent;
+            display: block;
+        }
+
+        /* Action Buttons Footer */
+        footer {
+            display: flex;
+            height: 85px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--btn-bg);
+        }
+
+        .game-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            color: var(--btn-text);
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            outline: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game-btn:active {
+            background: var(--btn-hover);
+        }
+
+        .game-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        #btn-no {
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Screen Overlays */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(6, 28, 30, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .overlay h2 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .overlay p {
+            font-size: 15px;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.5;
+            margin-bottom: 30px;
+        }
+
+        .start-btn {
+            background: var(--accent-color);
+            color: #051c1e;
+            border: none;
+            padding: 14px 40px;
+            font-size: 18px;
+            font-weight: 700;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(64, 196, 255, 0.3);
+            transition: transform 0.2s, cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .start-btn:active {
+            transform: scale(0.95);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <header>
+            <div class="stat-box">
+                <span class="stat-label">Score</span>
+                <span id="score-val" class="stat-value">0</span>
+            </div>
+            <div class="timer-container">
+                <div id="timer-bar"></div>
+            </div>
+            <div class="stat-box" style="text-align: right;">
+                <span class="stat-label">High Score</span>
+                <span id="high-score-val" class="stat-value">0</span>
+            </div>
+        </header>
+
+        <div id="instruction-text">Do the highlighted cards match?</div>
+
+        <div id="canvas-wrapper">
+            <canvas id="gameCanvas" width="360" height="360"></canvas>
+        </div>
+
+        <footer>
+            <button id="btn-no" class="game-btn" onclick="handleChoice(false)">NO</button>
+            <button id="btn-yes" class="game-btn" onclick="handleChoice(true)">YES</button>
+        </footer>
+
+        <div id="start-overlay" class="overlay">
+            <h2>Pipeline Recall</h2>
+            <p>Cards will shift clockwise. Remember the cards entering hidden slots, and verify if the <b>Bottom-Left</b> card matches the active <b>Top-Right</b> card.</p>
+            <button class="start-btn" onclick="startGame()">START GAME</button>
+        </div>
+
+        <div id="gameover-overlay" class="overlay hidden">
+            <h2>Time's Up!</h2>
+            <p>Great training session. Your processing accuracy score has been tallied.</p>
+            <div style="margin-bottom: 25px;">
+                <div class="stat-label">Final Score</div>
+                <div id="final-score" class="stat-value" style="font-size: 42px; color: var(--accent-color);">0</div>
+            </div>
+            <button class="start-btn" onclick="startGame()">PLAY AGAIN</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Game UI Elements
+        const scoreValEl = document.getElementById('score-val');
+        const highScoreValEl = document.getElementById('high-score-val');
+        const finalScoreEl = document.getElementById('final-score');
+        const timerBar = document.getElementById('timer-bar');
+        const instructionText = document.getElementById('instruction-text');
+        const startOverlay = document.getElementById('start-overlay');
+        const gameoverOverlay = document.getElementById('gameover-overlay');
+        const btnYes = document.getElementById('btn-yes');
+        const btnNo = document.getElementById('btn-no');
+
+        // Audio Context Synthesizer (Zero asset dependency)
+        let audioCtx = null;
+        function playTone(freq, type, duration) {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) { console.log("Audio not supported or blocked"); }
+        }
+
+        // Card Configuration Archetypes
+        const SHAPES = ['square', 'circle', 'triangle', 'diamond', 'flower'];
+        const COLORS = ['#D81B60', '#00ACC1', '#8E24AA', '#FDD835', '#43A047'];
+
+        // Grid Configuration Constants
+        const CARD_SIZE = 110;
+        const POSITIONS = [
+            { x: 40,  y: 40  }, // 0: Top-Left (TL)
+            { x: 210, y: 40  }, // 1: Top-Right (TR) - Always Exposed
+            { x: 210, y: 210 }, // 2: Bottom-Right (BR)
+            { x: 40,  y: 210 }  // 3: Bottom-Left (BL)
+        ];
+
+        // Game State Variables
+        let score = 0;
+        let highScore = localStorage.getItem('highScore') || 0;
+        let gameActive = false;
+        let gameTimer = null;
+        let timeLeft = 60;
+        let isAnimating = false;
+        let gameState = 'preview'; // 'preview', 'playing'
+        let previewCountdown = 3;
+
+        // Active State Card Objects Pipeline Array
+        // Array Indexes: [0: TL, 1: TR, 2: BR, 3: BL]
+        let pipelineCards = [];
+        let upcomingCard = null; // Animating incoming element
+
+        // Animation Variables
+        let animProgress = 0;
+        const ANIM_SPEED = 0.07; // Control movement speed
+        let flashFeedback = null; // { type: 'correct'/'incorrect', alpha: 1.0 }
+
+        // High Score Initialization
+        highScoreValEl.textContent = highScore;
+
+        function getRandomCard() {
+            const index = Math.floor(Math.random() * SHAPES.length);
+            return {
+                shape: SHAPES[index],
+                color: COLORS[index]
+            };
+        }
+
+        function createPipeline() {
+            pipelineCards = [];
+            for (let i = 0; i < 4; i++) {
+                pipelineCards.push(getRandomCard());
+            }
+        }
+
+        function startGame() {
+            startOverlay.classList.add('hidden');
+            gameoverOverlay.classList.add('hidden');
+            
+            score = 0;
+            scoreValEl.textContent = score;
+            timeLeft = 60;
+            timerBar.style.width = '100%';
+            isAnimating = false;
+            flashFeedback = null;
+            
+            createPipeline();
+            
+            // Start with Preview Phase
+            gameState = 'preview';
+            previewCountdown = 3;
+            instructionText.innerHTML = `Remember the cards! <span style="color:var(--accent-color)">${previewCountdown}</span>`;
+            btnYes.disabled = true;
+            btnNo.disabled = true;
+
+            // Trigger preview countdown ticking 
+            if(gameTimer) clearInterval(gameTimer);
+            gameTimer = setInterval(() => {
+                if (gameState === 'preview') {
+                    previewCountdown--;
+                    if (previewCountdown <= 0) {
+                        gameState = 'playing';
+                        instructionText.textContent = "Do the highlighted cards match?";
+                        btnYes.disabled = false;
+                        btnNo.disabled = false;
+                    } else {
+                        instructionText.innerHTML = `Remember the cards! <span style="color:var(--accent-color)">${previewCountdown}</span>`;
+                    }
+                } else if (gameState === 'playing') {
+                    timeLeft -= 0.1;
+                    timerBar.style.width = `${(timeLeft / 60) * 100}%`;
+                    if (timeLeft <= 0) {
+                        endGame();
+                    }
+                }
+            }, 100);
+
+            gameActive = true;
+        }
+
+        function endGame() {
+            gameActive = false;
+            clearInterval(gameTimer);
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('highScore', highScore);
+                highScoreValEl.textContent = highScore;
+            }
+            finalScoreEl.textContent = score;
+            gameoverOverlay.classList.remove('hidden');
+            btnYes.disabled = true;
+            btnNo.disabled = true;
+        }
+
+        function handleChoice(userSaysMatch) {
+            if (!gameActive || isAnimating || gameState !== 'playing') return;
+
+            // Target Match Evaluation Logic: Top-Right (Index 1) vs Bottom-Left (Index 3)
+            const actualMatch = (pipelineCards[1].shape === pipelineCards[3].shape);
+
+            if (userSaysMatch === actualMatch) {
+                score++;
+                scoreValEl.textContent = score;
+                flashFeedback = { type: 'correct', alpha: 0.6 };
+                playTone(523.25, 'sine', 0.15); // C5 clean tone
+            } else {
+                flashFeedback = { type: 'incorrect', alpha: 0.6 };
+                playTone(196.00, 'triangle', 0.25); // G3 warning buzz
+            }
+
+            // Queue up next rotation step
+            isAnimating = true;
+            animProgress = 0;
+            
+            // Balanced dynamic card feed generator injection logic (40% match injection)
+            const forceMatchNextTurn = Math.random() < 0.40;
+            if (forceMatchNextTurn) {
+                // Next turn TR will be current TL. Next turn BL will be current BR.
+                // Force current TL to mimic current BR parameters.
+                pipelineCards[0] = { ...pipelineCards[2] };
+            }
+            
+            // Create the incoming dynamic canvas element
+            upcomingCard = getRandomCard();
+        }
+
+        // Vector Card Shape Render Utilities
+        function drawCardShape(ctx, shape, color, cx, cy, size) {
+            ctx.fillStyle = color;
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 4;
+            ctx.lineJoin = "round";
+            ctx.lineCap = "round";
+            
+            ctx.beginPath();
+            if (shape === 'square') {
+                ctx.fillRect(cx - size/2, cy - size/2, size, size);
+            } 
+            else if (shape === 'circle') {
+                ctx.arc(cx, cy, size/2, 0, Math.PI * 2);
+                ctx.fill();
+            } 
+            else if (shape === 'triangle') {
+                ctx.moveTo(cx, cy - size/2);
+                ctx.lineTo(cx + size/2, cy + size/2);
+                ctx.lineTo(cx - size/2, cy + size/2);
+                ctx.closePath();
+                ctx.fill();
+            } 
+            else if (shape === 'diamond') {
+                ctx.moveTo(cx, cy - size/2);
+                ctx.lineTo(cx + size/2, cy);
+                ctx.lineTo(cx, cy + size/2);
+                ctx.lineTo(cx - size/2, cy);
+                ctx.closePath();
+                ctx.fill();
+            } 
+            else if (shape === 'flower') {
+                // 6 Petal Vector Geometry Flower Canvas Node mapping
+                for (let i = 0; i < 6; i++) {
+                    let angle = (i * Math.PI) / 3;
+                    let px = cx + Math.cos(angle) * (size/3);
+                    let py = cy + Math.sin(angle) * (size/3);
+                    ctx.beginPath();
+                    ctx.arc(px, py, size/4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.beginPath();
+                ctx.arc(cx, cy, size/4, 0, Math.PI * 2);
+                ctx.fillStyle = '#fff';
+                ctx.fill();
+            }
+        }
+
+        function drawCardBase(x, y, isOpen, cardData) {
+            // Smooth Rounded Rect Base
+            const radius = 14;
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + CARD_SIZE - radius, y);
+            ctx.quadraticCurveTo(x + CARD_SIZE, y, x + CARD_SIZE, y + radius);
+            ctx.lineTo(x + CARD_SIZE, y + CARD_SIZE - radius);
+            ctx.quadraticCurveTo(x + CARD_SIZE, y + CARD_SIZE, x + CARD_SIZE - radius, y + CARD_SIZE);
+            ctx.lineTo(x + radius, y + CARD_SIZE);
+            ctx.quadraticCurveTo(x, y + CARD_SIZE, x, y + CARD_SIZE - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+
+            if (isOpen) {
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+                // Draw Inner Icon Graphics Graphic Asset
+                drawCardShape(ctx, cardData.shape, cardData.color, x + CARD_SIZE/2, y + CARD_SIZE/2, 52);
+            } else {
+                // Facedown Matte Texture
+                ctx.fillStyle = '#166870';
+                ctx.fill();
+                ctx.strokeStyle = '#1e7b85';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                // Detailed Crosshatch Geometric Pattern
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(x + 8, y + 8, CARD_SIZE - 16, CARD_SIZE - 16);
+                ctx.clip();
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+                ctx.lineWidth = 2;
+                for (let i = -CARD_SIZE; i < CARD_SIZE * 2; i += 12) {
+                    ctx.moveTo(x + i, y);
+                    ctx.lineTo(x + i + CARD_SIZE, y + CARD_SIZE);
+                    ctx.moveTo(x + i + CARD_SIZE, y);
+                    ctx.lineTo(x + i, y + CARD_SIZE);
+                }
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        // Render Frame Engine Loop
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Draw Dashed Active Comparison Matrix Borders
+            if (gameState === 'playing') {
+                ctx.save();
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+                ctx.lineWidth = 3;
+                ctx.setLineDash([6, 4]);
+                
+                // Outline Top-Right Slot
+                ctx.strokeRect(POSITIONS[1].x - 6, POSITIONS[1].y - 6, CARD_SIZE + 12, CARD_SIZE + 12);
+                // Outline Bottom-Left Slot
+                ctx.strokeRect(POSITIONS[3].x - 6, POSITIONS[3].y - 6, CARD_SIZE + 12, CARD_SIZE + 12);
+                ctx.restore();
+            }
+
+            if (!isAnimating) {
+                // Static Pipeline Rendering Map
+                for (let i = 0; i < 4; i++) {
+                    // Rule Check: Index 1 (Top-Right) is ALWAYS open. 
+                    // All cards are open during the preliminary preview stage.
+                    const showFace = (gameState === 'preview' || i === 1);
+                    drawCardBase(POSITIONS[i].x, POSITIONS[i].y, showFace, pipelineCards[i]);
+                }
+            } else {
+                // Active Rotation Animation Vector Interpolator
+                animProgress += ANIM_SPEED;
+                if (animProgress >= 1) {
+                    animProgress = 1;
+                    isAnimating = false;
+
+                    // Complete Clockwise Pipeline Step Cycle shift array
+                    // Old BL exits, BR -> BL, TR -> BR, TL -> TR, Upcoming -> TL
+                    pipelineCards = [upcomingCard, pipelineCards[0], pipelineCards[1], pipelineCards[2]];
+                }
+
+                // Interpolated Position Computations
+                for (let i = 0; i < 4; i++) {
+                    let nextIdx = (i + 1) % 4;
+                    let startPos = POSITIONS[i];
+                    let endPos = POSITIONS[nextIdx];
+
+                    let currentX = startPos.x + (endPos.x - startPos.x) * animProgress;
+                    let currentY = startPos.y + (endPos.y - startPos.y) * animProgress;
+
+                    // Exiting card handles custom drop path off left screen edge
+                    if (i === 3) {
+                        currentX = startPos.x - 180 * animProgress;
+                        currentY = startPos.y;
+                    }
+
+                    // Render visibility flags mid-movement
+                    // Only display open layout configurations if moving into active Top-Right slot position index 1
+                    let showFace = (nextIdx === 1 && animProgress > 0.5);
+                    if (i === 3) showFace = false; // Exiting card remains facedown
+
+                    drawCardBase(currentX, currentY, showFace, pipelineCards[i]);
+                }
+
+                // Render incoming card path animating into Top-Left (Pos 0)
+                let incomingX = POSITIONS[0].x;
+                let incomingY = POSITIONS[0].y - 180 * (1 - animProgress);
+                drawCardBase(incomingX, incomingY, false, upcomingCard);
+            }
+
+            // 2. Performance HUD Interaction Feedback Flash
+            if (flashFeedback) {
+                ctx.save();
+                ctx.fillStyle = flashFeedback.type === 'correct' ? 'rgba(76, 175, 80, ' : 'rgba(244, 67, 54, ';
+                ctx.fillStyle += flashFeedback.alpha + ')';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.restore();
+
+                flashFeedback.alpha -= 0.04;
+                if (flashFeedback.alpha <= 0) flashFeedback = null;
+            }
+
+            requestAnimationFrame(draw);
+        }
+
+        // Start Render Loop Engine
+        requestAnimationFrame(draw);
+    </script>
+</body>
+</html>
+
+```
