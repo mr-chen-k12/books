@@ -1,21 +1,23 @@
 [
   {
-    "weekTitle": "Week 38 – 5/25 to 5/29",
-    "objectives": "By the end of the week, students will showcase their academic growth on the English and Math MAP assessments. They will also transition into Unit 5, beginning their exploration of decimal arithmetic and base-ten representations in real-world contexts.",
-    "agenda": [
-      "<strong>Monday:</strong> Memorial Day (No School)",
-      "<strong>Tuesday:</strong> MAP Testing (English)",
-      "<strong>Wednesday:</strong> MAP Testing (Math)",
-      "<strong>Thursday:</strong> Unit 5 Launch! Lesson 1: Using Decimals in a Shopping Context",
-      "<strong>Friday:</strong> Unit 5, Lesson 2: Using Diagrams to Represent Addition and Subtraction"
-    ],
-    "homework": "Delta Math Week 38 (Light week due to MAP testing!)",
-    "languageObjectives": [
-      "Students will read, interpret, and discuss real-world shopping contexts involving decimals.",
-      "Students will explain how visual diagrams represent the addition and subtraction of decimals.",
-      "Students will use precise mathematical place-value terminology (tenths, hundredths) to describe decimal numbers."
-    ]
-  },
+  "weekTitle": "Week 38 – 5/25 to 5/29",
+  "objectives": "By the end of the week, students will showcase their academic growth on the English and Math MAP assessments. They will also transition into Unit 5, beginning their exploration of decimal arithmetic and base-ten representations in real-world contexts.",
+  "agenda": [
+    "<strong>Monday:</strong> Memorial Day (No School)",
+    "<strong>Tuesday:</strong> MAP Testing (English)",
+    "<strong>Wednesday:</strong> Unit 5 Launch! Lesson 1: Using Decimals in a Shopping Context",
+    "<strong>Thursday:</strong> MAP Testing (Math)",
+    "<strong>Friday:</strong> Unit 5, Lesson 2: Using Diagrams to Represent Addition and Subtraction"
+  ],
+  "homework": "Delta Math Week 38 (Light week due to MAP testing!)",
+  "languageObjectives": [
+    "Students will read, interpret, and discuss real-world shopping contexts involving decimals.",
+    "Students will explain how visual diagrams represent the addition and subtraction of decimals.",
+    "Students will use precise mathematical place-value terminology (tenths, hundredths) to describe decimal numbers."
+  ]
+}
+  
+  ,
   {
     "weekTitle": "Week 37 – 5/18 to 5/22",
     "objectives": "By the end of the week, students will finalize their understanding of fraction division and volume, demonstrate their mastery on the end-of-unit assessment, and begin exploring decimal arithmetic in real-world contexts as we launch Unit 5.",
