@@ -39,7 +39,6 @@
             min-height: 100vh;
             box-sizing: border-box;
             font-weight: bold; 
-            /* Let the page scroll for multiple weeks */
             overflow-y: auto; 
             overflow-x: hidden;
         }
@@ -54,27 +53,22 @@
             height: 100vh;
             background-image: url('image_573374.png');
             background-repeat: no-repeat;
-            /* Shifted to the right side of the screen */
             background-position: 85% center; 
             background-size: 50%; 
-            /* Increased opacity from 0.15 to 0.35 to show better on TVs */
             opacity: 0.35; 
             z-index: -1;
             pointer-events: none;
         }
 
-        /* Container for all the fetched weeks */
         #all-weeks-container {
             display: flex;
             flex-direction: column;
-            gap: 2rem; /* Space between different weeks */
+            gap: 2rem; 
             padding-bottom: 2rem;
         }
 
-        /* Main Unified Board for a Single Week */
         .main-board {
             width: 100%;
-            /* Semi-transparent white so the text is readable but logo shows through */
             background: rgba(255, 255, 255, 0.85); 
             display: flex;
             flex-direction: column;
@@ -179,7 +173,7 @@
             width: 120px;
             cursor: pointer;
         }
-        
+         
         .loading-text {
             text-align: center;
             margin-top: 2rem;
@@ -205,16 +199,33 @@
 
         async function loadWeeklyData() {
             try {
-                // Cache-busting to always grab the latest from GitHub
                 const response = await fetch(JSON_URL + '?t=' + new Date().getTime());
                 if (!response.ok) throw new Error('Network response was not ok');
                 
-                const data = await response.json();
+                // Read as raw text first to execute deep data cleaning
+                const rawText = await response.text();
+                
+                // 1. Sanitize mobile/smart curly quotes back to clean code quotes
+                let cleanJSON = rawText
+                    .replace(/[\u201C\u201D]/g, '"')
+                    .replace(/[\u2018\u2019]/g, "'");
+
+                // 2. Clear broken trailing commas that break standard browser parsing
+                cleanJSON = cleanJSON.replace(/,\s*([\]}])/g, '$1');
+
+                // 3. Automatically fix single math backslashes so they parse cleanly
+                cleanJSON = cleanJSON.replace(/\\(?!["\\\/bfnrtu])/g, '\\\\');
+
+                // Safe parsing operation
+                const data = JSON.parse(cleanJSON);
                 renderWeeks(data);
             } catch (error) {
-                console.error("Failed to load JSON:", error);
+                console.error("Failed to parse JSON cleanly:", error);
                 document.getElementById('all-weeks-container').innerHTML = 
-                    `<div class="loading-text" style="color: red;">Failed to load data. Make sure objectives.json exists on GitHub and is formatted correctly.</div>`;
+                    `<div class="loading-text" style="color: red; background: rgba(255,255,255,0.9); padding: 1.5rem; border-radius: 8px;">
+                        <strong>Formatting Error Detected in JSON File</strong><br>
+                        <span style="font-size: 1rem; font-weight: normal;">Details: ${error.message}</span>
+                     </div>`;
             }
         }
 
@@ -222,20 +233,28 @@
             const container = document.getElementById('all-weeks-container');
             container.innerHTML = ''; 
 
+            if (!Array.isArray(weeksArray)) {
+                throw new Error("Root element inside objectives.json is not a valid array [].");
+            }
+
             weeksArray.forEach(week => {
                 const weekBoard = document.createElement('div');
                 weekBoard.className = 'main-board';
 
-                const agendaHTML = week.agenda.map(item => `<li>${item}</li>`).join('');
-                const langHTML = week.languageObjectives.map(item => `<li>${item}</li>`).join('');
+                // Ensure sub-arrays exist safely before using mapping mechanisms
+                const agendaItems = Array.isArray(week.agenda) ? week.agenda : [];
+                const langItems = Array.isArray(week.languageObjectives) ? week.languageObjectives : [];
+
+                const agendaHTML = agendaItems.map(item => `<li>${item}</li>`).join('');
+                const langHTML = langItems.map(item => `<li>${item}</li>`).join('');
 
                 weekBoard.innerHTML = `
                     <header>
-                        <h1>${week.weekTitle}</h1>
+                        <h1>${week.weekTitle || 'Untitled Week'}</h1>
                     </header>
                     <div class="content-section">
                         <span class="badge badge-obj">Objectives</span>
-                        <p>${week.objectives}</p>
+                        <p>${week.objectives || ''}</p>
                     </div>
                     <div class="content-section">
                         <span class="badge badge-agenda">Agenda</span>
@@ -243,7 +262,7 @@
                     </div>
                     <div class="content-section">
                         <span class="badge badge-hw">Homework</span>
-                        <p>${week.homework}</p>
+                        <p>${week.homework || ''}</p>
                     </div>
                     <div class="content-section">
                         <span class="badge badge-lang">Language Objectives</span>
@@ -254,7 +273,7 @@
                 container.appendChild(weekBoard);
             });
 
-            if (window.MathJax) {
+            if (window.MathJax && typeof MathJax.typesetPromise === 'function') {
                 MathJax.typesetPromise();
             }
         }
