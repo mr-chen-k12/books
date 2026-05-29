@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conductor Route Switcher</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobile Train Switcher</title>
     <style>
         body {
             margin: 0;
+            padding: 0;
             background-color: #2c3e50;
             color: #ecf0f1;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -16,45 +17,57 @@
             justify-content: center;
             min-height: 100vh;
             overflow: hidden;
+            touch-action: manipulation;
         }
 
         h1 {
-            margin: 5px 0;
-            font-size: 2rem;
+            margin: 5px 0 2px 0;
+            font-size: 1.4rem;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
             color: #f1c40f;
+            text-align: center;
         }
 
         p {
-            margin: 5px 0 15px 0;
+            margin: 0 0 10px 0;
             color: #bdc3c7;
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 0 10px;
         }
 
         #gameContainer {
             position: relative;
+            width: 95vw;
+            max-width: 400px;
+            height: 80vh;
+            max-height: 650px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border-radius: 8px;
+            border-radius: 12px;
             overflow: hidden;
         }
 
         canvas {
             background-color: #34495e;
+            width: 100%;
+            height: 100%;
             display: block;
             cursor: pointer;
         }
 
         .ui-overlay {
             position: absolute;
-            top: 15px;
-            left: 20px;
-            right: 20px;
+            top: 12px;
+            left: 15px;
+            right: 15px;
             display: flex;
             justify-content: space-between;
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: bold;
             pointer-events: none;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+            z-index: 10;
         }
 
         #gameOverScreen {
@@ -64,51 +77,50 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.9);
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
+            z-index: 20;
         }
 
         #gameOverScreen h2 {
             color: #e74c3c;
-            font-size: 3rem;
-            margin-bottom: 10px;
+            font-size: 2.5rem;
+            margin-bottom: 5px;
         }
 
         #gameOverScreen button {
             background-color: #2ecc71;
             color: white;
             border: none;
-            padding: 12px 30px;
+            padding: 12px 35px;
             font-size: 1.2rem;
-            border-radius: 5px;
+            border-radius: 25px;
             cursor: pointer;
-            transition: background 0.2s;
-            margin-top: 20px;
             font-weight: bold;
-        }
-
-        #gameOverScreen button:hover {
-            background-color: #27ae60;
+            margin-top: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
     </style>
 </head>
 <body>
 
-    <h1>Train Routing Puzzle</h1>
-    <p>Click on a branching track to change the active line connection!</p>
+    <h1>Route Switcher</h1>
+    <p>Tap near a house or its track branch to route the trains!</p>
 
     <div id="gameContainer">
-        <canvas id="gameCanvas" width="800" height="500"></canvas>
+        <canvas id="gameCanvas" width="400" height="650"></canvas>
+        
         <div class="ui-overlay">
             <div id="scoreDisplay">Score: 0</div>
             <div id="livesDisplay">Lives: ❤️❤️❤️</div>
         </div>
+
         <div id="gameOverScreen">
             <h2>Game Over</h2>
-            <p id="finalScore">Your final score: 0</p>
+            <p id="finalScore" style="font-size: 1.1rem;">Your final score: 0</p>
             <button onclick="resetGame()">Play Again</button>
         </div>
     </div>
@@ -121,64 +133,43 @@
         const gameOverScreen = document.getElementById('gameOverScreen');
         const finalScore = document.getElementById('finalScore');
 
-        // Colors Mapping
-        const COLORS = {
-            red: '#e74c3c',
-            green: '#2ecc71',
-            blue: '#3498db'
-        };
+        const COLORS = { red: '#e74c3c', green: '#2ecc71', blue: '#3498db' };
         const COLOR_KEYS = ['red', 'green', 'blue'];
 
-        // Game State
+        // Core Layout Coordinates (Vertical flow)
+        const nodes = {
+            tunnel: { x: 200, y: 40 },
+            switch1: { x: 200, y: 180 },
+            switch2: { x: 200, y: 400 },
+            house0: { id: 0, colorKey: 'red', x: 80, y: 180 },     // Left branch 1
+            house1: { id: 1, colorKey: 'green', x: 320, y: 400 },   // Right branch 2
+            house2: { id: 2, colorKey: 'blue', x: 200, y: 580 }     // Dead end bottom
+        };
+
         let score = 0;
         let lives = 3;
         let trains = [];
-        let activeBranch = 1; // 0: Top (Red), 1: Middle (Green), 2: Bottom (Blue)
+        let activeRoute = 2; // 0: House Red, 1: House Green, 2: House Blue
         let gameOver = false;
         let lastSpawnTime = 0;
-        let spawnInterval = 3500; // MS between train spawns
+        let spawnInterval = 3800; 
 
-        // Map Layout Coordinates
-        const tunnelX = 60;
-        const switchX = 280;
-        const trackY = 250;
-
-        const houses = [
-            { id: 0, color: 'red', x: 720, y: 100 },
-            { id: 1, color: 'green', x: 720, y: 250 },
-            { id: 2, color: 'blue', x: 720, y: 400 }
-        ];
-
-        // Track Click Boundaries
+        // Handle Touch/Click inputs optimized for mobile tapping targets
         canvas.addEventListener('click', function(event) {
             if (gameOver) return;
 
             const rect = canvas.getBoundingClientRect();
-            const clickX = event.clientX - rect.left;
-            const clickY = event.clientY - rect.top;
+            // Translate screen touches accurately to our internal 400x650 coordinate canvas space
+            const touchX = ((event.clientX - rect.left) / rect.width) * canvas.width;
+            const touchY = ((event.clientY - rect.top) / rect.height) * canvas.height;
 
-            // Only switch if clicking to the right of the switch point
-            if (clickX >= switchX - 20 && clickX <= canvas.width) {
-                // Determine which branch path line is closest vertically
-                let closestBranch = 1;
-                let minDistance = Infinity;
-
-                houses.forEach(house => {
-                    // Quick linear interpolation formula to find track Y at clickX position
-                    const t = (clickX - switchX) / (house.x - switchX);
-                    const expectedY = trackY + t * (house.y - trackY);
-                    const dist = Math.abs(clickY - expectedY);
-
-                    if (dist < minDistance) {
-                        minDistance = dist;
-                        closestBranch = house.id;
-                    }
-                });
-
-                // Set active track connection if click was reasonably near track fields
-                if (minDistance < 60) {
-                    activeBranch = closestBranch;
-                }
+            // Determine which house route the user is trying to hit based on touch height/sides
+            if (touchY < 260) {
+                activeRoute = 0; // Route to Upper Red House
+            } else if (touchY >= 260 && touchY < 480) {
+                activeRoute = 1; // Route to Middle Green House
+            } else {
+                activeRoute = 2; // Route to Bottom Blue House
             }
         });
 
@@ -186,189 +177,187 @@
             constructor() {
                 this.colorKey = COLOR_KEYS[Math.floor(Math.random() * COLOR_KEYS.length)];
                 this.color = COLORS[this.colorKey];
-                this.x = tunnelX;
-                this.y = trackY;
-                this.speed = 1.2 + (score * 0.05); // Speed gradually increases with points
-                this.phase = 'main'; // 'main' or 'branch'
-                this.targetBranch = null; 
-                this.progress = 0; // percentage along the current path phase
+                this.x = nodes.tunnel.x;
+                this.y = nodes.tunnel.y;
+                this.speed = 1.3 + (score * 0.06); 
+                
+                // Track path generation using waypoint node injection 
+                this.waypoints = [nodes.tunnel, nodes.switch1];
+                this.currentWaypointIdx = 0;
             }
 
             update() {
-                if (this.phase === 'main') {
-                    this.x += this.speed;
-                    if (this.x >= switchX) {
-                        // Locks into whatever branch track is active the moment it hits the switch
-                        this.phase = 'branch';
-                        this.targetBranch = activeBranch;
-                        this.progress = 0;
+                let target = this.waypoints[this.currentWaypointIdx + 1];
+                
+                // If the train arrives at a decision point switch, dynamically look up active player choice
+                if (!target) {
+                    if (this.waypoints[this.currentWaypointIdx] === nodes.switch1) {
+                        if (activeRoute === 0) {
+                            this.waypoints.push(nodes.house0);
+                        } else {
+                            this.waypoints.push(nodes.switch2);
+                        }
+                    } else if (this.waypoints[this.currentWaypointIdx] === nodes.switch2) {
+                        if (activeRoute === 1) {
+                            this.waypoints.push(nodes.house1);
+                        } else {
+                            this.waypoints.push(nodes.house2);
+                        }
+                    } else {
+                        // Reached a final destination house terminal
+                        this.arrive(this.waypoints[this.currentWaypointIdx]);
+                        return false; 
                     }
-                } else if (this.phase === 'branch') {
-                    const targetHouse = houses[this.targetBranch];
-                    
-                    // Total horizontal distance for branch phase
-                    const totalDistX = targetHouse.x - switchX;
-                    this.x += this.speed;
-                    
-                    // Calculate relative progress along X axis
-                    this.progress = (this.x - switchX) / totalDistX;
-                    
-                    // Interpolate Y coordinate smoothly
-                    this.y = trackY + (targetHouse.y - trackY) * this.progress;
-
-                    // Check if train reached the house destination
-                    if (this.x >= targetHouse.x) {
-                        this.arrive(targetHouse);
-                        return false; // Request deletion
-                    }
+                    target = this.waypoints[this.currentWaypointIdx + 1];
                 }
-                return true; // Keep alive
+
+                // Vector calculation for movement heading toward current targeted node waypoint
+                let dx = target.x - this.x;
+                let dy = target.y - this.y;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist <= this.speed) {
+                    this.x = target.x;
+                    this.y = target.y;
+                    this.currentWaypointIdx++;
+                } else {
+                    this.angle = Math.atan2(dy, dx);
+                    this.x += (dx / dist) * this.speed;
+                    this.y += (dy / dist) * this.speed;
+                }
+                return true;
             }
 
             arrive(house) {
-                if (this.colorKey === house.color) {
+                if (this.colorKey === house.colorKey) {
                     score++;
                     scoreDisplay.innerText = "Score: " + score;
                 } else {
                     lives--;
                     updateLivesDisplay();
-                    if (lives <= 0) {
-                        endGame();
-                    }
+                    if (lives <= 0) endGame();
                 }
             }
 
             draw() {
                 ctx.save();
                 ctx.translate(this.x, this.y);
+                if (this.angle !== undefined) ctx.rotate(this.angle);
 
-                // Calculate angle for rotating the train chassis based on path orientation
-                if (this.phase === 'branch') {
-                    const targetHouse = houses[this.targetBranch];
-                    const angle = Math.atan2(targetHouse.y - trackY, targetHouse.x - switchX);
-                    ctx.rotate(angle);
-                }
-
-                // Draw Train Locomotive body
+                // Chassis
                 ctx.fillStyle = this.color;
-                ctx.fillRect(-25, -12, 35, 20); // Cabin Main Body
+                ctx.fillRect(-22, -10, 32, 18);
                 ctx.fillStyle = '#2c3e50';
-                ctx.fillRect(2, -8, 6, 6);      // Window
+                ctx.fillRect(2, -6, 6, 5); // Window
 
-                // Engine details
-                ctx.fillStyle = '#555';
-                ctx.fillRect(5, -18, 4, 8);     // Smokestack
-                ctx.fillRect(-30, -5, 5, 12);    // Rear bumper
+                // Smoke stack & features
+                ctx.fillStyle = '#444';
+                ctx.fillRect(4, -14, 3, 6);
 
                 // Wheels
                 ctx.fillStyle = '#111';
                 ctx.beginPath();
-                ctx.arc(-15, 10, 5, 0, Math.PI * 2);
-                ctx.arc(0, 10, 5, 0, Math.PI * 2);
+                ctx.arc(-12, 9, 4, 0, Math.PI * 2);
+                ctx.arc(2, 9, 4, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.restore();
             }
         }
 
-        function updateLivesDisplay() {
-            let hearts = "";
-            for (let i = 0; i < 3; i++) {
-                hearts += i < lives ? "❤️" : "🖤";
-            }
-            livesDisplay.innerText = "Lives: " + hearts;
-        }
-
-        function drawBackgroundElements() {
-            // 1. Draw Junction / Tracks Setup
-            houses.forEach(house => {
-                const isActive = (house.id === activeBranch);
-                
-                ctx.beginPath();
-                ctx.moveTo(switchX, trackY);
-                ctx.lineTo(house.x, house.y);
-                
-                // Track style properties
-                ctx.lineWidth = isActive ? 5 : 3;
-                ctx.strokeStyle = isActive ? '#f1c40f' : '#7f8c8d';
-                ctx.setLineDash([6, 6]); // Dotted path rule configuration
-                ctx.stroke();
-                ctx.setLineDash([]); // Reset dash rules for regular drawings
-            });
-
-            // Central Main Track trunk line
+        function drawTrackSegment(from, to, isActive) {
             ctx.beginPath();
-            ctx.moveTo(tunnelX, trackY);
-            ctx.lineTo(switchX, trackY);
-            ctx.lineWidth = 5;
-            ctx.strokeStyle = '#f1c40f';
+            ctx.moveTo(from.x, from.y);
+            ctx.lineTo(to.x, to.y);
+            ctx.lineWidth = isActive ? 6 : 3;
+            ctx.strokeStyle = isActive ? '#f1c40f' : '#7f8c8d';
             ctx.setLineDash([6, 6]);
             ctx.stroke();
             ctx.setLineDash([]);
+        }
 
-            // Draw a mechanical switch visual lever overlay on the junction node
+        function drawHouse(house) {
+            ctx.save();
+            ctx.translate(house.x, house.y);
+
+            // House Base Structure
+            ctx.fillStyle = COLORS[house.colorKey];
+            ctx.fillRect(-18, -10, 36, 30);
+
+            // Roof line
+            ctx.fillStyle = '#c0392b';
             ctx.beginPath();
-            ctx.arc(switchX, trackY, 8, 0, Math.PI * 2);
+            ctx.moveTo(-24, -10);
+            ctx.lineTo(0, -28);
+            ctx.lineTo(24, -10);
+            ctx.closePath();
+            ctx.fill();
+
+            // Door panel
             ctx.fillStyle = '#f39c12';
-            ctx.fill();
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = '#fff';
-            ctx.stroke();
+            ctx.fillRect(-5, 8, 10, 12);
 
-            // 2. Draw The Spawning Tunnel Icon
-            ctx.fillStyle = '#7f8c8d';
-            ctx.fillRect(0, trackY - 35, tunnelX, 70);
-            ctx.fillStyle = '#111111';
-            ctx.beginPath();
-            ctx.arc(tunnelX, trackY, 25, -Math.PI/2, Math.PI/2);
-            ctx.fill();
+            ctx.restore();
+        }
 
-            // 3. Draw Houses Destination Icons
-            houses.forEach(house => {
-                ctx.save();
-                ctx.translate(house.x, house.y);
+        function drawBackgroundElements() {
+            // Determine active tracking highlights for the sequential systems
+            const r0Active = (activeRoute === 0);
+            const r1Active = (activeRoute === 1);
+            const r2Active = (activeRoute === 2);
 
-                // Base Square Wall structure
-                ctx.fillStyle = COLORS[house.color];
-                ctx.fillRect(0, -20, 40, 40);
+            // Trunk Line 1 (Tunnel down to Switch 1)
+            drawTrackSegment(nodes.tunnel, nodes.switch1, true);
 
-                // Triangular Roof element
-                ctx.fillStyle = '#c0392b';
+            // Branching System 1 (Switch 1 out to Red House or going down)
+            drawTrackSegment(nodes.switch1, nodes.house0, r0Active);
+            drawTrackSegment(nodes.switch1, nodes.switch2, r1Active || r2Active);
+
+            // Branching System 2 (Switch 2 out to Green House or going to Blue House)
+            drawTrackSegment(nodes.switch2, nodes.house1, r1Active);
+            drawTrackSegment(nodes.switch2, nodes.house2, r2Active);
+
+            // Mechanical Junction Nodes Visualizers
+            [nodes.switch1, nodes.switch2].forEach(sw => {
                 ctx.beginPath();
-                ctx.moveTo(-10, -20);
-                ctx.lineTo(20, -45);
-                ctx.lineTo(50, -20);
-                ctx.closePath();
+                ctx.arc(sw.x, sw.y, 7, 0, Math.PI * 2);
+                ctx.fillStyle = '#e67e22';
                 ctx.fill();
-
-                // Front Door panel
-                ctx.fillStyle = '#f39c12';
-                ctx.fillRect(12, 5, 14, 15);
-
-                ctx.restore();
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
             });
+
+            // The Entry Tunnel
+            ctx.fillStyle = '#7f8c8d';
+            ctx.fillRect(nodes.tunnel.x - 30, 0, 60, nodes.tunnel.y);
+            ctx.fillStyle = '#111';
+            ctx.beginPath();
+            ctx.arc(nodes.tunnel.x, nodes.tunnel.y, 20, Math.PI, 0);
+            ctx.fill();
+
+            // Draw Houses Destination Structures
+            drawHouse(nodes.house0);
+            drawHouse(nodes.house1);
+            drawHouse(nodes.house2);
         }
 
         function gameLoop(timestamp) {
             if (gameOver) return;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Draw environment layout architecture
             drawBackgroundElements();
 
-            // Spawning management
             if (!lastSpawnTime) lastSpawnTime = timestamp;
             const elapsed = timestamp - lastSpawnTime;
             
-            // Handle dynamic spawn rate modifiers based on player scaling performance
-            let adjustedInterval = Math.max(1500, spawnInterval - (score * 120));
-            if (elapsed >= adjustedInterval) {
+            // Dynamic acceleration scaling rules
+            let dynamicInterval = Math.max(1600, spawnInterval - (score * 110));
+            if (elapsed >= dynamicInterval) {
                 trains.push(new Train());
                 lastSpawnTime = timestamp;
             }
 
-            // Update & Render Moving Trains
             trains = trains.filter(train => {
                 const keep = train.update();
                 if (keep) train.draw();
@@ -376,6 +365,12 @@
             });
 
             requestAnimationFrame(gameLoop);
+        }
+
+        function updateLivesDisplay() {
+            let hearts = "";
+            for (let i = 0; i < 3; i++) hearts += i < lives ? "❤️" : "🖤";
+            livesDisplay.innerText = "Lives: " + hearts;
         }
 
         function endGame() {
@@ -388,7 +383,7 @@
             score = 0;
             lives = 3;
             trains = [];
-            activeBranch = 1;
+            activeRoute = 2;
             gameOver = false;
             lastSpawnTime = 0;
             scoreDisplay.innerText = "Score: 0";
@@ -397,7 +392,6 @@
             requestAnimationFrame(gameLoop);
         }
 
-        // Initialize execution on runtime ready state
         updateLivesDisplay();
         requestAnimationFrame(gameLoop);
     </script>
