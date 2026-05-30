@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinese Chess (Xiangqi)</title>
+    <style>
+        :root {
+            --board-bg: #e6b87d;
+            --line-color: #4a2e1b;
+            --red-piece: #cc3333;
+            --black-piece: #222222;
+            --piece-bg: #f7e6c4;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #2f3542;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #fff;
+        }
+
+        h1 {
+            margin-bottom: 5px;
+            font-weight: 400;
+            letter-spacing: 2px;
+        }
+
+        #status {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            padding: 5px 15px;
+            border-radius: 4px;
+            background: rgba(0,0,0,0.2);
+        }
+
+        /* The Board Wrapper */
+        .board-container {
+            position: relative;
+            background-color: var(--board-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 4px double var(--line-color);
+        }
+
+        /* Grid Layer */
+        .board-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 60px);
+            grid-template-rows: repeat(9, 60px);
+            border: 2px solid var(--line-color);
+            position: relative;
+        }
+
+        .cell {
+            border-right: 1px solid var(--line-color);
+            border-bottom: 1px solid var(--line-color);
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        /* Remove outer grid borders since the container handles it */
+        .cell:nth-child(8n) { border-right: none; }
+        .cell:nth-child(n+73) { border-bottom: none; }
+
+        /* The River */
+        .river {
+            position: absolute;
+            top: 240px;
+            left: 0;
+            width: 480px;
+            height: 60px;
+            background-color: var(--board-bg);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--line-color);
+            letter-spacing: 10px;
+            pointer-events: none; /* Let clicks pass through to intersections */
+        }
+
+        /* Palaces (Chuhe Hanjie lines) */
+        .diagonal-palace-top, .diagonal-palace-bottom {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            left: 180px;
+            pointer-events: none;
+        }
+        .diagonal-palace-top {
+            top: 0;
+            background: 
+                linear-gradient(to top right, transparent 49.5%, var(--line-color) 49.5%, var(--line-color) 50.5%, transparent 50.5%),
+                linear-gradient(to top left, transparent 49.5%, var(--line-color) 49.5%, var(--line-color) 50.5%, transparent 50.5%);
+        }
+        .diagonal-palace-bottom {
+            bottom: 0;
+            background: 
+                linear-gradient(to top right, transparent 49.5%, var(--line-color) 49.5%, var(--line-color) 50.5%, transparent 50.5%),
+                linear-gradient(to top left, transparent 49.5%, var(--line-color) 49.5%, var(--line-color) 50.5%, transparent 50.5%);
+        }
+
+        /* Intersections Layer (Where pieces actually sit) */
+        .intersections-layer {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 480px;
+            height: 540px;
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            grid-template-rows: repeat(10, 1fr);
+        }
+
+        .intersection {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 0;
+            height: 0;
+            transform: translate(0, 0); /* Center point alignment */
+        }
+
+        /* Clickable zone for easier targeting */
+        .click-zone {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .click-zone:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .click-zone.selected .piece {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px #ffd700;
+            border-color: #ffd700;
+        }
+
+        /* Pieces Styling */
+        .piece {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background-color: var(--piece-bg);
+            border: 2px solid var(--line-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            font-weight: bold;
+            user-select: none;
+            box-shadow: 2px 3px 5px rgba(0,0,0,0.3);
+            transition: transform 0.1s;
+        }
+
+        .piece.red {
+            color: var(--red-piece);
+            border-color: var(--red-piece);
+        }
+
+        .piece.black {
+            color: var(--black-piece);
+            border-color: var(--black-piece);
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #1e90ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #3742fa;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>象棋 · Xiangqi</h1>
+    <div id="status">Red's Turn</div>
+
+    <div class="board-container">
+        <div class="board-grid" id="boardGrid"></div>
+        
+        <div class="river"><span>楚河</span><span>漢界</span></div>
+        <div class="diagonal-palace-top"></div>
+        <div class="diagonal-palace-bottom"></div>
+
+        <div class="intersections-layer" id="intersectionsLayer"></div>
+    </div>
+
+    <button onclick="resetGame()">Restart Game</button>
+
+    <script>
+        const RED = 'red';
+        const BLACK = 'black';
+        let currentTurn = RED;
+        let selectedSquare = null;
+
+        // Setup matrix matching standard initial Xiangqi positions [row][col]
+        // R=Red, B=Black. 
+        // Piece Notation: C=Chariot, H=Horse, E=Elephant, A=Advisor, G=General, P=Cannon, S=Soldier
+        let boardState = Array(10).fill(null).map(() => Array(9).fill(null));
+
+        const pieceNames = {
+            'BC': { text: '車', side: BLACK }, 'BH': { text: '馬', side: BLACK }, 'BE': { text: '象', side: BLACK }, 'BA': { text: '士', side: BLACK }, 'BG': { text: '將', side: BLACK }, 'BP': { text: '砲', side: BLACK }, 'BS': { text: '卒', side: BLACK },
+            'RC': { text: '車', side: RED },   'RH': { text: '傌', side: RED },   'RE': { text: '相', side: RED },   'RA': { text: '仕', side: RED },   'RG': { text: '帥', side: RED },   'RP': { text: '炮', side: RED },   'RS': { text: '兵', side: RED }
+        };
+
+        function initBoardState() {
+            boardState = Array(10).fill(null).map(() => Array(9).fill(null));
+            
+            // Black Pieces
+            boardState[0] = ['BC', 'BH', 'BE', 'BA', 'BG', 'BA', 'BE', 'BH', 'BC'];
+            boardState[2][1] = 'BP'; boardState[2][7] = 'BP';
+            boardState[3] = ['BS', null, 'BS', null, 'BS', null, 'BS', null, 'BS'];
+
+            // Red Pieces
+            boardState[9] = ['RC', 'RH', 'RE', 'RA', 'RG', 'RA', 'RE', 'RH', 'RC'];
+            boardState[7][1] = 'RP'; boardState[7][7] = 'RP';
+            boardState[6] = ['RS', null, 'RS', null, 'RS', null, 'RS', null, 'RS'];
+        }
+
+        // Generate visual board squares (9 rows, 8 columns of background cells)
+        function createGridBackground() {
+            const grid = document.getElementById('boardGrid');
+            grid.innerHTML = '';
+            for (let i = 0; i < 72; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                grid.appendChild(cell);
+            }
+        }
+
+        // Generate the actual interactive nodes (10 rows, 9 columns)
+        function renderIntersections() {
+            const layer = document.getElementById('intersectionsLayer');
+            layer.innerHTML = '';
+
+            for (let r = 0; r < 10; r++) {
+                for (let c = 0; c < 9; c++) {
+                    const intersection = document.createElement('div');
+                    intersection.classList.add('intersection');
+
+                    const clickZone = document.createElement('div');
+                    clickZone.classList.add('click-zone');
+                    clickZone.dataset.row = r;
+                    clickZone.dataset.col = c;
+                    clickZone.addEventListener('click', handleSquareClick);
+
+                    const pieceKey = boardState[r][c];
+                    if (pieceKey) {
+                        const pieceData = pieceNames[pieceKey];
+                        const pieceEl = document.createElement('div');
+                        pieceEl.classList.add('piece', pieceData.side);
+                        pieceEl.innerText = pieceData.text;
+                        clickZone.appendChild(pieceEl);
+                    }
+
+                    // Highlight selected piece
+                    if (selectedSquare && selectedSquare.row === r && selectedSquare.col === c) {
+                        clickZone.classList.add('selected');
+                    }
+
+                    intersection.appendChild(clickZone);
+                    layer.appendChild(intersection);
+                }
+            }
+        }
+
+        function handleSquareClick(e) {
+            const zone = e.currentTarget;
+            const r = parseInt(zone.dataset.row);
+            const c = parseInt(zone.dataset.col);
+            const clickedPiece = boardState[r][c];
+
+            if (selectedSquare) {
+                // If clicking another piece of the same team, switch selection
+                if (clickedPiece && pieceNames[clickedPiece].side === currentTurn) {
+                    selectedSquare = { row: r, col: c };
+                    renderIntersections();
+                    return;
+                }
+
+                // Move Piece (Sandbox mode: Allows any turn-based movement onto empty or enemy cells)
+                const originalPiece = boardState[selectedSquare.row][selectedSquare.col];
+                
+                boardState[r][c] = originalPiece;
+                boardState[selectedSquare.row][selectedSquare.col] = null;
+                
+                // Switch turn
+                currentTurn = currentTurn === RED ? BLACK : RED;
+                document.getElementById('status').innerText = `${currentTurn.charAt(0).toUpperCase() + currentTurn.slice(1)}'s Turn`;
+                
+                selectedSquare = null;
+                renderIntersections();
+            } else {
+                // Select a piece
+                if (clickedPiece && pieceNames[clickedPiece].side === currentTurn) {
+                    selectedSquare = { row: r, col: c };
+                    zone.classList.add('selected');
+                }
+            }
+        }
+
+        function resetGame() {
+            currentTurn = RED;
+            selectedSquare = null;
+            document.getElementById('status').innerText = "Red's Turn";
+            initBoardState();
+            renderIntersections();
+        }
+
+        // Initialize Application
+        createGridBackground();
+        initBoardState();
+        renderIntersections();
+    </script>
+</body>
+</html>
