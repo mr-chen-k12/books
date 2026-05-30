@@ -57,7 +57,7 @@
         .board-container {
             position: relative;
             background-color: var(--board-bg);
-            padding: 25px; /* Space for half-pieces on edges */
+            padding: 25px; /* Outer boundary padding */
             border-radius: 8px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
             border: 4px double var(--line-color);
@@ -83,12 +83,22 @@
         .cell:nth-child(8n) { border-right: none; }
         .cell:nth-child(n+73) { border-bottom: none; }
 
+        /* Unified Master Background Layer for Board Markings */
+        .decorations-layer {
+            position: absolute;
+            top: 27px; /* 25px padding + 2px grid border */
+            left: 27px;
+            width: calc(8 * var(--cell-size));
+            height: calc(9 * var(--cell-size));
+            pointer-events: none;
+        }
+
         /* The River */
         .river {
             position: absolute;
             top: calc(4 * var(--cell-size));
             left: 0;
-            width: calc(8 * var(--cell-size));
+            width: 100%;
             height: var(--cell-size);
             background-color: var(--board-bg);
             display: flex;
@@ -98,35 +108,35 @@
             font-weight: bold;
             color: var(--line-color);
             letter-spacing: 4px;
-            pointer-events: none; 
         }
 
-        /* Palaces */
+        /* Palaces (The X Marks) */
         .diagonal-palace-top, .diagonal-palace-bottom {
             position: absolute;
             width: calc(2 * var(--cell-size));
             height: calc(2 * var(--cell-size));
             left: calc(3 * var(--cell-size));
-            pointer-events: none;
         }
+        
         .diagonal-palace-top {
             top: 0;
             background: 
-                linear-gradient(to top right, transparent 49%, var(--line-color) 49%, var(--line-color) 51%, transparent 51%),
-                linear-gradient(to top left, transparent 49%, var(--line-color) 49%, var(--line-color) 51%, transparent 51%);
+                linear-gradient(to top right, transparent 48.5%, var(--line-color) 48.5%, var(--line-color) 51.5%, transparent 51.5%),
+                linear-gradient(to top left, transparent 48.5%, var(--line-color) 48.5%, var(--line-color) 51.5%, transparent 51.5%);
         }
+        
         .diagonal-palace-bottom {
             bottom: 0;
             background: 
-                linear-gradient(to top right, transparent 49%, var(--line-color) 49%, var(--line-color) 51%, transparent 51%),
-                linear-gradient(to top left, transparent 49%, var(--line-color) 49%, var(--line-color) 51%, transparent 51%);
+                linear-gradient(to top right, transparent 48.5%, var(--line-color) 48.5%, var(--line-color) 51.5%, transparent 51.5%),
+                linear-gradient(to top left, transparent 48.5%, var(--line-color) 48.5%, var(--line-color) 51.5%, transparent 51.5%);
         }
 
-        /* Master Coordinate Layer for Pieces */
+        /* Master Coordinate Layer for Interactive Pieces */
         .intersections-layer {
             position: absolute;
-            top: 25px; /* Must match container padding exactly */
-            left: 25px;
+            top: 27px; /* Matches the decorations layer perfectly */
+            left: 27px;
             pointer-events: none; 
         }
 
@@ -135,14 +145,14 @@
             position: absolute;
             width: var(--cell-size);
             height: var(--cell-size);
-            transform: translate(-50%, -50%); /* Centers the click target perfectly over the crosshair */
+            transform: translate(-50%, -50%); /* Centers the click target perfectly over crosshairs */
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 2;
             pointer-events: auto;
-            -webkit-tap-highlight-color: transparent; /* Removes iOS flash element box */
+            -webkit-tap-highlight-color: transparent;
         }
 
         .click-zone:hover {
@@ -207,9 +217,11 @@
     <div class="board-container">
         <div class="board-grid" id="boardGrid"></div>
         
-        <div class="river"><span>楚河</span><span>漢界</span></div>
-        <div class="diagonal-palace-top"></div>
-        <div class="diagonal-palace-bottom"></div>
+        <div class="decorations-layer">
+            <div class="river"><span>楚河</span><span>漢界</span></div>
+            <div class="diagonal-palace-top"></div>
+            <div class="diagonal-palace-bottom"></div>
+        </div>
 
         <div class="intersections-layer" id="intersectionsLayer"></div>
     </div>
@@ -253,7 +265,6 @@
             }
         }
 
-        // Uses mathematical offsets to align elements directly to intersection intersections
         function renderIntersections() {
             const layer = document.getElementById('intersectionsLayer');
             layer.innerHTML = '';
@@ -263,7 +274,6 @@
                     const clickZone = document.createElement('div');
                     clickZone.classList.add('click-zone');
                     
-                    // Direct mathematical lockstep positioning matching grid cell lines
                     clickZone.style.left = `calc(${c} * var(--cell-size))`;
                     clickZone.style.top = `calc(${r} * var(--cell-size))`;
                     
