@@ -2,15 +2,27 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Chinese Chess (Xiangqi)</title>
     <style>
         :root {
+            /* Desktop Defaults */
+            --cell-size: 52px;
+            --piece-size: 46px;
+            
             --board-bg: #e6b87d;
             --line-color: #4a2e1b;
             --red-piece: #cc3333;
             --black-piece: #222222;
             --piece-bg: #f7e6c4;
+        }
+
+        /* Dynamic scaling for mobile screens (like iPhone 16 Pro) */
+        @media (max-width: 500px) {
+            :root {
+                --cell-size: 10.5vw;
+                --piece-size: 9.2vw;
+            }
         }
 
         body {
@@ -23,128 +35,119 @@
             min-height: 100vh;
             margin: 0;
             color: #fff;
+            touch-action: manipulation;
         }
 
         h1 {
-            margin-bottom: 5px;
+            margin: 10px 0 5px 0;
             font-weight: 400;
             letter-spacing: 2px;
+            font-size: 1.5rem;
         }
 
         #status {
-            font-size: 1.2rem;
+            font-size: 1rem;
             margin-bottom: 15px;
             padding: 5px 15px;
             border-radius: 4px;
             background: rgba(0,0,0,0.2);
         }
 
-        /* The Board Wrapper */
+        /* Main Container */
         .board-container {
             position: relative;
             background-color: var(--board-bg);
-            padding: 20px;
+            padding: 25px; /* Space for half-pieces on edges */
             border-radius: 8px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
             border: 4px double var(--line-color);
+            display: inline-block;
         }
 
-        /* Grid Layer */
+        /* Visual Grid Layer (Cells) */
         .board-grid {
             display: grid;
-            grid-template-columns: repeat(8, 60px);
-            grid-template-rows: repeat(9, 60px);
+            grid-template-columns: repeat(8, var(--cell-size));
+            grid-template-rows: repeat(9, var(--cell-size));
             border: 2px solid var(--line-color);
             position: relative;
+            box-sizing: content-box;
         }
 
         .cell {
             border-right: 1px solid var(--line-color);
             border-bottom: 1px solid var(--line-color);
-            position: relative;
             box-sizing: border-box;
         }
 
-        /* Remove outer grid borders since the container handles it */
         .cell:nth-child(8n) { border-right: none; }
         .cell:nth-child(n+73) { border-bottom: none; }
 
         /* The River */
         .river {
             position: absolute;
-            top: 240px;
+            top: calc(4 * var(--cell-size));
             left: 0;
-            width: 480px;
-            height: 60px;
+            width: calc(8 * var(--cell-size));
+            height: var(--cell-size);
             background-color: var(--board-bg);
             display: flex;
             align-items: center;
             justify-content: space-around;
-            font-size: 1.2rem;
+            font-size: calc(var(--cell-size) * 0.38);
             font-weight: bold;
             color: var(--line-color);
-            letter-spacing: 10px;
-            pointer-events: none; /* Let clicks pass through to intersections */
+            letter-spacing: 4px;
+            pointer-events: none; 
         }
 
-        /* Palaces (Chuhe Hanjie lines) */
+        /* Palaces */
         .diagonal-palace-top, .diagonal-palace-bottom {
             position: absolute;
-            width: 120px;
-            height: 120px;
-            left: 180px;
+            width: calc(2 * var(--cell-size));
+            height: calc(2 * var(--cell-size));
+            left: calc(3 * var(--cell-size));
             pointer-events: none;
         }
         .diagonal-palace-top {
             top: 0;
             background: 
-                linear-gradient(to top right, transparent 49.5%, var(--line-color) 49.5%, var(--line-color) 50.5%, transparent 50.5%),
-                linear-gradient(to top left, transparent 49.5%, var(--line-color) 49.5%, var(--line-color) 50.5%, transparent 50.5%);
+                linear-gradient(to top right, transparent 49%, var(--line-color) 49%, var(--line-color) 51%, transparent 51%),
+                linear-gradient(to top left, transparent 49%, var(--line-color) 49%, var(--line-color) 51%, transparent 51%);
         }
         .diagonal-palace-bottom {
             bottom: 0;
             background: 
-                linear-gradient(to top right, transparent 49.5%, var(--line-color) 49.5%, var(--line-color) 50.5%, transparent 50.5%),
-                linear-gradient(to top left, transparent 49.5%, var(--line-color) 49.5%, var(--line-color) 50.5%, transparent 50.5%);
+                linear-gradient(to top right, transparent 49%, var(--line-color) 49%, var(--line-color) 51%, transparent 51%),
+                linear-gradient(to top left, transparent 49%, var(--line-color) 49%, var(--line-color) 51%, transparent 51%);
         }
 
-        /* Intersections Layer (Where pieces actually sit) */
+        /* Master Coordinate Layer for Pieces */
         .intersections-layer {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            width: 480px;
-            height: 540px;
-            display: grid;
-            grid-template-columns: repeat(9, 1fr);
-            grid-template-rows: repeat(10, 1fr);
+            top: 25px; /* Must match container padding exactly */
+            left: 25px;
+            pointer-events: none; 
         }
 
-        .intersection {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 0;
-            height: 0;
-            transform: translate(0, 0); /* Center point alignment */
-        }
-
-        /* Clickable zone for easier targeting */
+        /* Click Zones mapped directly to line coordinate intersections */
         .click-zone {
             position: absolute;
-            width: 50px;
-            height: 50px;
+            width: var(--cell-size);
+            height: var(--cell-size);
+            transform: translate(-50%, -50%); /* Centers the click target perfectly over the crosshair */
             cursor: pointer;
-            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 2;
+            pointer-events: auto;
+            -webkit-tap-highlight-color: transparent; /* Removes iOS flash element box */
         }
 
         .click-zone:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
         }
 
         .click-zone.selected .piece {
@@ -155,15 +158,15 @@
 
         /* Pieces Styling */
         .piece {
-            width: 46px;
-            height: 46px;
+            width: var(--piece-size);
+            height: var(--piece-size);
             border-radius: 50%;
             background-color: var(--piece-bg);
             border: 2px solid var(--line-color);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.6rem;
+            font-size: calc(var(--piece-size) * 0.55);
             font-weight: bold;
             user-select: none;
             box-shadow: 2px 3px 5px rgba(0,0,0,0.3);
@@ -181,7 +184,7 @@
         }
 
         button {
-            margin-top: 20px;
+            margin: 20px 0;
             padding: 10px 20px;
             font-size: 1rem;
             background-color: #1e90ff;
@@ -219,9 +222,6 @@
         let currentTurn = RED;
         let selectedSquare = null;
 
-        // Setup matrix matching standard initial Xiangqi positions [row][col]
-        // R=Red, B=Black. 
-        // Piece Notation: C=Chariot, H=Horse, E=Elephant, A=Advisor, G=General, P=Cannon, S=Soldier
         let boardState = Array(10).fill(null).map(() => Array(9).fill(null));
 
         const pieceNames = {
@@ -232,18 +232,17 @@
         function initBoardState() {
             boardState = Array(10).fill(null).map(() => Array(9).fill(null));
             
-            // Black Pieces
+            // Black Team
             boardState[0] = ['BC', 'BH', 'BE', 'BA', 'BG', 'BA', 'BE', 'BH', 'BC'];
             boardState[2][1] = 'BP'; boardState[2][7] = 'BP';
             boardState[3] = ['BS', null, 'BS', null, 'BS', null, 'BS', null, 'BS'];
 
-            // Red Pieces
+            // Red Team
             boardState[9] = ['RC', 'RH', 'RE', 'RA', 'RG', 'RA', 'RE', 'RH', 'RC'];
             boardState[7][1] = 'RP'; boardState[7][7] = 'RP';
             boardState[6] = ['RS', null, 'RS', null, 'RS', null, 'RS', null, 'RS'];
         }
 
-        // Generate visual board squares (9 rows, 8 columns of background cells)
         function createGridBackground() {
             const grid = document.getElementById('boardGrid');
             grid.innerHTML = '';
@@ -254,18 +253,20 @@
             }
         }
 
-        // Generate the actual interactive nodes (10 rows, 9 columns)
+        // Uses mathematical offsets to align elements directly to intersection intersections
         function renderIntersections() {
             const layer = document.getElementById('intersectionsLayer');
             layer.innerHTML = '';
 
             for (let r = 0; r < 10; r++) {
                 for (let c = 0; c < 9; c++) {
-                    const intersection = document.createElement('div');
-                    intersection.classList.add('intersection');
-
                     const clickZone = document.createElement('div');
                     clickZone.classList.add('click-zone');
+                    
+                    // Direct mathematical lockstep positioning matching grid cell lines
+                    clickZone.style.left = `calc(${c} * var(--cell-size))`;
+                    clickZone.style.top = `calc(${r} * var(--cell-size))`;
+                    
                     clickZone.dataset.row = r;
                     clickZone.dataset.col = c;
                     clickZone.addEventListener('click', handleSquareClick);
@@ -279,13 +280,11 @@
                         clickZone.appendChild(pieceEl);
                     }
 
-                    // Highlight selected piece
                     if (selectedSquare && selectedSquare.row === r && selectedSquare.col === c) {
                         clickZone.classList.add('selected');
                     }
 
-                    intersection.appendChild(clickZone);
-                    layer.appendChild(intersection);
+                    layer.appendChild(clickZone);
                 }
             }
         }
@@ -297,27 +296,22 @@
             const clickedPiece = boardState[r][c];
 
             if (selectedSquare) {
-                // If clicking another piece of the same team, switch selection
                 if (clickedPiece && pieceNames[clickedPiece].side === currentTurn) {
                     selectedSquare = { row: r, col: c };
                     renderIntersections();
                     return;
                 }
 
-                // Move Piece (Sandbox mode: Allows any turn-based movement onto empty or enemy cells)
                 const originalPiece = boardState[selectedSquare.row][selectedSquare.col];
-                
                 boardState[r][c] = originalPiece;
                 boardState[selectedSquare.row][selectedSquare.col] = null;
                 
-                // Switch turn
                 currentTurn = currentTurn === RED ? BLACK : RED;
                 document.getElementById('status').innerText = `${currentTurn.charAt(0).toUpperCase() + currentTurn.slice(1)}'s Turn`;
                 
                 selectedSquare = null;
                 renderIntersections();
             } else {
-                // Select a piece
                 if (clickedPiece && pieceNames[clickedPiece].side === currentTurn) {
                     selectedSquare = { row: r, col: c };
                     zone.classList.add('selected');
@@ -333,7 +327,6 @@
             renderIntersections();
         }
 
-        // Initialize Application
         createGridBackground();
         initBoardState();
         renderIntersections();
