@@ -1,5 +1,19 @@
 [
-
+{
+  "weekTitle": "Week 41 – 6/8 to 6/11",
+  "objectives": "By the end of the week, students will extend their operational understanding of decimals to multiplication and division. They will use area diagrams and partial products to determine decimal products and connect these visual models to vertical calculation strategies. Students will then transition to division, applying partial quotients and long division algorithms to compute accurate whole-number and decimal quotients while maintaining place-value reasoning.",
+  "agenda": [
+    "<strong>Monday:</strong> Unit 5, Lesson 7: Using Diagrams to Represent Multiplication",
+    "<strong>Tuesday:</strong> Unit 5, Lesson 8: Calculating Products of Decimals",
+    "<strong>Wednesday:</strong> Unit 5, Lesson 10: Using Partial Quotients",
+    "<strong>Thursday:</strong> Unit 5, Lesson 11: Using Long Division"
+  ],
+  "homework": "Delta Math Week 41",
+  "languageObjectives": [
+    "Students will justify orally and in writing how area diagrams and partial products visually represent the decomposition and multiplication of multi-digit decimals.",
+    "Students will explain orally and in writing what each step in a partial quotients or long division calculation represents, using precise mathematical terminology (dividend, divisor, partial quotients, quotient)."
+  ]
+},
   {
   "weekTitle": "Week 40 – 6/1 to 6/4",
   "objectives": "By the end of the week, students will deepen their understanding of decimal arithmetic by using base-ten diagrams and standard algorithms to add, subtract, and multiply decimals. They will relate visual chunking models to numerical steps to maintain precise place-value accuracy.",
