@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vietnamese Flashcards</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f2f2f2;
+    display: flex;
+    justify-content: center;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 480px;
+    padding: 16px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 24px;
+  }
+
+  .controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+
+  button, select {
+    padding: 10px 12px;
+    border: none;
+    border-radius: 8px;
+    background: #222;
+    color: white;
+    font-size: 14px;
+  }
+
+  button.secondary {
+    background: #666;
+  }
+
+  button.wrong {
+    background: #b00020;
+  }
+
+  button.right {
+    background: #087f23;
+  }
+
+  .card-wrap {
+    perspective: 1000px;
+    height: 320px;
+    touch-action: pan-y;
+  }
+
+  .card {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.35s ease;
+    cursor: pointer;
+  }
+
+  .card.flipped {
+    transform: rotateY(180deg);
+  }
+
+  .face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 18px;
+    background: white;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 28px;
+    box-sizing: border-box;
+  }
+
+  .front {
+    font-size: 34px;
+    font-weight: bold;
+  }
+
+  .back {
+    transform: rotateY(180deg);
+    font-size: 32px;
+    font-weight: bold;
+  }
+
+  .sub {
+    margin-top: 12px;
+    font-size: 15px;
+    color: #555;
+    font-weight: normal;
+  }
+
+  .small {
+    text-align: center;
+    margin-top: 12px;
+    color: #555;
+  }
+
+  textarea {
+    width: 100%;
+    height: 220px;
+    margin-top: 16px;
+    font-family: monospace;
+    font-size: 13px;
+    border-radius: 10px;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+</style>
+</head>
+
+<body>
+<div class="app">
+  <h1>Vietnamese Flashcards</h1>
+
+  <div class="controls">
+    <select id="mode">
+      <option value="normal">Flip Mode</option>
+      <option value="front">Front Only</option>
+      <option value="back">Back Only</option>
+    </select>
+
+    <button onclick="speakCard()">🔊 Sound</button>
+    <button onclick="markRight()" class="right">Got It</button>
+    <button onclick="markWrong()" class="wrong">Wrong</button>
+    <button onclick="smartReview()" class="secondary">Smart Review</button>
+    <button onclick="resetDeck()" class="secondary">All Cards</button>
+  </div>
+
+  <div class="card-wrap" id="cardWrap">
+    <div class="card" id="card" onclick="flipCard()">
+      <div class="face front">
+        <div>
+          <div id="frontText"></div>
+          <div class="sub">English</div>
+        </div>
+      </div>
+
+      <div class="face back">
+        <div>
+          <div id="backText"></div>
+          <div class="sub">Vietnamese</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="small" id="counter"></div>
+
+  <textarea id="jsonBox"></textarea>
+  <button onclick="loadJson()" style="width:100%; margin-top:8px;">Load Updated JSON</button>
+</div>
+
+<script>
+/*
+  Update your flashcards here.
+  Front = English
+  Back = Vietnamese
+*/
+
+let cards = [
+  { front: "Hello", back: "Xin chào" },
+  { front: "Good morning", back: "Chào buổi sáng" },
+  { front: "Goodbye", back: "Tạm biệt" },
+  { front: "How are you?", back: "Bạn có khỏe không?" },
+
+  { front: "Traffic", back: "Giao thông" },
+  { front: "Traffic jam", back: "Kẹt xe" },
+  { front: "Tunnel", back: "Đường hầm" },
+  { front: "Bridge", back: "Cây cầu" },
+  { front: "Tree", back: "Cây" },
+  { front: "Highway", back: "Cao tốc" },
+  { front: "Highway exit", back: "Lối ra cao tốc" },
+  { front: "The road is dangerous", back: "Con đường nguy hiểm" },
+
+  { front: "Red light", back: "Đèn đỏ" },
+  { front: "Green light", back: "Đèn xanh" },
+  { front: "Yellow light", back: "Đèn vàng" },
+  { front: "Red", back: "Đỏ" },
+  { front: "Green", back: "Xanh" },
+  { front: "Yellow", back: "Vàng" },
+
+  { front: "I like chicken", back: "Tôi thích gà" },
+  { front: "I like fish", back: "Tôi thích cá" },
+  { front: "I like coffee", back: "Tôi thích cà phê" },
+  { front: "Chicken", back: "Gà" },
+  { front: "Fish", back: "Cá" },
+  { front: "Coffee", back: "Cà phê" },
+
+  { front: "I'm sleepy", back: "Tôi buồn ngủ" },
+  { front: "I'm crazy", back: "Tôi bị điên" },
+  { front: "You're very beautiful", back: "Bạn đẹp quá" },
+  { front: "You're beautiful", back: "Em đẹp quá" },
+
+  { front: "I love you", back: "Anh yêu em" },
+  { front: "I love you", back: "Em yêu anh" }
+];
+
+let fullDeck = [...cards];
+let wrongCards = [];
+let index = 0;
+let flipped = false;
+
+const card = document.getElementById("card");
+const frontText = document.getElementById("frontText");
+const backText = document.getElementById("backText");
+const counter = document.getElementById("counter");
+const mode = document.getElementById("mode");
+const jsonBox = document.getElementById("jsonBox");
+
+jsonBox.value = JSON.stringify(cards, null, 2);
+
+function renderCard() {
+  if (cards.length === 0) {
+    frontText.textContent = "No cards";
+    backText.textContent = "No cards";
+    counter.textContent = "";
+    return;
+  }
+
+  const current = cards[index];
+
+  frontText.textContent = current.front;
+  backText.textContent = current.back;
+
+  if (mode.value === "front") {
+    flipped = false;
+  } else if (mode.value === "back") {
+    flipped = true;
+  }
+
+  card.classList.toggle("flipped", flipped);
+
+  counter.textContent = `${index + 1} / ${cards.length}`;
+}
+
+function flipCard() {
+  if (mode.value !== "normal") return;
+  flipped = !flipped;
+  renderCard();
+}
+
+function nextCard() {
+  if (cards.length === 0) return;
+  index = (index + 1) % cards.length;
+
+  if (mode.value === "normal") {
+    flipped = false;
+  }
+
+  renderCard();
+}
+
+function prevCard() {
+  if (cards.length === 0) return;
+  index = (index - 1 + cards.length) % cards.length;
+
+  if (mode.value === "normal") {
+    flipped = false;
+  }
+
+  renderCard();
+}
+
+function speakCard() {
+  if (cards.length === 0) return;
+
+  const current = cards[index];
+  const text = flipped || mode.value === "back" ? current.back : current.front;
+
+  const utterance = new SpeechSynthesisUtterance(text);
+
+  if (flipped || mode.value === "back") {
+    utterance.lang = "vi-VN";
+  } else {
+    utterance.lang = "en-US";
+  }
+
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utterance);
+}
+
+function markWrong() {
+  const current = cards[index];
+
+  if (!wrongCards.some(card => card.front === current.front && card.back === current.back)) {
+    wrongCards.push(current);
+  }
+
+  nextCard();
+}
+
+function markRight() {
+  const current = cards[index];
+
+  wrongCards = wrongCards.filter(card =>
+    !(card.front === current.front && card.back === current.back)
+  );
+
+  nextCard();
+}
+
+function smartReview() {
+  if (wrongCards.length === 0) {
+    alert("No wrong cards marked yet.");
+    return;
+  }
+
+  cards = [...wrongCards];
+  index = 0;
+  flipped = false;
+  renderCard();
+}
+
+function resetDeck() {
+  cards = [...fullDeck];
+  index = 0;
+  flipped = false;
+  renderCard();
+}
+
+function loadJson() {
+  try {
+    const updated = JSON.parse(jsonBox.value);
+
+    if (!Array.isArray(updated)) {
+      alert("JSON must be an array.");
+      return;
+    }
+
+    for (const item of updated) {
+      if (!item.front || !item.back) {
+        alert("Each card needs a front and back.");
+        return;
+      }
+    }
+
+    fullDeck = updated;
+    cards = [...fullDeck];
+    wrongCards = [];
+    index = 0;
+    flipped = false;
+    renderCard();
+
+  } catch (error) {
+    alert("Invalid JSON. Check commas, quotes, and brackets.");
+  }
+}
+
+/* Swipe support */
+let startX = 0;
+let endX = 0;
+
+const cardWrap = document.getElementById("cardWrap");
+
+cardWrap.addEventListener("touchstart", function(e) {
+  startX = e.changedTouches[0].screenX;
+});
+
+cardWrap.addEventListener("touchend", function(e) {
+  endX = e.changedTouches[0].screenX;
+  handleSwipe();
+});
+
+function handleSwipe() {
+  const diff = endX - startX;
+
+  if (Math.abs(diff) < 50) return;
+
+  if (diff < 0) {
+    nextCard();
+  } else {
+    prevCard();
+  }
+}
+
+mode.addEventListener("change", renderCard);
+
+renderCard();
+</script>
+</body>
+</html>
