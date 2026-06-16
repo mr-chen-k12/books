@@ -82,13 +82,13 @@
   }
 
   .front {
-    font-size: 34px;
+    font-size: 30px;
     font-weight: bold;
   }
 
   .back {
     transform: rotateY(180deg);
-    font-size: 32px;
+    font-size: 30px;
     font-weight: bold;
   }
 
@@ -99,17 +99,11 @@
     font-weight: normal;
   }
 
-  .small {
+  .small, .hint {
     text-align: center;
-    margin-top: 12px;
+    margin-top: 10px;
     color: #555;
-  }
-
-  .hint {
-    text-align: center;
     font-size: 13px;
-    color: #666;
-    margin-top: 8px;
   }
 </style>
 </head>
@@ -156,41 +150,114 @@
 
 <script>
 let cards = [
+  // Greetings
   { front: "Hello", back: "Xin chào" },
   { front: "Good morning", back: "Chào buổi sáng" },
   { front: "Goodbye", back: "Tạm biệt" },
+  { front: "Thank you", back: "Cảm ơn" },
   { front: "How are you?", back: "Bạn có khỏe không?" },
+  { front: "How are you? informal", back: "Khỏe không?" },
 
-  { front: "Traffic", back: "Giao thông" },
-  { front: "Traffic jam", back: "Kẹt xe" },
-  { front: "Tunnel", back: "Đường hầm" },
-  { front: "Bridge", back: "Cây cầu" },
-  { front: "Tree", back: "Cây" },
-  { front: "Highway", back: "Cao tốc" },
-  { front: "Highway exit", back: "Lối ra cao tốc" },
-  { front: "The road is dangerous", back: "Con đường nguy hiểm" },
+  // Introductions
+  { front: "My name is...", back: "Tôi tên là..." },
+  { front: "I am a teacher", back: "Tôi là giáo viên" },
 
-  { front: "Red light", back: "Đèn đỏ" },
-  { front: "Green light", back: "Đèn xanh" },
-  { front: "Yellow light", back: "Đèn vàng" },
+  // Daily Conversation
+  { front: "Have you eaten yet?", back: "Bạn ăn chưa?" },
+  { front: "Lunch", back: "Ăn trưa" },
+  { front: "That's right", back: "Đúng rồi" },
+  { front: "Good job", back: "Làm tốt lắm" },
+
+  // Numbers 1–20
+  { front: "1", back: "Một" },
+  { front: "2", back: "Hai" },
+  { front: "3", back: "Ba" },
+  { front: "4", back: "Bốn" },
+  { front: "5", back: "Năm" },
+  { front: "6", back: "Sáu" },
+  { front: "7", back: "Bảy" },
+  { front: "8", back: "Tám" },
+  { front: "9", back: "Chín" },
+  { front: "10", back: "Mười" },
+  { front: "11", back: "Mười một" },
+  { front: "12", back: "Mười hai" },
+  { front: "13", back: "Mười ba" },
+  { front: "14", back: "Mười bốn" },
+  { front: "15", back: "Mười lăm" },
+  { front: "16", back: "Mười sáu" },
+  { front: "17", back: "Mười bảy" },
+  { front: "18", back: "Mười tám" },
+  { front: "19", back: "Mười chín" },
+  { front: "20", back: "Hai mươi" },
+  { front: "21", back: "Hai mươi mốt" },
+  { front: "30", back: "Ba mươi" },
+  { front: "31", back: "Ba mươi mốt" },
+  { front: "40", back: "Bốn mươi" },
+
+  // Colors
   { front: "Red", back: "Đỏ" },
   { front: "Green", back: "Xanh" },
   { front: "Yellow", back: "Vàng" },
 
-  { front: "I like chicken", back: "Tôi thích gà" },
-  { front: "I like fish", back: "Tôi thích cá" },
-  { front: "I like coffee", back: "Tôi thích cà phê" },
+  // Traffic Lights
+  { front: "Red light", back: "Đèn đỏ" },
+  { front: "Green light", back: "Đèn xanh" },
+  { front: "Yellow light", back: "Đèn vàng" },
+
+  // Transportation and Roads
+  { front: "Traffic", back: "Giao thông" },
+  { front: "Traffic jam", back: "Kẹt xe" },
+  { front: "Vehicle / car", back: "Xe" },
+  { front: "Fast", back: "Nhanh" },
+  { front: "Bridge", back: "Cây cầu" },
+  { front: "Tunnel", back: "Đường hầm" },
+  { front: "Tree", back: "Cây" },
+  { front: "Highway", back: "Cao tốc" },
+  { front: "Highway exit", back: "Lối ra cao tốc" },
+  { front: "Airplane", back: "Máy bay" },
+  { front: "Police", back: "Cảnh sát" },
+
+  // Dangerous
+  { front: "Dangerous", back: "Nguy hiểm" },
+  { front: "The road is dangerous", back: "Con đường nguy hiểm" },
+  { front: "The highway is dangerous", back: "Cao tốc nguy hiểm" },
+
+  // Food and Drinks
   { front: "Chicken", back: "Gà" },
   { front: "Fish", back: "Cá" },
   { front: "Coffee", back: "Cà phê" },
+  { front: "I like chicken", back: "Tôi thích gà" },
+  { front: "I like fish", back: "Tôi thích cá" },
+  { front: "I like coffee", back: "Tôi thích cà phê" },
 
-  { front: "I'm sleepy", back: "Tôi buồn ngủ" },
-  { front: "I'm crazy", back: "Tôi bị điên" },
-  { front: "You're very beautiful", back: "Bạn đẹp quá" },
-  { front: "You're beautiful", back: "Em đẹp quá" },
+  // Feelings and Personality
+  { front: "Sleepy", back: "Buồn ngủ" },
+  { front: "I am sleepy", back: "Tôi buồn ngủ" },
+  { front: "I am crazy", back: "Tôi điên" },
+  { front: "I am crazy / acting crazy", back: "Tôi bị điên" },
+  { front: "I am unlucky", back: "Tôi bị đen" },
+  { front: "You are silly / goofy", back: "Bạn ngốc nghếch" },
 
-  { front: "I love you", back: "Anh yêu em" },
-  { front: "I love you", back: "Em yêu anh" }
+  // Compliments
+  { front: "You look nice", back: "Bạn trông đẹp" },
+  { front: "You are beautiful", back: "Bạn đẹp quá" },
+  { front: "You are beautiful / affectionate", back: "Em đẹp quá" },
+
+  // Love Expressions
+  { front: "I love you, male to female", back: "Anh yêu em" },
+  { front: "I love you, female to male", back: "Em yêu anh" },
+
+  // Bathroom Vocabulary
+  { front: "I want to go to the restroom", back: "Tôi muốn đi vệ sinh" },
+  { front: "I want to pee", back: "Tôi muốn đi tiểu" },
+  { front: "I peed my pants", back: "Tôi tè ra quần" },
+
+  // Useful Word Parts
+  { front: "Stuck / jammed", back: "Kẹt" },
+  { front: "Vehicle", back: "Xe" },
+  { front: "Electricity / light", back: "Đèn" },
+  { front: "Road / path", back: "Đường" },
+  { front: "Exit", back: "Lối ra" }
 ];
 
 let fullDeck = [...cards];
@@ -310,18 +377,14 @@ function handleSwipe() {
   if (Math.abs(diffX) < 40 && Math.abs(diffY) < 40) return;
 
   if (Math.abs(diffX) > Math.abs(diffY)) {
-    if (diffX < 0) {
-      nextCard();
-    } else {
-      prevCard();
-    }
+    if (diffX < 0) nextCard();
+    else prevCard();
   } else {
     flipCard();
   }
 }
 
 mode.addEventListener("change", renderCard);
-
 renderCard();
 </script>
 </body>
