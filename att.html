@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Private Attendance Tool</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .student { padding: 10px; border-bottom: 1px solid #ccc; cursor: pointer; display: flex; justify-content: space-between; }
+        .present { background-color: #d4edda; }
+        .absent { background-color: #f8d7da; }
+        textarea { width: 100%; height: 100px; margin-bottom: 10px; }
+        button { padding: 10px 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h2>Attendance Tracker</h2>
+    <textarea id="jsonInput" placeholder="Paste JSON roster here..."></textarea>
+    <br>
+    <button onclick="loadRoster()">Load/Reset Roster</button>
+    <div id="roster"></div>
+
+    <script>
+        function loadRoster() {
+            const container = document.getElementById('roster');
+            const data = JSON.parse(document.getElementById('jsonInput').value);
+            container.innerHTML = '';
+            data.attendance_report.students.forEach(s => {
+                const div = document.createElement('div');
+                div.className = 'student ' + (s.status === 'Absent' ? 'absent' : 'present');
+                div.innerHTML = `<span>${s.name}</span><span class="status">${s.status}</span>`;
+                div.onclick = () => {
+                    div.classList.toggle('present');
+                    div.classList.toggle('absent');
+                    const statusText = div.classList.contains('absent') ? 'Absent' : 'Present';
+                    div.querySelector('.status').innerText = statusText;
+                };
+                container.appendChild(div);
+            });
+        }
+    </script>
+</body>
+</html>
