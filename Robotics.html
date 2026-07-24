@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EV3 Robotics Week Planner</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#121a2f;
+      --panel2:#17223d;
+      --text:#eef3ff;
+      --muted:#9fb0cf;
+      --accent:#6ee7ff;
+      --accent2:#8b5cf6;
+      --good:#22c55e;
+      --warn:#f59e0b;
+      --danger:#ef4444;
+      --border:rgba(255,255,255,.09);
+      --shadow:0 18px 50px rgba(0,0,0,.28);
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(110,231,255,.12), transparent 28%),
+        radial-gradient(circle at 85% 0%, rgba(139,92,246,.14), transparent 30%),
+        linear-gradient(180deg,#08101f 0%,#0b1020 100%);
+      color:var(--text);
+      min-height:100vh;
+    }
+
+    button,input,textarea{font:inherit}
+    button{cursor:pointer}
+
+    .app{
+      max-width:1280px;
+      margin:auto;
+      padding:24px;
+    }
+
+    .hero{
+      display:grid;
+      grid-template-columns:1.35fr .65fr;
+      gap:18px;
+      margin-bottom:18px;
+    }
+
+    .hero-card,.panel,.day-card{
+      background:linear-gradient(180deg,rgba(23,34,61,.94),rgba(18,26,47,.94));
+      border:1px solid var(--border);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(10px);
+    }
+
+    .hero-main{padding:28px}
+    .eyebrow{
+      color:var(--accent);
+      font-weight:800;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-size:.76rem;
+    }
+    h1{
+      margin:.35rem 0 .6rem;
+      font-size:clamp(2rem,5vw,4.6rem);
+      line-height:.94;
+      letter-spacing:-.055em;
+    }
+    .subtitle{
+      max-width:780px;
+      color:var(--muted);
+      font-size:1.02rem;
+      line-height:1.6;
+      margin:0;
+    }
+
+    .hero-side{
+      padding:22px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:20px;
+    }
+
+    .progress-wrap{
+      background:#0b1327;
+      border:1px solid var(--border);
+      height:16px;
+      border-radius:999px;
+      overflow:hidden;
+    }
+    .progress-bar{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,var(--accent),var(--accent2));
+      transition:width .25s ease;
+    }
+    .progress-label{
+      display:flex;
+      justify-content:space-between;
+      color:var(--muted);
+      margin-bottom:8px;
+      font-size:.92rem;
+    }
+
+    .toolbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .btn{
+      border:none;
+      border-radius:12px;
+      padding:11px 14px;
+      color:#08101f;
+      background:var(--accent);
+      font-weight:800;
+    }
+    .btn.secondary{
+      color:var(--text);
+      background:#263456;
+      border:1px solid var(--border);
+    }
+    .btn.danger{
+      color:#fff;
+      background:#7f1d1d;
+    }
+
+    .overview{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px;
+      margin-bottom:18px;
+    }
+
+    .panel{padding:20px}
+    .panel h2,.panel h3{margin-top:0}
+    .panel-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:14px;
+    }
+
+    .checklist{
+      display:grid;
+      gap:9px;
+    }
+    .check-row{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      padding:11px 12px;
+      border-radius:13px;
+      background:#0e172b;
+      border:1px solid transparent;
+      transition:.2s ease;
+    }
+    .check-row:hover{border-color:var(--border)}
+    .check-row input{margin-top:3px;transform:scale(1.2)}
+    .check-row.done span{
+      text-decoration:line-through;
+      color:#6f809f;
+    }
+
+    .add-row{
+      display:flex;
+      gap:8px;
+      margin-top:12px;
+    }
+    .add-row input{
+      flex:1;
+      color:var(--text);
+      background:#0b1327;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:11px 12px;
+      outline:none;
+    }
+
+    .days{
+      display:grid;
+      gap:16px;
+    }
+    .day-card{overflow:hidden}
+    .day-header{
+      width:100%;
+      border:none;
+      background:transparent;
+      color:var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      text-align:left;
+      padding:20px;
+    }
+    .day-header h2{margin:0;font-size:1.45rem}
+    .day-tag{
+      color:var(--accent);
+      font-weight:800;
+      font-size:.86rem;
+      margin-bottom:4px;
+    }
+    .chev{font-size:1.35rem;transition:.2s}
+    .day-card.open .chev{transform:rotate(180deg)}
+    .day-content{
+      display:none;
+      padding:0 20px 20px;
+    }
+    .day-card.open .day-content{display:block}
+    .day-grid{
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:16px;
+    }
+
+    .timeline{
+      display:grid;
+      gap:10px;
+    }
+    .time-block{
+      display:grid;
+      grid-template-columns:100px 1fr;
+      gap:12px;
+      padding:12px;
+      background:#0e172b;
+      border:1px solid var(--border);
+      border-radius:14px;
+    }
+    .time{
+      font-weight:900;
+      color:var(--accent);
+    }
+    .time-block strong{display:block;margin-bottom:3px}
+    .time-block p{margin:0;color:var(--muted);line-height:1.45}
+
+    textarea{
+      width:100%;
+      min-height:150px;
+      resize:vertical;
+      color:var(--text);
+      background:#0b1327;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:13px;
+      outline:none;
+      line-height:1.5;
+    }
+    textarea:focus,input:focus{border-color:rgba(110,231,255,.55)}
+
+    .pill-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-bottom:12px;
+    }
+    .pill{
+      background:#0e172b;
+      color:var(--muted);
+      border:1px solid var(--border);
+      padding:7px 10px;
+      border-radius:999px;
+      font-size:.86rem;
+    }
+
+    .mentor-box{
+      margin-top:12px;
+      padding:14px;
+      border-radius:14px;
+      border:1px solid rgba(139,92,246,.3);
+      background:rgba(139,92,246,.09);
+    }
+
+    .quick-notes{
+      position:fixed;
+      right:18px;
+      bottom:18px;
+      width:min(380px,calc(100vw - 36px));
+      z-index:10;
+    }
+    .quick-notes .panel{padding:14px}
+    .quick-notes textarea{min-height:100px}
+    .quick-notes.collapsed .quick-body{display:none}
+    .quick-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .status{
+      font-size:.85rem;
+      color:var(--muted);
+      min-height:1.2em;
+      margin-top:8px;
+    }
+
+    @media(max-width:900px){
+      .hero,.overview,.day-grid{grid-template-columns:1fr}
+      .quick-notes{position:static;width:auto;margin-top:18px}
+    }
+
+    @media(max-width:580px){
+      .app{padding:14px}
+      .hero-main,.hero-side,.panel{padding:16px}
+      .day-header{padding:16px}
+      .day-content{padding:0 16px 16px}
+      .time-block{grid-template-columns:1fr}
+      .toolbar{display:grid;grid-template-columns:1fr 1fr}
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="hero">
+      <div class="hero-card hero-main">
+        <div class="eyebrow">Lego EV3 Robotics</div>
+        <h1>Four-Day Class Command Center</h1>
+        <p class="subtitle">
+          Prep the kits, organize the room, run repeatable two-hour lessons, support beginners,
+          challenge experienced students, and finish with a robot battle using sensor-based arena boundaries.
+        </p>
+      </div>
+
+      <aside class="hero-card hero-side">
+        <div>
+          <div class="progress-label">
+            <span>Overall preparation</span>
+            <strong id="progressText">0%</strong>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <button class="btn" id="downloadNotesBtn">Download Notes</button>
+          <button class="btn secondary" id="exportBtn">Export Backup</button>
+          <label class="btn secondary" style="display:inline-flex;align-items:center;justify-content:center;">
+            Import Backup
+            <input id="importInput" type="file" accept=".json" hidden />
+          </label>
+          <button class="btn danger" id="resetBtn">Reset</button>
+        </div>
+      </aside>
+    </section>
+
+    <section class="overview">
+      <article class="panel">
+        <div class="panel-title">
+          <div>
+            <div class="eyebrow">Before Class</div>
+            <h2>Equipment and Logistics</h2>
+          </div>
+        </div>
+
+        <div class="checklist" id="prepChecklist"></div>
+        <div class="add-row">
+          <input id="prepInput" placeholder="Add another prep task..." />
+          <button class="btn" onclick="addChecklistItem('prep')">Add</button>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="eyebrow">Physical Setup</div>
+        <h2>Cabinet and Room Tasks</h2>
+        <div class="checklist" id="roomChecklist"></div>
+        <div class="add-row">
+          <input id="roomInput" placeholder="Add another room task..." />
+          <button class="btn" onclick="addChecklistItem('room')">Add</button>
+        </div>
+
+        <h3 style="margin-top:20px;">Logistics Notes</h3>
+        <textarea id="logisticsNotes" placeholder="Parking, unloading route, construction access, room setup, people to contact..."></textarea>
+      </article>
+    </section>
+
+    <section class="days" id="daysContainer"></section>
+
+    <section class="quick-notes" id="quickNotesBox">
+      <div class="panel">
+        <div class="quick-title">
+          <div>
+            <div class="eyebrow">Brain Dump</div>
+            <strong>Quick Notes</strong>
+          </div>
+          <button class="btn secondary" id="toggleQuickBtn">Hide</button>
+        </div>
+        <div class="quick-body">
+          <textarea id="quickNotes" placeholder="Capture ideas before you forget them..."></textarea>
+          <div class="status" id="saveStatus">Autosaves locally in this browser.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "ev3PlannerState_v1";
+
+    const defaultData = {
+      prep: [
+        "Bring about 10 EV3 kits for 7 groups and backup parts",
+        "Bring 3–5 computers",
+        "Confirm VS Code and the EV3 extension are installed",
+        "Make sure every kit has USB cables and charging cords",
+        "Confirm each kit has the correct motors and sensors",
+        "Check that every EV3 brick has a working microSD card",
+        "Bring spare microSD cards and a card reader",
+        "Charge and power-test every EV3 brick",
+        "Find last year's PowerPoint slides or create new slides",
+        "Prepare digital robot-building instructions",
+        "Plan a secure kit storage and lockup routine"
+      ],
+      room: [
+        "Bring the two hats",
+        "Prepare the wood blocks",
+        "Pre-drill and align pilot holes at home",
+        "Bring drill, bits, screws, and mounting hardware",
+        "Drill through the metal cabinet and install the attachment",
+        "Scout a backup unloading location near Northeastern",
+        "Plan where to park during construction",
+        "Bring science display boards and painter's tape",
+        "Create the taped competition arena boundary"
+      ],
+      logisticsNotes: "",
+      quickNotes: "",
+      days: {
+        monday: "",
+        tuesday: "",
+        wednesday: "",
+        thursday: ""
+      },
+      checked: {},
+      custom: {
+        prep: [],
+        room: []
+      }
+    };
+
+    const dayPlans = [
+      {
+        id:"monday",
+        tag:"Day 1",
+        title:"Build, Boot, and Get Moving",
+        chips:["Base Robot","Kit Routines","Mentors","First Movement"],
+        objective:"Every group builds and drives a functioning base robot while learning how kits are checked out, tested, and cleaned up.",
+        timeline:[
+          ["0–10 min","Welcome and Setup","Introduce the week, assign groups, explain kit checkout, and identify students with prior EV3 experience."],
+          ["10–25 min","Mini Lesson","Show the EV3 brick, motors, ports, cables, power, microSD card, and basic programming workflow."],
+          ["25–75 min","Base Robot Build","Students follow the digital instruction manual and build a reliable driving base."],
+          ["75–95 min","First Code","Move forward, stop, reverse, and make a basic turn."],
+          ["95–110 min","Demo Challenge","Each group completes a simple movement course or target-distance challenge."],
+          ["110–120 min","Cleanup","Parts check, cable check, power down, return kits, and lock everything up."]
+        ],
+        mentor:"Experienced students can act as rotating mentors after their base robot works. They may also begin designing a “Final Boss” robot, but only after helping other teams."
+      },
+      {
+        id:"tuesday",
+        tag:"Day 2",
+        title:"Sensors and Straight-Line Control",
+        chips:["Color Sensor","Gyro Sensor","Calibration","Debugging"],
+        objective:"Students use sensor feedback to improve robot behavior instead of relying only on timed motor commands.",
+        timeline:[
+          ["0–10 min","Rebuild and Boot","Teams retrieve kits, check parts, connect computers, and run a quick motor test."],
+          ["10–25 min","Mini Lesson","Introduce color sensor readings, gyro angle, calibration, thresholds, loops, and corrections."],
+          ["25–70 min","Sensor Build","Groups add either a color sensor or gyro sensor to the base robot."],
+          ["70–100 min","Challenge","Follow a line, detect a border, or use gyro correction to drive straighter."],
+          ["100–110 min","Share and Compare","Teams explain what failed, what changed, and what made the robot more reliable."],
+          ["110–120 min","Cleanup","Save code, power down, inventory parts, and lock up."]
+        ],
+        mentor:"Advanced students can create a proportional correction system, compare gyro and color-sensor strategies, or help other groups calibrate."
+      },
+      {
+        id:"wednesday",
+        tag:"Day 3",
+        title:"Strategy, Reliability, and Mini Battles",
+        chips:["Iteration","Attachments","Testing","Mini Competition"],
+        objective:"Teams improve reliability, design attachments, and test strategies for pushing, steering, and staying inside the arena.",
+        timeline:[
+          ["0–10 min","Warm Start","Retrieve kits, run a systems check, and review yesterday's sensor results."],
+          ["10–20 min","Mini Lesson","Discuss center of mass, traction, pushing force, wheel choice, gearing, and safe attachments."],
+          ["20–75 min","Build and Refine","Teams improve the robot body, front attachment, sensor placement, and code."],
+          ["75–105 min","Mini Battles","Run short practice rounds and collect observations about failure points."],
+          ["105–112 min","Strategy Reset","Teams make one targeted improvement based on evidence."],
+          ["112–120 min","Cleanup","Return all parts, save programs, and prepare for Thursday."]
+        ],
+        mentor:"Mentors may run a debugging station or test the Final Boss robot against multiple designs. Their goal is to raise the level of the whole room."
+      },
+      {
+        id:"thursday",
+        tag:"Day 4",
+        title:"Robot Arena Competition",
+        chips:["Competition","Sensor Boundary","Final Boss","Awards"],
+        objective:"Teams demonstrate a reliable robot, compete safely, and explain the engineering choices behind their design.",
+        timeline:[
+          ["0–15 min","Final Setup","Build the arena with science display boards and painter's tape. Confirm rules, brackets, and tie procedures."],
+          ["15–40 min","Final Testing","Teams run last checks on sensors, motors, attachments, and code."],
+          ["40–95 min","Competition","Run short rounds. A robot loses if it is pushed out, stops functioning, or violates the rules."],
+          ["95–105 min","Final Boss Round","Qualified teams may challenge the mentor-built boss robot."],
+          ["105–113 min","Reflection and Awards","Recognize best engineering, best comeback, best mentor, strongest teamwork, and most creative design."],
+          ["113–120 min","Deep Cleanup","Full inventory, cable collection, charging setup, computer shutdown, and locked storage."]
+        ],
+        mentor:"Use mentors as referees, repair coaches, bracket managers, or Final Boss operators. Keep them responsible for fairness and helping the event run."
+      }
+    ];
+
+    let state = loadState();
+
+    function loadState(){
+      try{
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        return saved ? mergeDefaults(saved) : structuredClone(defaultData);
+      }catch{
+        return structuredClone(defaultData);
+      }
+    }
+
+    function mergeDefaults(saved){
+      return {
+        ...structuredClone(defaultData),
+        ...saved,
+        days:{...defaultData.days,...(saved.days||{})},
+        checked:{...(saved.checked||{})},
+        custom:{
+          prep:[...((saved.custom&&saved.custom.prep)||[])],
+          room:[...((saved.custom&&saved.custom.room)||[])]
+        }
+      };
+    }
+
+    function saveState(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      document.getElementById("saveStatus").textContent = "Saved locally at " + new Date().toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});
+      updateProgress();
+    }
+
+    function getItems(type){
+      return [...defaultData[type], ...(state.custom[type]||[])];
+    }
+
+    function renderChecklist(type){
+      const el = document.getElementById(type+"Checklist");
+      el.innerHTML = "";
+      getItems(type).forEach((text,index)=>{
+        const key = `${type}_${index}`;
+        const row = document.createElement("label");
+        row.className = "check-row" + (state.checked[key] ? " done" : "");
+        row.innerHTML = `<input type="checkbox" ${state.checked[key] ? "checked" : ""}><span>${escapeHtml(text)}</span>`;
+        row.querySelector("input").addEventListener("change",e=>{
+          state.checked[key]=e.target.checked;
+          row.classList.toggle("done",e.target.checked);
+          saveState();
+        });
+        el.appendChild(row);
+      });
+    }
+
+    function addChecklistItem(type){
+      const input = document.getElementById(type+"Input");
+      const value = input.value.trim();
+      if(!value) return;
+      state.custom[type].push(value);
+      input.value="";
+      renderChecklist(type);
+      saveState();
+    }
+
+    function renderDays(){
+      const container = document.getElementById("daysContainer");
+      container.innerHTML="";
+      dayPlans.forEach((day,idx)=>{
+        const card = document.createElement("article");
+        card.className = "day-card" + (idx===0 ? " open" : "");
+        card.innerHTML = `
+          <button class="day-header" aria-expanded="${idx===0}">
+            <div>
+              <div class="day-tag">${day.tag}</div>
+              <h2>${day.title}</h2>
+            </div>
+            <div class="chev">⌄</div>
+          </button>
+          <div class="day-content">
+            <div class="pill-row">${day.chips.map(c=>`<span class="pill">${c}</span>`).join("")}</div>
+            <div class="day-grid">
+              <div>
+                <div class="panel" style="box-shadow:none;margin-bottom:14px;">
+                  <div class="eyebrow">Objective</div>
+                  <p style="color:var(--muted);line-height:1.55;margin-bottom:0;">${day.objective}</p>
+                </div>
+                <div class="timeline">
+                  ${day.timeline.map(t=>`
+                    <div class="time-block">
+                      <div class="time">${t[0]}</div>
+                      <div><strong>${t[1]}</strong><p>${t[2]}</p></div>
+                    </div>`).join("")}
+                </div>
+              </div>
+              <div>
+                <div class="mentor-box">
+                  <div class="eyebrow">Mentor / Final Boss Path</div>
+                  <p style="margin-bottom:0;line-height:1.55;color:var(--muted);">${day.mentor}</p>
+                </div>
+                <h3 style="margin-top:18px;">My Notes</h3>
+                <textarea data-day="${day.id}" placeholder="Add changes, supplies, student roles, challenge ideas, or reminders...">${escapeHtml(state.days[day.id]||"")}</textarea>
+              </div>
+            </div>
+          </div>`;
+        card.querySelector(".day-header").addEventListener("click",()=>{
+          card.classList.toggle("open");
+          card.querySelector(".day-header").setAttribute("aria-expanded",card.classList.contains("open"));
+        });
+        card.querySelector("textarea").addEventListener("input",e=>{
+          state.days[day.id]=e.target.value;
+          saveState();
+        });
+        container.appendChild(card);
+      });
+    }
+
+    function updateProgress(){
+      const all = [...getItems("prep").map((_,i)=>`prep_${i}`), ...getItems("room").map((_,i)=>`room_${i}`)];
+      const done = all.filter(k=>state.checked[k]).length;
+      const pct = all.length ? Math.round(done/all.length*100) : 0;
+      document.getElementById("progressBar").style.width = pct+"%";
+      document.getElementById("progressText").textContent = pct+"%";
+    }
+
+    function downloadFile(filename,content,type="text/plain"){
+      const blob = new Blob([content],{type});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href=url;
+      a.download=filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function buildNotesText(){
+      const lines = [];
+      lines.push("EV3 ROBOTICS WEEK PLANNER");
+      lines.push("========================");
+      lines.push("");
+      lines.push("LOGISTICS NOTES");
+      lines.push(state.logisticsNotes || "(none)");
+      lines.push("");
+      lines.push("QUICK NOTES");
+      lines.push(state.quickNotes || "(none)");
+      lines.push("");
+      dayPlans.forEach(day=>{
+        lines.push(day.tag.toUpperCase()+" — "+day.title.toUpperCase());
+        lines.push(state.days[day.id] || "(none)");
+        lines.push("");
+      });
+      lines.push("CUSTOM PREP TASKS");
+      lines.push(state.custom.prep.length ? state.custom.prep.map(x=>"- "+x).join("\n") : "(none)");
+      lines.push("");
+      lines.push("CUSTOM ROOM TASKS");
+      lines.push(state.custom.room.length ? state.custom.room.map(x=>"- "+x).join("\n") : "(none)");
+      return lines.join("\n");
+    }
+
+    function escapeHtml(str){
+      return String(str).replace(/[&<>"']/g,m=>({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      })[m]);
+    }
+
+    document.getElementById("logisticsNotes").value = state.logisticsNotes;
+    document.getElementById("quickNotes").value = state.quickNotes;
+
+    document.getElementById("logisticsNotes").addEventListener("input",e=>{
+      state.logisticsNotes=e.target.value;
+      saveState();
+    });
+    document.getElementById("quickNotes").addEventListener("input",e=>{
+      state.quickNotes=e.target.value;
+      saveState();
+    });
+
+    document.getElementById("downloadNotesBtn").addEventListener("click",()=>{
+      downloadFile("EV3_Robotics_Notes.txt",buildNotesText());
+    });
+
+    document.getElementById("exportBtn").addEventListener("click",()=>{
+      downloadFile("EV3_Planner_Backup.json",JSON.stringify(state,null,2),"application/json");
+    });
+
+    document.getElementById("importInput").addEventListener("change",e=>{
+      const file=e.target.files[0];
+      if(!file) return;
+      const reader=new FileReader();
+      reader.onload=()=>{
+        try{
+          state=mergeDefaults(JSON.parse(reader.result));
+          saveState();
+          location.reload();
+        }catch{
+          alert("That backup file could not be read.");
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    document.getElementById("resetBtn").addEventListener("click",()=>{
+      if(confirm("Reset all saved notes and checklist progress?")){
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
+      }
+    });
+
+    document.getElementById("toggleQuickBtn").addEventListener("click",()=>{
+      const box=document.getElementById("quickNotesBox");
+      box.classList.toggle("collapsed");
+      document.getElementById("toggleQuickBtn").textContent=box.classList.contains("collapsed")?"Show":"Hide";
+    });
+
+    document.getElementById("prepInput").addEventListener("keydown",e=>{
+      if(e.key==="Enter") addChecklistItem("prep");
+    });
+    document.getElementById("roomInput").addEventListener("keydown",e=>{
+      if(e.key==="Enter") addChecklistItem("room");
+    });
+
+    renderChecklist("prep");
+    renderChecklist("room");
+    renderDays();
+    updateProgress();
+    saveState();
+  </script>
+</body>
+</html>
