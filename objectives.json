@@ -1,4 +1,25 @@
 [
+
+  {
+    "weekTitle": "Week 1 – September 8 to September 11",
+    "objectives": "By the end of the week, students will build our classroom community, learn the routines and materials needed for math class, set up DeltaMath, and demonstrate what they remember from Grade 5 math.",
+    "agenda": [
+      "<strong>Tuesday:</strong> Welcome to 6th Grade Math; make name tents; meet our class; review daily materials; receive an available take-home IM book; and begin the Grade 5 math diagnostic.",
+      "<strong>Wednesday:</strong> Complete the Grade 5 math diagnostic and register for DeltaMath.",
+      "<strong>Thursday:</strong> Practice our classroom routines and begin our first math lesson.",
+      "<strong>Friday:</strong> Continue the math lesson, share strategies, and reflect on our first week.",
+      "<strong>Name-Tent Directions:</strong> Fold an 8.5 × 11-inch sheet into thirds so it stands. Write your name large, dark, and easy to read. At the bottom, add one sport or activity you enjoy.",
+      "<strong>Daily Materials:</strong> Bring a notebook, paper, and a pencil to every class."
+    ],
+    "homework": "Bring your notebook, paper, and a pencil every day. Keep your assigned math book at home for review.",
+    "languageObjectives": [
+      "Students will introduce themselves and share one sport or activity they enjoy.",
+      "Students will explain their mathematical thinking and describe the strategies they use."
+    ]
+  }
+
+  
+  /*
   {
   "weekTitle": "Week 40 – 6/1 to 6/4",
   "objectives": "By the end of the week, students will master adding and subtracting decimals using concrete place-value strategies. They will then transition to multiplying decimals by analyzing how scaling by tenths and hundredths affects the position of the decimal point in a product.",
@@ -202,5 +223,5 @@
       "Students will interpret and represent division situations by creating tape diagrams and writing corresponding multiplication or division equations.",
       "Students will justify their reasoning about division by explaining how a diagram represents either the number of groups or the size of each group."
     ]
-  }
+  }*/
 ]
