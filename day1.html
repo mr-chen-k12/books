@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<!-- saved from url=(0081)file:///C:/Users/Chen/Downloads/Classroom%20TV%20Display%20-%20Dynamic%20(2).html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to 6th Grade Math</title>
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async="" src="./day1_files/tex-mml-chtml.js.download"></script>
+
+    <style>
+        /* Modern, Packed CSS Design */
+        :root {
+            --bg-color: #ffffff;
+            --text-main: #222222;
+            --highlight-obj: #ffeb3b; /* Yellow */
+            --highlight-hw: #00bcd4;  /* Cyan */
+            --highlight-lang: #4caf50; /* Green */
+        }
+
+        html {
+            font-size: 22px; 
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-main);
+            margin: 0;
+            padding: 0.5rem 2%; 
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            box-sizing: border-box;
+            font-weight: bold; 
+            overflow-y: auto; 
+            overflow-x: hidden;
+        }
+
+        /* FADED FIXED BACKGROUND LOGO */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh;
+            background-image: url('image_573374.png');
+            background-repeat: no-repeat;
+            background-position: 85% center; 
+            background-size: 50%; 
+            opacity: 0.35; 
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        #all-weeks-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem; 
+            padding-bottom: 2rem;
+        }
+
+        .main-board {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.85); 
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem; 
+            padding-bottom: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        header {
+            text-align: center;
+            padding: 0.5rem;
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            border-radius: 8px 8px 0 0;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            letter-spacing: 1px;
+            font-weight: 900; 
+        }
+
+        .content-section {
+            padding: 0 0.5rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 900; 
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+        }
+
+        .badge-obj { background-color: var(--highlight-obj); color: #000; }
+        .badge-agenda { background-color: #e0e0e0; color: #333; }
+        .badge-hw { background-color: var(--highlight-hw); color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+        .badge-lang { background-color: var(--highlight-lang); color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+
+        p {
+            display: inline;
+            font-size: 1.2rem;
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        ul {
+            margin: 0.2rem 0 0.5rem 0; 
+            padding-left: 2rem;
+        }
+
+        li {
+            font-size: 1.2rem;
+            line-height: 1.3;
+            margin-bottom: 0.2rem;
+        }
+
+        /* CONFIGURATION PANEL */
+        .config-zone {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            z-index: 1000;
+        }
+
+        .config-panel {
+            background: rgba(44, 62, 80, 0.95);
+            color: white;
+            padding: 20px;
+            border-radius: 12px 0 0 12px;
+            box-shadow: -4px 0 15px rgba(0,0,0,0.2);
+            opacity: 0;
+            transform: translateX(30px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            pointer-events: none;
+            text-align: center;
+        }
+
+        .config-zone:hover .config-panel {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+        .config-panel label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            font-family: sans-serif;
+        }
+
+        .config-panel input[type="range"] {
+            width: 120px;
+            cursor: pointer;
+        }
+         
+        .loading-text {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 1.5rem;
+        }
+    </style>
+<style type="text/css">.CtxtMenu_InfoClose {  top:.2em; right:.2em;}
+.CtxtMenu_InfoContent {  overflow:auto; text-align:left; font-size:80%;  padding:.4em .6em; border:1px inset; margin:1em 0px;  max-height:20em; max-width:30em; background-color:#EEEEEE;  white-space:normal;}
+.CtxtMenu_Info.CtxtMenu_MousePost {outline:none;}
+.CtxtMenu_Info {  position:fixed; left:50%; width:auto; text-align:center;  border:3px outset; padding:1em 2em; background-color:#DDDDDD;  color:black;  cursor:default; font-family:message-box; font-size:120%;  font-style:normal; text-indent:0; text-transform:none;  line-height:normal; letter-spacing:normal; word-spacing:normal;  word-wrap:normal; white-space:nowrap; float:none; z-index:201;  border-radius: 15px;                     /* Opera 10.5 and IE9 */  -webkit-border-radius:15px;               /* Safari and Chrome */  -moz-border-radius:15px;                  /* Firefox */  -khtml-border-radius:15px;                /* Konqueror */  box-shadow:0px 10px 20px #808080;         /* Opera 10.5 and IE9 */  -webkit-box-shadow:0px 10px 20px #808080; /* Safari 3 & Chrome */  -moz-box-shadow:0px 10px 20px #808080;    /* Forefox 3.5 */  -khtml-box-shadow:0px 10px 20px #808080;  /* Konqueror */  filter:progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color="gray", Positive="true"); /* IE */}
+</style><style type="text/css">.CtxtMenu_MenuClose {  position:absolute;  cursor:pointer;  display:inline-block;  border:2px solid #AAA;  border-radius:18px;  -webkit-border-radius: 18px;             /* Safari and Chrome */  -moz-border-radius: 18px;                /* Firefox */  -khtml-border-radius: 18px;              /* Konqueror */  font-family: "Courier New", Courier;  font-size:24px;  color:#F0F0F0}
+.CtxtMenu_MenuClose span {  display:block; background-color:#AAA; border:1.5px solid;  border-radius:18px;  -webkit-border-radius: 18px;             /* Safari and Chrome */  -moz-border-radius: 18px;                /* Firefox */  -khtml-border-radius: 18px;              /* Konqueror */  line-height:0;  padding:8px 0 6px     /* may need to be browser-specific */}
+.CtxtMenu_MenuClose:hover {  color:white!important;  border:2px solid #CCC!important}
+.CtxtMenu_MenuClose:hover span {  background-color:#CCC!important}
+.CtxtMenu_MenuClose:hover:focus {  outline:none}
+</style><style type="text/css">.CtxtMenu_Menu {  position:absolute;  background-color:white;  color:black;  width:auto; padding:5px 0px;  border:1px solid #CCCCCC; margin:0; cursor:default;  font: menu; text-align:left; text-indent:0; text-transform:none;  line-height:normal; letter-spacing:normal; word-spacing:normal;  word-wrap:normal; white-space:nowrap; float:none; z-index:201;  border-radius: 5px;                     /* Opera 10.5 and IE9 */  -webkit-border-radius: 5px;             /* Safari and Chrome */  -moz-border-radius: 5px;                /* Firefox */  -khtml-border-radius: 5px;              /* Konqueror */  box-shadow:0px 10px 20px #808080;         /* Opera 10.5 and IE9 */  -webkit-box-shadow:0px 10px 20px #808080; /* Safari 3 & Chrome */  -moz-box-shadow:0px 10px 20px #808080;    /* Forefox 3.5 */  -khtml-box-shadow:0px 10px 20px #808080;  /* Konqueror */}
+.CtxtMenu_MenuItem {  padding: 1px 2em;  background:transparent;}
+.CtxtMenu_MenuArrow {  position:absolute; right:.5em; padding-top:.25em; color:#666666;  font-family: null; font-size: .75em}
+.CtxtMenu_MenuActive .CtxtMenu_MenuArrow {color:white}
+.CtxtMenu_MenuArrow.CtxtMenu_RTL {left:.5em; right:auto}
+.CtxtMenu_MenuCheck {  position:absolute; left:.7em;  font-family: null}
+.CtxtMenu_MenuCheck.CtxtMenu_RTL { right:.7em; left:auto }
+.CtxtMenu_MenuRadioCheck {  position:absolute; left: .7em;}
+.CtxtMenu_MenuRadioCheck.CtxtMenu_RTL {  right: .7em; left:auto}
+.CtxtMenu_MenuInputBox {  padding-left: 1em; right:.5em; color:#666666;  font-family: null;}
+.CtxtMenu_MenuInputBox.CtxtMenu_RTL {  left: .1em;}
+.CtxtMenu_MenuComboBox {  left:.1em; padding-bottom:.5em;}
+.CtxtMenu_MenuSlider {  left: .1em;}
+.CtxtMenu_SliderValue {  position:absolute; right:.1em; padding-top:.25em; color:#333333;  font-size: .75em}
+.CtxtMenu_SliderBar {  outline: none; background: #d3d3d3}
+.CtxtMenu_MenuLabel {  padding: 1px 2em 3px 1.33em;  font-style:italic}
+.CtxtMenu_MenuRule {  border-top: 1px solid #DDDDDD;  margin: 4px 3px;}
+.CtxtMenu_MenuDisabled {  color:GrayText}
+.CtxtMenu_MenuActive {  background-color: #606872;  color: white;}
+.CtxtMenu_MenuDisabled:focus {  background-color: #E8E8E8}
+.CtxtMenu_MenuLabel:focus {  background-color: #E8E8E8}
+.CtxtMenu_ContextMenu:focus {  outline:none}
+.CtxtMenu_ContextMenu .CtxtMenu_MenuItem:focus {  outline:none}
+.CtxtMenu_SelectionMenu {  position:relative; float:left;  border-bottom: none; -webkit-box-shadow:none; -webkit-border-radius:0px; }
+.CtxtMenu_SelectionItem {  padding-right: 1em;}
+.CtxtMenu_Selection {  right: 40%; width:50%; }
+.CtxtMenu_SelectionBox {  padding: 0em; max-height:20em; max-width: none;  background-color:#FFFFFF;}
+.CtxtMenu_SelectionDivider {  clear: both; border-top: 2px solid #000000;}
+.CtxtMenu_Menu .CtxtMenu_MenuClose {  top:-10px; left:-10px}
+</style><style id="MJX-CHTML-styles">
+mjx-container[jax="CHTML"] {
+  line-height: 0;
+}
+
+mjx-container [space="1"] {
+  margin-left: .111em;
+}
+
+mjx-container [space="2"] {
+  margin-left: .167em;
+}
+
+mjx-container [space="3"] {
+  margin-left: .222em;
+}
+
+mjx-container [space="4"] {
+  margin-left: .278em;
+}
+
+mjx-container [space="5"] {
+  margin-left: .333em;
+}
+
+mjx-container [rspace="1"] {
+  margin-right: .111em;
+}
+
+mjx-container [rspace="2"] {
+  margin-right: .167em;
+}
+
+mjx-container [rspace="3"] {
+  margin-right: .222em;
+}
+
+mjx-container [rspace="4"] {
+  margin-right: .278em;
+}
+
+mjx-container [rspace="5"] {
+  margin-right: .333em;
+}
+
+mjx-container [size="s"] {
+  font-size: 70.7%;
+}
+
+mjx-container [size="ss"] {
+  font-size: 50%;
+}
+
+mjx-container [size="Tn"] {
+  font-size: 60%;
+}
+
+mjx-container [size="sm"] {
+  font-size: 85%;
+}
+
+mjx-container [size="lg"] {
+  font-size: 120%;
+}
+
+mjx-container [size="Lg"] {
+  font-size: 144%;
+}
+
+mjx-container [size="LG"] {
+  font-size: 173%;
+}
+
+mjx-container [size="hg"] {
+  font-size: 207%;
+}
+
+mjx-container [size="HG"] {
+  font-size: 249%;
+}
+
+mjx-container [width="full"] {
+  width: 100%;
+}
+
+mjx-box {
+  display: inline-block;
+}
+
+mjx-block {
+  display: block;
+}
+
+mjx-itable {
+  display: inline-table;
+}
+
+mjx-row {
+  display: table-row;
+}
+
+mjx-row > * {
+  display: table-cell;
+}
+
+mjx-mtext {
+  display: inline-block;
+}
+
+mjx-mstyle {
+  display: inline-block;
+}
+
+mjx-merror {
+  display: inline-block;
+  color: red;
+  background-color: yellow;
+}
+
+mjx-mphantom {
+  visibility: hidden;
+}
+
+_::-webkit-full-page-media, _:future, :root mjx-container {
+  will-change: opacity;
+}
+
+mjx-assistive-mml {
+  position: absolute !important;
+  top: 0px;
+  left: 0px;
+  clip: rect(1px, 1px, 1px, 1px);
+  padding: 1px 0px 0px 0px !important;
+  border: 0px !important;
+  display: block !important;
+  width: auto !important;
+  overflow: hidden !important;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+mjx-assistive-mml[display="block"] {
+  width: 100% !important;
+}
+
+mjx-c::before {
+  display: block;
+  width: 0;
+}
+
+.MJX-TEX {
+  font-family: MJXZERO, MJXTEX;
+}
+
+.TEX-B {
+  font-family: MJXZERO, MJXTEX-B;
+}
+
+.TEX-I {
+  font-family: MJXZERO, MJXTEX-I;
+}
+
+.TEX-MI {
+  font-family: MJXZERO, MJXTEX-MI;
+}
+
+.TEX-BI {
+  font-family: MJXZERO, MJXTEX-BI;
+}
+
+.TEX-S1 {
+  font-family: MJXZERO, MJXTEX-S1;
+}
+
+.TEX-S2 {
+  font-family: MJXZERO, MJXTEX-S2;
+}
+
+.TEX-S3 {
+  font-family: MJXZERO, MJXTEX-S3;
+}
+
+.TEX-S4 {
+  font-family: MJXZERO, MJXTEX-S4;
+}
+
+.TEX-A {
+  font-family: MJXZERO, MJXTEX-A;
+}
+
+.TEX-C {
+  font-family: MJXZERO, MJXTEX-C;
+}
+
+.TEX-CB {
+  font-family: MJXZERO, MJXTEX-CB;
+}
+
+.TEX-FR {
+  font-family: MJXZERO, MJXTEX-FR;
+}
+
+.TEX-FRB {
+  font-family: MJXZERO, MJXTEX-FRB;
+}
+
+.TEX-SS {
+  font-family: MJXZERO, MJXTEX-SS;
+}
+
+.TEX-SSB {
+  font-family: MJXZERO, MJXTEX-SSB;
+}
+
+.TEX-SSI {
+  font-family: MJXZERO, MJXTEX-SSI;
+}
+
+.TEX-SC {
+  font-family: MJXZERO, MJXTEX-SC;
+}
+
+.TEX-T {
+  font-family: MJXZERO, MJXTEX-T;
+}
+
+.TEX-V {
+  font-family: MJXZERO, MJXTEX-V;
+}
+
+.TEX-VB {
+  font-family: MJXZERO, MJXTEX-VB;
+}
+
+mjx-stretchy-v mjx-c, mjx-stretchy-h mjx-c {
+  font-family: MJXZERO, MJXTEX-S1, MJXTEX-S4, MJXTEX, MJXTEX-A ! important;
+}
+
+@font-face /* 0 */ {
+  font-family: MJXZERO;
+  src: url("file:///C:/Users/Chen/Downloads/Classroom%20TV%20Display%20-%20Dynamic_files/output/chtml/fonts/woff-v2/MathJax_Zero.woff") format("woff");
+}
+
+@font-face /* 1 */ {
+  font-family: MJXTEX;
+  src: url("file:///C:/Users/Chen/Downloads/Classroom%20TV%20Display%20-%20Dynamic_files/output/chtml/fonts/woff-v2/MathJax_Main-Regular.woff") format("woff");
+}
+
+@font-face /* 2 */ {
+  font-family: MJXTEX-B;
+  src: url("file:///C:/Users/Chen/Downloads/Classroom%20TV%20Display%20-%20Dynamic_files/output/chtml/fonts/woff-v2/MathJax_Main-Bold.woff") format("woff");
+}
+
+@font-face /* 3 */ {
+  font-family: MJXTEX-I;
+  src: url("file:///C:/Users/Chen/Downloads/Classroom%20TV%20Display%20-%20Dynamic_files/output/chtml/fonts/woff-v2/MathJax_Math-Italic.woff") format("woff");
+}
+
+@font-face /* 4 */ {
+  font-family: MJXTEX-MI;
+  src: url("file:///C:/Users/Chen/Downloads/Classroom%20TV%20Display%20-%20Dynamic_files/output/chtml/fonts/woff-v2/MathJax_Main-Italic.woff") format("woff");
+}
+
+@font-face /* 5 */ {
+  font-family: MJXTEX-BI;
+  src: url("file:///C:/Users/Chen/Downloads/Classroom%20TV%20Display%20-%20Dynamic_files/output/chtml/fonts/woff-v2/MathJax_Math-BoldItalic.woff") format("woff");
+}
+
+@font-face /* 6 */ {
+  font-family: MJXTEX-S1;
+  src: url("file:///C:/Users/Chen/Downloads/Classroom%20TV%20Display%20-%20Dynamic_files/output/chtml/fonts/woff-v2/MathJax_Size1-Regular.woff") format("woff");
+}
+
+@font-face /* 7 */ {
+  font-family: MJXTEX-S2;
+  src: url("file:///C:/Users/Chen/Downloads/Classroom%20TV%20Display%20-%20Dynamic_files/output/chtml/fonts/woff-v2/MathJax_Size2-Regular.woff") format("woff");
+}
+
+@font-face /* 8 */ {
+  font-family: MJXTEX-S3;
+  src: url("file:///C:/Users/Chen/Downloads/Classroom%20TV%20Display%20-%20Dynamic_files/output/chtml/fonts/woff-v2/MathJax_Size3-Regular.woff") format("woff");
+}
+
+@font-face /* 9 */ {
+  font-family: MJXTEX-S4;
+  src: url("file:///C:/Users/Chen/Downloads/Classroom%20TV%20Display%20-%20Dynamic_files/output/chtml/fonts/woff-v2/MathJax_Size4-Regular.woff") format("woff");
+}
+
+@font-face /* 10 */ {
+  font-family: MJXTEX-A;
+  src: url("file:///C:/Users/Chen/Downloads/Classroom%20TV%20Display%20-%20Dynamic_files/output/chtml/fonts/woff-v2/MathJax_AMS-Regular.woff") format("woff");
+}
+
+@font-face /* 11 */ {
+  font-family: MJXTEX-C;
+  src: url("file:///C:/Users/Chen/Downloads/Classroom%20TV%20Display%20-%20Dynamic_files/output/chtml/fonts/woff-v2/MathJax_Calligraphic-Regular.woff") format("woff");
+}
+
+@font-face /* 12 */ {
+  font-family: MJXTEX-CB;
+  src: url("file:///C:/Users/Chen/Downloads/Classroom%20TV%20Display%20-%20Dynamic_files/output/chtml/fonts/woff-v2/MathJax_Calligraphic-Bold.woff") format("woff");
+}
+
+@font-face /* 13 */ {
+  font-family: MJXTEX-FR;
+  src: url("file:///C:/Users/Chen/Downloads/Classroom%20TV%20Display%20-%20Dynamic_files/output/chtml/fonts/woff-v2/MathJax_Fraktur-Regular.woff") format("woff");
+}
+
+@font-face /* 14 */ {
+  font-family: MJXTEX-FRB;
+  src: url("file:///C:/Users/Chen/Downloads/Classroom%20TV%20Display%20-%20Dynamic_files/output/chtml/fonts/woff-v2/MathJax_Fraktur-Bold.woff") format("woff");
+}
+
+@font-face /* 15 */ {
+  font-family: MJXTEX-SS;
+  src: url("file:///C:/Users/Chen/Downloads/Classroom%20TV%20Display%20-%20Dynamic_files/output/chtml/fonts/woff-v2/MathJax_SansSerif-Regular.woff") format("woff");
+}
+
+@font-face /* 16 */ {
+  font-family: MJXTEX-SSB;
+  src: url("file:///C:/Users/Chen/Downloads/Classroom%20TV%20Display%20-%20Dynamic_files/output/chtml/fonts/woff-v2/MathJax_SansSerif-Bold.woff") format("woff");
+}
+
+@font-face /* 17 */ {
+  font-family: MJXTEX-SSI;
+  src: url("file:///C:/Users/Chen/Downloads/Classroom%20TV%20Display%20-%20Dynamic_files/output/chtml/fonts/woff-v2/MathJax_SansSerif-Italic.woff") format("woff");
+}
+
+@font-face /* 18 */ {
+  font-family: MJXTEX-SC;
+  src: url("file:///C:/Users/Chen/Downloads/Classroom%20TV%20Display%20-%20Dynamic_files/output/chtml/fonts/woff-v2/MathJax_Script-Regular.woff") format("woff");
+}
+
+@font-face /* 19 */ {
+  font-family: MJXTEX-T;
+  src: url("file:///C:/Users/Chen/Downloads/Classroom%20TV%20Display%20-%20Dynamic_files/output/chtml/fonts/woff-v2/MathJax_Typewriter-Regular.woff") format("woff");
+}
+
+@font-face /* 20 */ {
+  font-family: MJXTEX-V;
+  src: url("file:///C:/Users/Chen/Downloads/Classroom%20TV%20Display%20-%20Dynamic_files/output/chtml/fonts/woff-v2/MathJax_Vector-Regular.woff") format("woff");
+}
+
+@font-face /* 21 */ {
+  font-family: MJXTEX-VB;
+  src: url("file:///C:/Users/Chen/Downloads/Classroom%20TV%20Display%20-%20Dynamic_files/output/chtml/fonts/woff-v2/MathJax_Vector-Bold.woff") format("woff");
+}
+</style><style type="text/css">.CtxtMenu_InfoClose {  top:.2em; right:.2em;}
+.CtxtMenu_InfoContent {  overflow:auto; text-align:left; font-size:80%;  padding:.4em .6em; border:1px inset; margin:1em 0px;  max-height:20em; max-width:30em; background-color:#EEEEEE;  white-space:normal;}
+.CtxtMenu_Info.CtxtMenu_MousePost {outline:none;}
+.CtxtMenu_Info {  position:fixed; left:50%; width:auto; text-align:center;  border:3px outset; padding:1em 2em; background-color:#DDDDDD;  color:black;  cursor:default; font-family:message-box; font-size:120%;  font-style:normal; text-indent:0; text-transform:none;  line-height:normal; letter-spacing:normal; word-spacing:normal;  word-wrap:normal; white-space:nowrap; float:none; z-index:201;  border-radius: 15px;                     /* Opera 10.5 and IE9 */  -webkit-border-radius:15px;               /* Safari and Chrome */  -moz-border-radius:15px;                  /* Firefox */  -khtml-border-radius:15px;                /* Konqueror */  box-shadow:0px 10px 20px #808080;         /* Opera 10.5 and IE9 */  -webkit-box-shadow:0px 10px 20px #808080; /* Safari 3 & Chrome */  -moz-box-shadow:0px 10px 20px #808080;    /* Forefox 3.5 */  -khtml-box-shadow:0px 10px 20px #808080;  /* Konqueror */  filter:progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color="gray", Positive="true"); /* IE */}
+</style><style type="text/css">.CtxtMenu_MenuClose {  position:absolute;  cursor:pointer;  display:inline-block;  border:2px solid #AAA;  border-radius:18px;  -webkit-border-radius: 18px;             /* Safari and Chrome */  -moz-border-radius: 18px;                /* Firefox */  -khtml-border-radius: 18px;              /* Konqueror */  font-family: "Courier New", Courier;  font-size:24px;  color:#F0F0F0}
+.CtxtMenu_MenuClose span {  display:block; background-color:#AAA; border:1.5px solid;  border-radius:18px;  -webkit-border-radius: 18px;             /* Safari and Chrome */  -moz-border-radius: 18px;                /* Firefox */  -khtml-border-radius: 18px;              /* Konqueror */  line-height:0;  padding:8px 0 6px     /* may need to be browser-specific */}
+.CtxtMenu_MenuClose:hover {  color:white!important;  border:2px solid #CCC!important}
+.CtxtMenu_MenuClose:hover span {  background-color:#CCC!important}
+.CtxtMenu_MenuClose:hover:focus {  outline:none}
+</style><style type="text/css">.CtxtMenu_Menu {  position:absolute;  background-color:white;  color:black;  width:auto; padding:5px 0px;  border:1px solid #CCCCCC; margin:0; cursor:default;  font: menu; text-align:left; text-indent:0; text-transform:none;  line-height:normal; letter-spacing:normal; word-spacing:normal;  word-wrap:normal; white-space:nowrap; float:none; z-index:201;  border-radius: 5px;                     /* Opera 10.5 and IE9 */  -webkit-border-radius: 5px;             /* Safari and Chrome */  -moz-border-radius: 5px;                /* Firefox */  -khtml-border-radius: 5px;              /* Konqueror */  box-shadow:0px 10px 20px #808080;         /* Opera 10.5 and IE9 */  -webkit-box-shadow:0px 10px 20px #808080; /* Safari 3 & Chrome */  -moz-box-shadow:0px 10px 20px #808080;    /* Forefox 3.5 */  -khtml-box-shadow:0px 10px 20px #808080;  /* Konqueror */}
+.CtxtMenu_MenuItem {  padding: 1px 2em;  background:transparent;}
+.CtxtMenu_MenuArrow {  position:absolute; right:.5em; padding-top:.25em; color:#666666;  font-family: null; font-size: .75em}
+.CtxtMenu_MenuActive .CtxtMenu_MenuArrow {color:white}
+.CtxtMenu_MenuArrow.CtxtMenu_RTL {left:.5em; right:auto}
+.CtxtMenu_MenuCheck {  position:absolute; left:.7em;  font-family: null}
+.CtxtMenu_MenuCheck.CtxtMenu_RTL { right:.7em; left:auto }
+.CtxtMenu_MenuRadioCheck {  position:absolute; left: .7em;}
+.CtxtMenu_MenuRadioCheck.CtxtMenu_RTL {  right: .7em; left:auto}
+.CtxtMenu_MenuInputBox {  padding-left: 1em; right:.5em; color:#666666;  font-family: null;}
+.CtxtMenu_MenuInputBox.CtxtMenu_RTL {  left: .1em;}
+.CtxtMenu_MenuComboBox {  left:.1em; padding-bottom:.5em;}
+.CtxtMenu_MenuSlider {  left: .1em;}
+.CtxtMenu_SliderValue {  position:absolute; right:.1em; padding-top:.25em; color:#333333;  font-size: .75em}
+.CtxtMenu_SliderBar {  outline: none; background: #d3d3d3}
+.CtxtMenu_MenuLabel {  padding: 1px 2em 3px 1.33em;  font-style:italic}
+.CtxtMenu_MenuRule {  border-top: 1px solid #DDDDDD;  margin: 4px 3px;}
+.CtxtMenu_MenuDisabled {  color:GrayText}
+.CtxtMenu_MenuActive {  background-color: #606872;  color: white;}
+.CtxtMenu_MenuDisabled:focus {  background-color: #E8E8E8}
+.CtxtMenu_MenuLabel:focus {  background-color: #E8E8E8}
+.CtxtMenu_ContextMenu:focus {  outline:none}
+.CtxtMenu_ContextMenu .CtxtMenu_MenuItem:focus {  outline:none}
+.CtxtMenu_SelectionMenu {  position:relative; float:left;  border-bottom: none; -webkit-box-shadow:none; -webkit-border-radius:0px; }
+.CtxtMenu_SelectionItem {  padding-right: 1em;}
+.CtxtMenu_Selection {  right: 40%; width:50%; }
+.CtxtMenu_SelectionBox {  padding: 0em; max-height:20em; max-width: none;  background-color:#FFFFFF;}
+.CtxtMenu_SelectionDivider {  clear: both; border-top: 2px solid #000000;}
+.CtxtMenu_Menu .CtxtMenu_MenuClose {  top:-10px; left:-10px}
+</style></head>
+<body>
+
+    <div class="config-zone">
+        <div class="config-panel">
+            <label for="font-slider">⚙️ Font Size</label>
+            <input type="range" id="font-slider" min="10" max="50" value="22" step="1">
+        </div>
+    </div>
+
+    <div id="all-weeks-container"><div class="main-board">
+                    <header>
+                        <h1>Welcome to 6th Grade Math!</h1>
+                    </header>
+                    <div class="content-section">
+                        <span class="badge badge-obj">Objectives</span>
+                        <p>Today, we will get to know one another, learn how to be ready for math class, set up our learning tools, and show what we remember from Grade 5 math.</p>
+                    </div>
+                    <div class="content-section">
+                        <span class="badge badge-agenda">Agenda</span>
+                        <ul><li><strong>Welcome &amp; Name Tents:</strong> Fold an 8.5 × 11-inch sheet into thirds so it stands. Write your name large, dark, and easy to read. At the bottom, add one sport or activity you enjoy.</li><li><strong>Meet Our Class:</strong> Learn names, share interests, and review how our math community will work together.</li><li><strong>Be Ready Every Day:</strong> Bring a notebook, paper, and a pencil to every class.</li><li><strong>Take-Home Math Book:</strong> Receive an available IM book to keep at home and use for review.</li><li><strong>Grade 5 Math Diagnostic:</strong> Show what you already know so your teacher can plan the right support.</li><li><strong>DeltaMath Setup:</strong> Register for our class account.</li><li><strong>First Math Activity:</strong> Begin learning together during the second half of class.</li></ul>
+                    </div>
+                    <div class="content-section">
+                        <span class="badge badge-hw">Homework</span>
+                        <p>Bring your notebook, paper, and a pencil to the next class. Keep your assigned math book at home for review.</p>
+                    </div>
+                    <div class="content-section">
+                        <span class="badge badge-lang">Language Objectives</span>
+                        <ul><li>I can introduce myself by displaying my name clearly and sharing one sport or activity I enjoy.</li><li>I can describe what I need to bring to math class each day.</li></ul>
+                    </div>
+                </div></div>
+
+    <script>
+        const JSON_URL = 'https://mr-chen-k12.github.io/books/objectives.json';
+
+        // Keep this set to true for the first day. Change it to false when you
+        // are ready to return to the weekly objectives from objectives.json.
+        const SHOW_FIRST_DAY_DISPLAY = true;
+
+        const FIRST_DAY_DATA = [{
+            weekTitle: 'Welcome to 6th Grade Math!',
+            objectives: 'Today, we will get to know one another, learn how to be ready for math class, set up our learning tools, and show what we remember from Grade 5 math.',
+            agenda: [
+                '<strong>Welcome &amp; Name Tents:</strong> Fold an 8.5 × 11-inch sheet into thirds so it stands. Write your name large, dark, and easy to read. At the bottom, add one sport or activity you enjoy.',
+                '<strong>Meet Our Class:</strong> Learn names, share interests, and review how our math community will work together.',
+                '<strong>Be Ready Every Day:</strong> Bring a notebook, paper, and a pencil to every class.',
+                '<strong>Take-Home Math Book:</strong> Receive an available IM book to keep at home and use for review.',
+                '<strong>Grade 5 Math Diagnostic:</strong> Show what you already know so your teacher can plan the right support.',
+                '<strong>DeltaMath Setup:</strong> Register for our class account.',
+                '<strong>First Math Activity:</strong> Begin learning together during the second half of class.'
+            ],
+            homework: 'Bring your notebook, paper, and a pencil to the next class. Keep your assigned math book at home for review.',
+            languageObjectives: [
+                'I can introduce myself by displaying my name clearly and sharing one sport or activity I enjoy.',
+                'I can describe what I need to bring to math class each day.'
+            ]
+        }];
+
+        async function loadWeeklyData() {
+            if (SHOW_FIRST_DAY_DISPLAY) {
+                renderWeeks(FIRST_DAY_DATA);
+                return;
+            }
+
+            try {
+                const response = await fetch(JSON_URL + '?t=' + new Date().getTime());
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                // Read as raw text first to execute deep data cleaning
+                const rawText = await response.text();
+                
+                // 1. Sanitize mobile/smart curly quotes back to clean code quotes
+                let cleanJSON = rawText
+                    .replace(/[\u201C\u201D]/g, '"')
+                    .replace(/[\u2018\u2019]/g, "'");
+
+                // 2. Clear broken trailing commas that break standard browser parsing
+                cleanJSON = cleanJSON.replace(/,\s*([\]}])/g, '$1');
+
+                // 3. Automatically fix single math backslashes so they parse cleanly
+                cleanJSON = cleanJSON.replace(/\\(?!["\\\/bfnrtu])/g, '\\\\');
+
+                // Safe parsing operation
+                const data = JSON.parse(cleanJSON);
+                renderWeeks(data);
+            } catch (error) {
+                console.error("Failed to parse JSON cleanly:", error);
+                document.getElementById('all-weeks-container').innerHTML = 
+                    `<div class="loading-text" style="color: red; background: rgba(255,255,255,0.9); padding: 1.5rem; border-radius: 8px;">
+                        <strong>Formatting Error Detected in JSON File</strong><br>
+                        <span style="font-size: 1rem; font-weight: normal;">Details: ${error.message}</span>
+                     </div>`;
+            }
+        }
+
+        function renderWeeks(weeksArray) {
+            const container = document.getElementById('all-weeks-container');
+            container.innerHTML = ''; 
+
+            if (!Array.isArray(weeksArray)) {
+                throw new Error("Root element inside objectives.json is not a valid array [].");
+            }
+
+            weeksArray.forEach(week => {
+                const weekBoard = document.createElement('div');
+                weekBoard.className = 'main-board';
+
+                // Ensure sub-arrays exist safely before using mapping mechanisms
+                const agendaItems = Array.isArray(week.agenda) ? week.agenda : [];
+                const langItems = Array.isArray(week.languageObjectives) ? week.languageObjectives : [];
+
+                const agendaHTML = agendaItems.map(item => `<li>${item}</li>`).join('');
+                const langHTML = langItems.map(item => `<li>${item}</li>`).join('');
+
+                weekBoard.innerHTML = `
+                    <header>
+                        <h1>${week.weekTitle || 'Untitled Week'}</h1>
+                    </header>
+                    <div class="content-section">
+                        <span class="badge badge-obj">Objectives</span>
+                        <p>${week.objectives || ''}</p>
+                    </div>
+                    <div class="content-section">
+                        <span class="badge badge-agenda">Agenda</span>
+                        <ul>${agendaHTML}</ul>
+                    </div>
+                    <div class="content-section">
+                        <span class="badge badge-hw">Homework</span>
+                        <p>${week.homework || ''}</p>
+                    </div>
+                    <div class="content-section">
+                        <span class="badge badge-lang">Language Objectives</span>
+                        <ul>${langHTML}</ul>
+                    </div>
+                `;
+                
+                container.appendChild(weekBoard);
+            });
+
+            if (window.MathJax && typeof MathJax.typesetPromise === 'function') {
+                MathJax.typesetPromise();
+            }
+        }
+
+        function setupSlider() {
+            const fontSlider = document.getElementById('font-slider');
+            fontSlider.addEventListener('input', function() {
+                document.documentElement.style.fontSize = this.value + 'px';
+            });
+        }
+
+        window.onload = () => {
+            setupSlider();
+            loadWeeklyData();
+        };
+    </script>
+
+
+
+</body></html>
