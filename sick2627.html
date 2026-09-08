@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BPS Sick Day Calendar 2026-2027</title>
+    <style>
+        :root {
+            --bps-blue: #003366;
+            --bps-light-blue: #e6f0ff;
+            --bps-border: #ccddee;
+            --text-dark: #333;
+            --weekend-bg: #f9f9f9;
+            --holiday-bg: #fff0f0;
+            --holiday-text: #c00000;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 3px solid var(--bps-blue);
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            color: var(--bps-blue);
+            margin: 0;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            color: #666;
+            font-size: 1.2rem;
+            margin-top: 10px;
+            font-weight: 400;
+        }
+
+        .month-container {
+            margin-bottom: 40px;
+            page-break-inside: avoid;
+        }
+
+        .month-title {
+            background-color: var(--bps-blue);
+            color: white;
+            padding: 10px 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 5px 5px 0 0;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            border-left: 1px solid var(--bps-border);
+            border-top: 1px solid var(--bps-border);
+        }
+
+        .day-header {
+            background-color: var(--bps-light-blue);
+            color: var(--bps-blue);
+            font-weight: bold;
+            text-align: center;
+            padding: 10px 5px;
+            border-right: 1px solid var(--bps-border);
+            border-bottom: 1px solid var(--bps-border);
+            font-size: 0.9rem;
+        }
+
+        .day-cell {
+            min-height: 85px;
+            border-right: 1px solid var(--bps-border);
+            border-bottom: 1px solid var(--bps-border);
+            padding: 8px;
+            position: relative;
+            background-color: white;
+        }
+
+        .day-cell.weekend {
+            background-color: var(--weekend-bg);
+        }
+
+        .day-cell.holiday {
+            background-color: var(--holiday-bg);
+        }
+
+        .day-cell.empty {
+            background-color: #fafafa;
+        }
+
+        .date-number {
+            font-weight: bold;
+            font-size: 1rem;
+            color: #888;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .assignee {
+            display: block;
+            font-weight: 600;
+            color: var(--bps-blue);
+            font-size: 0.85rem;
+            background-color: var(--bps-light-blue);
+            padding: 4px 6px;
+            border-radius: 4px;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .holiday-label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--holiday-text);
+            font-weight: bold;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        @media print {
+            body {
+                background-color: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 0;
+            }
+            .month-title {
+                background-color: #003366 !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+            }
+            .assignee {
+                background-color: #e6f0ff !important;
+                -webkit-print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>BPS Sick Day Calendar</h1>
+        <h2>Generated Schedule: September 8, 2026 – June 30, 2027</h2>
+    </header>
+
+    <div id="calendar-root"></div>
+</div>
+
+<script>
+    // Start after Labor Day (September 8, 2026)
+    const startDate = new Date(2026, 8, 8); 
+    const endDate = new Date(2027, 5, 30);   
+    
+    // Rotating Staff List
+    const names = [
+        "Locke, Kristen",
+        "Murphy, Jar...",
+        "Xu, Jinhui",
+        "Muhammad",
+        "Tkacik, Nick",
+        "O'Connor, D...",
+        "Pham, Bang",
+        "McDonald",
+        "Rielly, Colleen",
+        "Zelin (Intern)",
+        "Ben (Intern)",
+        "Christian (Intern)"
+    ];
+
+    // BPS SY26-27 District Calendar No-School Days
+    const holidays = {
+        "2026-09-07": "Labor Day",
+        "2026-10-12": "Indigenous Peoples Day",
+        "2026-11-11": "Veterans Day",
+        "2026-11-26": "Thanksgiving Recess",
+        "2026-11-27": "Thanksgiving Recess",
+        "2026-12-24": "Winter Recess",
+        "2026-12-25": "Winter Recess",
+        "2026-12-28": "Winter Recess",
+        "2026-12-29": "Winter Recess",
+        "2026-12-30": "Winter Recess",
+        "2026-12-31": "Winter Recess",
+        "2027-01-01": "Winter Recess",
+        "2027-01-18": "M.L. King Jr. Day",
+        "2027-02-15": "February Recess",
+        "2027-02-16": "February Recess",
+        "2027-02-17": "February Recess",
+        "2027-02-18": "February Recess",
+        "2027-02-19": "February Recess",
+        "2027-03-26": "Good Friday",
+        "2027-04-19": "Spring Recess",
+        "2027-04-20": "Spring Recess",
+        "2027-04-21": "Spring Recess",
+        "2027-04-22": "Spring Recess",
+        "2027-04-23": "Spring Recess",
+        "2027-05-31": "Memorial Day",
+        "2027-06-18": "Juneteenth (Obs.)"
+    };
+
+    const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+    let currentNameIndex = 0;
+    const root = document.getElementById('calendar-root');
+
+    let startMonth = startDate.getMonth();
+    let startYear = startDate.getFullYear();
+    let endMonth = endDate.getMonth();
+    let endYear = endDate.getFullYear();
+
+    const formatDateKey = (year, month, day) => {
+        const m = String(month + 1).padStart(2, '0');
+        const d = String(day).padStart(2, '0');
+        return `${year}-${m}-${d}`;
+    };
+
+    for (let y = startYear; y <= endYear; y++) {
+        let mStart = (y === startYear) ? startMonth : 0;
+        let mEnd = (y === endYear) ? endMonth : 11;
+
+        for (let m = mStart; m <= mEnd; m++) {
+            renderMonth(y, m);
+        }
+    }
+
+    function renderMonth(year, month) {
+        const monthDiv = document.createElement('div');
+        monthDiv.className = 'month-container';
+
+        const title = document.createElement('div');
+        title.className = 'month-title';
+        title.innerText = `${monthNames[month]} ${year}`;
+        monthDiv.appendChild(title);
+
+        const grid = document.createElement('div');
+        grid.className = 'calendar-grid';
+
+        daysOfWeek.forEach(day => {
+            const header = document.createElement('div');
+            header.className = 'day-header';
+            header.innerText = day;
+            grid.appendChild(header);
+        });
+
+        const firstDayOfMonth = new Date(year, month, 1);
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const startDayOfWeek = firstDayOfMonth.getDay();
+
+        for (let i = 0; i < startDayOfWeek; i++) {
+            const emptyCell = document.createElement('div');
+            emptyCell.className = 'day-cell empty';
+            grid.appendChild(emptyCell);
+        }
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            const currentDate = new Date(year, month, d);
+            const dayOfWeek = currentDate.getDay();
+            const dateKey = formatDateKey(year, month, d);
+
+            const cell = document.createElement('div');
+            cell.className = 'day-cell';
+            
+            if (dayOfWeek === 0 || dayOfWeek === 6) {
+                cell.classList.add('weekend');
+            }
+
+            const dateNum = document.createElement('span');
+            dateNum.className = 'date-number';
+            dateNum.innerText = d;
+            cell.appendChild(dateNum);
+
+            if (currentDate >= startDate && currentDate <= endDate) {
+                if (holidays[dateKey]) {
+                    cell.classList.add('holiday');
+                    const holidaySpan = document.createElement('span');
+                    holidaySpan.className = 'holiday-label';
+                    holidaySpan.innerText = holidays[dateKey];
+                    cell.appendChild(holidaySpan);
+                } else if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+                    const nameSpan = document.createElement('span');
+                    nameSpan.className = 'assignee';
+                    nameSpan.innerText = names[currentNameIndex];
+                    cell.appendChild(nameSpan);
+
+                    currentNameIndex = (currentNameIndex + 1) % names.length;
+                }
+            }
+
+            grid.appendChild(cell);
+        }
+
+        const totalSlots = startDayOfWeek + daysInMonth;
+        const remainingSlots = 7 - (totalSlots % 7);
+        if (remainingSlots < 7) {
+            for (let i = 0; i < remainingSlots; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'day-cell empty';
+                grid.appendChild(emptyCell);
+            }
+        }
+
+        monthDiv.appendChild(grid);
+        root.appendChild(monthDiv);
+    }
+</script>
+
+</body>
+</html>
