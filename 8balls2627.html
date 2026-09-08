@@ -1,330 +1,293 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BPS Sick Day Calendar 2026-2027</title>
+    <title>BPS Staff Sick Day Oracle</title>
     <style>
         :root {
             --bps-blue: #003366;
-            --bps-light-blue: #e6f0ff;
-            --bps-border: #ccddee;
-            --text-dark: #333;
-            --weekend-bg: #f9f9f9;
-            --holiday-bg: #fff0f0;
-            --holiday-text: #c00000;
+            --bps-gold: #f2bc18;
+            --dark-bg: #070f26;
+            --text-light: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
+            background-color: var(--dark-bg);
+            background-image: radial-gradient(circle at center, var(--bps-blue) 0%, var(--dark-bg) 100%);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f4f9;
-            color: var(--text-dark);
-            margin: 0;
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
             padding: 20px;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            padding: 40px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border-radius: 8px;
-        }
-
-        header {
             text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 3px solid var(--bps-blue);
-            padding-bottom: 20px;
         }
 
         h1 {
-            color: var(--bps-blue);
-            margin: 0;
-            font-size: 2.5rem;
+            color: #ffffff;
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
             text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(242, 188, 24, 0.4);
+        }
+
+        .subtitle {
+            color: var(--bps-gold);
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+            font-style: italic;
             letter-spacing: 1px;
         }
 
-        h2 {
-            color: #666;
-            font-size: 1.2rem;
-            margin-top: 10px;
-            font-weight: 400;
-        }
-
-        .month-container {
-            margin-bottom: 40px;
-            page-break-inside: avoid;
-        }
-
-        .month-title {
-            background-color: var(--bps-blue);
-            color: white;
-            padding: 10px 15px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border-radius: 5px 5px 0 0;
-        }
-
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            border-left: 1px solid var(--bps-border);
-            border-top: 1px solid var(--bps-border);
-        }
-
-        .day-header {
-            background-color: var(--bps-light-blue);
-            color: var(--bps-blue);
-            font-weight: bold;
-            text-align: center;
-            padding: 10px 5px;
-            border-right: 1px solid var(--bps-border);
-            border-bottom: 1px solid var(--bps-border);
-            font-size: 0.9rem;
-        }
-
-        .day-cell {
-            min-height: 85px;
-            border-right: 1px solid var(--bps-border);
-            border-bottom: 1px solid var(--bps-border);
-            padding: 8px;
+        /* The 8-Ball Container */
+        .ball-outer {
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #1a357d, var(--bps-blue) 60%, #030814 100%);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 
+                        inset 0 10px 20px rgba(255, 255, 255, 0.2),
+                        inset 0 -10px 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             position: relative;
-            background-color: white;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.1s ease;
         }
 
-        .day-cell.weekend {
-            background-color: var(--weekend-bg);
+        /* 8-Ball Window Frame */
+        .ball-window {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: #040914;
+            border: 4px solid var(--bps-gold);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        .day-cell.holiday {
-            background-color: var(--holiday-bg);
+        /* Triangle Floating inside */
+        .oracle-triangle {
+            width: 0;
+            height: 0;
+            border-left: 65px solid transparent;
+            border-right: 65px solid transparent;
+            border-bottom: 110px solid rgba(242, 188, 24, 0.15);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
-        .day-cell.empty {
-            background-color: #fafafa;
-        }
-
-        .date-number {
+        /* Text Container mapped over triangle */
+        .answer-text {
+            position: absolute;
+            top: 32px;
+            width: 105px;
+            color: var(--bps-gold);
+            font-size: 0.72rem;
             font-weight: bold;
+            line-height: 1.3;
+            text-transform: uppercase;
+            text-align: center;
+            text-shadow: 0 0 8px rgba(242, 188, 24, 0.8);
+            opacity: 0;
+            transform: scale(0.6);
+            transition: opacity 2s ease-in-out, transform 2s ease-in-out;
+        }
+
+        .answer-text.reveal {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .teacher-name {
+            font-size: 0.95rem;
+            color: #ffffff;
+            display: block;
+            margin-bottom: 3px;
+            letter-spacing: 1px;
+            border-bottom: 1px dashed var(--bps-gold);
+            padding-bottom: 2px;
+        }
+
+        /* Shake Animation Rules */
+        .shake-animation {
+            animation: violent-shake 0.5s infinite;
+        }
+
+        @keyframes violent-shake {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            10% { transform: translate(-8px, 5px) rotate(-3deg); }
+            20% { transform: translate(7px, -6px) rotate(4deg); }
+            30% { transform: translate(-6px, -2px) rotate(-2deg); }
+            40% { transform: translate(5px, 6px) rotate(3deg); }
+            50% { transform: translate(-4px, -5px) rotate(-1deg); }
+            60% { transform: translate(6px, 3px) rotate(2deg); }
+            70% { transform: translate(-5px, 4px) rotate(-3deg); }
+            80% { transform: translate(4px, -4px) rotate(2deg); }
+            90% { transform: translate(-3px, 3px) rotate(-1deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        /* Action Buttons & Utilities */
+        .controls {
+            margin-top: 35px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+
+        #shakeBtn {
+            background-color: var(--bps-gold);
+            color: var(--dark-bg);
+            border: none;
+            padding: 14px 32px;
             font-size: 1rem;
-            color: #888;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        .assignee {
-            display: block;
-            font-weight: 600;
-            color: var(--bps-blue);
-            font-size: 0.85rem;
-            background-color: var(--bps-light-blue);
-            padding: 4px 6px;
-            border-radius: 4px;
-            text-align: center;
-            margin-top: 5px;
-        }
-
-        .holiday-label {
-            display: block;
-            font-size: 0.75rem;
-            color: var(--holiday-text);
             font-weight: bold;
-            text-align: center;
-            margin-top: 5px;
+            border-radius: 25px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(242, 188, 24, 0.3);
+            transition: all 0.2s ease;
         }
 
-        @media print {
-            body {
-                background-color: white;
-                padding: 0;
-            }
-            .container {
-                box-shadow: none;
-                padding: 0;
-            }
-            .month-title {
-                background-color: #003366 !important;
-                color: white !important;
-                -webkit-print-color-adjust: exact;
-            }
-            .assignee {
-                background-color: #e6f0ff !important;
-                -webkit-print-color-adjust: exact;
-            }
+        #shakeBtn:hover {
+            background-color: #ffffff;
+            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.4);
+        }
+
+        #shakeBtn:active {
+            transform: scale(0.96);
+        }
+
+        .hint {
+            font-size: 0.8rem;
+            color: #5a6e9c;
+            max-width: 280px;
+            line-height: 1.4;
+        }
+
+        .decor {
+            position: absolute;
+            font-size: 10rem;
+            color: rgba(242, 188, 24, 0.02);
+            z-index: -1;
+            user-select: none;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1>BPS Sick Day Calendar</h1>
-        <h2>Generated Schedule: September 8, 2026 – June 30, 2027</h2>
-    </header>
+    <div class="decor">🩺</div>
 
-    <div id="calendar-root"></div>
-</div>
+    <h1>BPS Sick Day Predictor</h1>
+    <div class="subtitle">Predicting Who's Calling Out Today...</div>
 
-<script>
-    // Start after Labor Day (September 8, 2026)
-    const startDate = new Date(2026, 8, 8); 
-    const endDate = new Date(2027, 5, 30);   
-    
-    // Rotating Staff List
-    const names = [
-        "Locke, Kristen",
-        "Murphy, Jar...",
-        "Xu, Jinhui",
-        "Muhammad",
-        "Tkacik, Nick",
-        "O'Connor, D...",
-        "Pham, Bang",
-        "McDonald",
-        "Rielly, Colleen",
-        "Zelin (Intern)",
-        "Ben (Intern)",
-        "Christian (Intern)"
-    ];
+    <div class="ball-outer" id="ball" onclick="triggerOracle()">
+        <div class="ball-window">
+            <div class="oracle-triangle">
+                <div class="answer-text" id="answer"></div>
+            </div>
+        </div>
+    </div>
 
-    // BPS SY26-27 District Calendar No-School Days
-    const holidays = {
-        "2026-09-07": "Labor Day",
-        "2026-10-12": "Indigenous Peoples Day",
-        "2026-11-11": "Veterans Day",
-        "2026-11-26": "Thanksgiving Recess",
-        "2026-11-27": "Thanksgiving Recess",
-        "2026-12-24": "Winter Recess",
-        "2026-12-25": "Winter Recess",
-        "2026-12-28": "Winter Recess",
-        "2026-12-29": "Winter Recess",
-        "2026-12-30": "Winter Recess",
-        "2026-12-31": "Winter Recess",
-        "2027-01-01": "Winter Recess",
-        "2027-01-18": "M.L. King Jr. Day",
-        "2027-02-15": "February Recess",
-        "2027-02-16": "February Recess",
-        "2027-02-17": "February Recess",
-        "2027-02-18": "February Recess",
-        "2027-02-19": "February Recess",
-        "2027-03-26": "Good Friday",
-        "2027-04-19": "Spring Recess",
-        "2027-04-20": "Spring Recess",
-        "2027-04-21": "Spring Recess",
-        "2027-04-22": "Spring Recess",
-        "2027-04-23": "Spring Recess",
-        "2027-05-31": "Memorial Day",
-        "2027-06-18": "Juneteenth (Obs.)"
-    };
+    <div class="controls">
+        <button id="shakeBtn" onclick="triggerOracle()">Predict Next Absence</button>
+        <div class="hint">Click the button or the ball directly to reveal today's missing staff member.</div>
+    </div>
 
-    const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    <script>
+        // Staff Roster including Team & Interns
+        const teachers = [
+            'Locke', 
+            'Murphy', 
+            'Xu', 
+            'Muhammad', 
+            'Tkacik', 
+            'O\'Connor', 
+            'Pham', 
+            'McDonald', 
+            'Rielly', 
+            'Zelin (Intern)', 
+            'Ben (Intern)', 
+            'Christian (Intern)'
+        ];
+        
+        // Sarcastic excuses
+        const excuses = [
+            "Calling in 'sick' (It's Friday).",
+            "Left interns in charge.",
+            "Trapped in Dunkin' drive-thru.",
+            "Sudden 24h bug before recess.",
+            "Lost in ASPEN portal space.",
+            "Taking a mental prep day.",
+            "Spotted heading to the beach.",
+            "Out on 'official' business.",
+            "Extended weekend engaged.",
+            "Interns stole lesson plan."
+        ];
 
-    let currentNameIndex = 0;
-    const root = document.getElementById('calendar-root');
+        const ball = document.getElementById('ball');
+        const answer = document.getElementById('answer');
+        const shakeBtn = document.getElementById('shakeBtn');
 
-    let startMonth = startDate.getMonth();
-    let startYear = startDate.getFullYear();
-    let endMonth = endDate.getMonth();
-    let endYear = endDate.getFullYear();
+        let isShaking = false;
 
-    const formatDateKey = (year, month, day) => {
-        const m = String(month + 1).padStart(2, '0');
-        const d = String(day).padStart(2, '0');
-        return `${year}-${m}-${d}`;
-    };
+        function triggerOracle() {
+            if (isShaking) return;
+            isShaking = true;
 
-    for (let y = startYear; y <= endYear; y++) {
-        let mStart = (y === startYear) ? startMonth : 0;
-        let mEnd = (y === endYear) ? endMonth : 11;
-
-        for (let m = mStart; m <= mEnd; m++) {
-            renderMonth(y, m);
-        }
-    }
-
-    function renderMonth(year, month) {
-        const monthDiv = document.createElement('div');
-        monthDiv.className = 'month-container';
-
-        const title = document.createElement('div');
-        title.className = 'month-title';
-        title.innerText = `${monthNames[month]} ${year}`;
-        monthDiv.appendChild(title);
-
-        const grid = document.createElement('div');
-        grid.className = 'calendar-grid';
-
-        daysOfWeek.forEach(day => {
-            const header = document.createElement('div');
-            header.className = 'day-header';
-            header.innerText = day;
-            grid.appendChild(header);
-        });
-
-        const firstDayOfMonth = new Date(year, month, 1);
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const startDayOfWeek = firstDayOfMonth.getDay();
-
-        for (let i = 0; i < startDayOfWeek; i++) {
-            const emptyCell = document.createElement('div');
-            emptyCell.className = 'day-cell empty';
-            grid.appendChild(emptyCell);
-        }
-
-        for (let d = 1; d <= daysInMonth; d++) {
-            const currentDate = new Date(year, month, d);
-            const dayOfWeek = currentDate.getDay();
-            const dateKey = formatDateKey(year, month, d);
-
-            const cell = document.createElement('div');
-            cell.className = 'day-cell';
+            // Clear old text instantly
+            answer.classList.remove('reveal');
             
-            if (dayOfWeek === 0 || dayOfWeek === 6) {
-                cell.classList.add('weekend');
-            }
+            // Initiate heavy visual shaking animation
+            ball.classList.add('shake-animation');
+            shakeBtn.disabled = true;
+            shakeBtn.innerText = "Consulting sick log...";
 
-            const dateNum = document.createElement('span');
-            dateNum.className = 'date-number';
-            dateNum.innerText = d;
-            cell.appendChild(dateNum);
+            setTimeout(() => {
+                // Stop shaking after 1.2 seconds
+                ball.classList.remove('shake-animation');
+                
+                // Select a random teacher and pairing excuse
+                const randomTeacher = teachers[Math.floor(Math.random() * teachers.length)];
+                const randomExcuse = excuses[Math.floor(Math.random() * excuses.length)];
 
-            if (currentDate >= startDate && currentDate <= endDate) {
-                if (holidays[dateKey]) {
-                    cell.classList.add('holiday');
-                    const holidaySpan = document.createElement('span');
-                    holidaySpan.className = 'holiday-label';
-                    holidaySpan.innerText = holidays[dateKey];
-                    cell.appendChild(holidaySpan);
-                } else if (dayOfWeek >= 1 && dayOfWeek <= 5) {
-                    const nameSpan = document.createElement('span');
-                    nameSpan.className = 'assignee';
-                    nameSpan.innerText = names[currentNameIndex];
-                    cell.appendChild(nameSpan);
+                // Update DOM text
+                answer.innerHTML = `<span class="teacher-name">${randomTeacher}</span> ${randomExcuse}`;
+                
+                // Trigger CSS transition to fade answer in
+                setTimeout(() => {
+                    answer.classList.add('reveal');
+                    isShaking = false;
+                    shakeBtn.disabled = false;
+                    shakeBtn.innerText = "Predict Next Absence";
+                }, 100);
 
-                    currentNameIndex = (currentNameIndex + 1) % names.length;
-                }
-            }
-
-            grid.appendChild(cell);
+            }, 1200);
         }
-
-        const totalSlots = startDayOfWeek + daysInMonth;
-        const remainingSlots = 7 - (totalSlots % 7);
-        if (remainingSlots < 7) {
-            for (let i = 0; i < remainingSlots; i++) {
-                const emptyCell = document.createElement('div');
-                emptyCell.className = 'day-cell empty';
-                grid.appendChild(emptyCell);
-            }
-        }
-
-        monthDiv.appendChild(grid);
-        root.appendChild(monthDiv);
-    }
-</script>
-
+    </script>
 </body>
 </html>
