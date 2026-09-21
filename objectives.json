@@ -1,4 +1,21 @@
 [
+
+    {
+    "weekTitle": "Week 3 – September 21 to September 25",
+    "objectives": "By the end of the week, students will calculate the area of parallelograms, use the properties of parallelograms to find missing side and angle measures, and classify different types of quadrilaterals.",
+    "agenda": [
+      "<strong>Day 1 – Monday: Area of Parallelograms</strong><br>Identify a base and its corresponding perpendicular height, then use <em>A = b × h</em> to find the area of a parallelogram. Explain how cutting and rearranging a parallelogram forms a rectangle with the same area.",
+      "<strong>Day 2 – Tuesday: Parallelogram Properties and Quadrilaterals</strong><br>Use the facts that opposite sides are parallel and congruent, opposite angles are congruent, and consecutive angles are supplementary to find missing side and angle measures. Classify and label parallelograms, rectangles, rhombuses, squares, trapezoids, and other quadrilaterals.",
+      "<strong>Day 3 – Wednesday: Applying Parallelogram Relationships</strong><br>Solve problems involving area, missing bases or heights, missing side lengths, and missing angle measures. Justify each answer using a parallelogram property.",
+      "<strong>Day 4 – Thursday: Quiz Review</strong><br>Complete mixed practice on parallelogram area, angle relationships, side relationships, and quadrilateral classification. Ask questions and correct misunderstandings before the quiz.",
+      "<strong>Day 5 – Friday: Quiz</strong><br>Demonstrate your understanding of parallelogram area and properties and the classification of quadrilaterals."
+    ],
+    "homework": "Complete assigned DeltaMath or review practice. Bring your notebook, paper, and a sharpened pencil to class every day. Study Thursday's review for Friday's quiz.",
+    "languageObjectives": [
+      "Students will explain how a base and its corresponding perpendicular height determine the area of a parallelogram.",
+      "Students will justify missing measures and classifications using the terms opposite, consecutive, parallel, congruent, supplementary, and quadrilateral."
+    ]
+  },
     {
     "weekTitle": "Week 2 – September 14 to September 18",
     "objectives": "By the end of the week, students will explain the meaning of area and use tiling, decomposing, rearranging, enclosing, and subtracting to find and compare the areas of two-dimensional figures.",
