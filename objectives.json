@@ -1,4 +1,21 @@
 [
+     {
+    "weekTitle": "Week 4 – September 28 to October 2",
+    "objectives": "By the end of the week, students will explain how triangle area relates to parallelogram area, identify a base and its corresponding perpendicular height, use A = (b × h) ÷ 2 to find triangle areas, and find polygon areas by decomposing them into simpler shapes. Students will explain their reasoning and label areas in square units.",
+    "agenda": [
+      "<strong>Day 1 – Monday: Lesson 7 – From Parallelograms to Triangles</strong><br>Split a parallelogram along a diagonal into two congruent triangles. Use diagrams to explain why each triangle has half the area of the parallelogram.",
+      "<strong>Day 2 – Tuesday: Lesson 8 – Area of Triangles</strong><br>Find triangle areas by composing two congruent copies into a parallelogram or by decomposing shapes with known areas. Compare strategies with a partner and explain your reasoning.",
+      "<strong>Day 3 – Wednesday: Lesson 9 – Formula for the Area of a Triangle</strong><br>Explain the one-half factor in <em>A = (b × h) ÷ 2</em>. Use the formula to calculate triangle areas and label answers in square units.",
+      "<strong>Day 4 – Thursday: Lesson 10 – Bases and Heights of Triangles</strong><br>Choose a base and identify or draw its corresponding perpendicular height. Find heights inside or outside a triangle, extending the base when needed, and distinguish height from a slanted side length.",
+      "<strong>Day 5 – Friday: Lesson 11 – Polygons</strong><br>Find polygon areas by decomposing figures into non-overlapping triangles, rectangles, or parallelograms and adding their areas. Compare different decompositions and justify why they give the same total area."
+    ],
+    "homework": "Complete assigned DeltaMath practice. Review your notes on triangle area, bases and heights, and polygon decomposition. Bring your notebook, paper, and a sharpened pencil to class every day.",
+    "languageObjectives": [
+      "Students will explain the relationship between triangle and parallelogram areas using the terms congruent, one-half, base, and height.",
+      "Students will describe how a height is perpendicular to its corresponding base or the line containing that base.",
+      "Students will compare and justify polygon area strategies using the terms decompose, non-overlapping, polygon, and square units."
+    ]
+  },
 
     {
     "weekTitle": "Week 3 – September 21 to September 25",
