@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>M-Delta Proof Visualizer: Lim x->2- 1/(x-2)^3 = -inf</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- KaTeX CSS & JS for Math Rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .font-mono {
+      font-family: 'Fira Code', monospace;
+    }
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col overflow-x-hidden selection:bg-indigo-500 selection:text-white">
+
+  <!-- Top Navigation Header -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50 px-4 lg:px-8 py-3.5 flex flex-wrap justify-between items-center gap-4">
+    <div class="flex items-center space-x-3">
+      <div class="p-2 bg-indigo-600/20 text-indigo-400 rounded-xl border border-indigo-500/30">
+        <i data-lucide="calculator" class="w-6 h-6"></i>
+      </div>
+      <div>
+        <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+          M-&delta; Limit Proof Explorer
+          <span class="text-xs font-normal px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Interactive Theorem</span>
+        </h1>
+        <p class="text-xs text-slate-400">Formal proof that <span id="header-math-limit"></span></p>
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-2">
+      <button id="btn-reset" class="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 transition">
+        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+        <span>Reset Proof</span>
+      </button>
+      <button id="btn-toggle-help" class="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition shadow-lg shadow-indigo-600/20">
+        <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+        <span>How it Works</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Grid Layout -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- LEFT PANEL: Proof Logic Roadmap (5 Cols on large screens) -->
+    <section class="lg:col-span-5 flex flex-col gap-4">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col h-full">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="git-commit" class="w-5 h-5 text-indigo-400"></i>
+            <h2 class="font-semibold text-slate-100 text-base">Proof Logic Roadmap</h2>
+          </div>
+          <span id="roadmap-progress-badge" class="text-xs font-mono text-indigo-400 bg-indigo-950/80 px-2.5 py-1 rounded-full border border-indigo-800/50">
+            Step 1 of 6
+          </span>
+        </div>
+
+        <!-- Roadmap Steps Container -->
+        <div class="space-y-3 flex-1 overflow-y-auto pr-1" id="roadmap-steps-container">
+          
+          <!-- Step 1 Item -->
+          <div data-step="1" class="step-card group p-3.5 rounded-xl border transition cursor-pointer bg-slate-800/80 border-indigo-500/50 shadow-md">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center space-x-2.5">
+                <span class="step-num-badge w-6 h-6 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center">1</span>
+                <h3 class="text-sm font-semibold text-white">1. Adversary's Challenge</h3>
+              </div>
+              <span class="step-status text-xs font-mono text-indigo-300">Active</span>
+            </div>
+            <p class="text-xs text-slate-300 mt-2 pl-8">
+              Adversary chooses any arbitrary lower limit bound <span class="math-inline" data-math="M < 0"></span>.
+            </p>
+          </div>
+
+          <!-- Step 2 Item -->
+          <div data-step="2" class="step-card group p-3.5 rounded-xl border transition cursor-pointer bg-slate-950/40 border-slate-800 hover:border-slate-700">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center space-x-2.5">
+                <span class="step-num-badge w-6 h-6 rounded-full bg-slate-800 text-slate-400 text-xs font-bold flex items-center justify-center">2</span>
+                <h3 class="text-sm font-semibold text-slate-300">2. Constructing $\delta$</h3>
+              </div>
+              <span class="step-status text-xs font-mono text-slate-500">Pending</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-2 pl-8">
+              Set <span class="math-inline" data-math="\delta = \min\left(1, \frac{1}{|M|}\right)"></span> to secure both power contraction and scale.
+            </p>
+          </div>
+
+          <!-- Step 3 Item -->
+          <div data-step="3" class="step-card group p-3.5 rounded-xl border transition cursor-pointer bg-slate-950/40 border-slate-800 hover:border-slate-700">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center space-x-2.5">
+                <span class="step-num-badge w-6 h-6 rounded-full bg-slate-800 text-slate-400 text-xs font-bold flex items-center justify-center">3</span>
+                <h3 class="text-sm font-semibold text-slate-300">3. Sampling $x \in (2-\delta, 2)$</h3>
+              </div>
+              <span class="step-status text-xs font-mono text-slate-500">Pending</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-2 pl-8">
+              Pick test input $x$ to the left of $2$ within distance $\delta$.
+            </p>
+          </div>
+
+          <!-- Step 4 Item -->
+          <div data-step="4" class="step-card group p-3.5 rounded-xl border transition cursor-pointer bg-slate-950/40 border-slate-800 hover:border-slate-700">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center space-x-2.5">
+                <span class="step-num-badge w-6 h-6 rounded-full bg-slate-800 text-slate-400 text-xs font-bold flex items-center justify-center">4</span>
+                <h3 class="text-sm font-semibold text-slate-300">4. Inequality Chain</h3>
+              </div>
+              <span class="step-status text-xs font-mono text-slate-500">Pending</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-2 pl-8">
+              Evaluate live steps: <span class="math-inline" data-math="|x-2|^3 < \delta \le \frac{1}{|M|} \implies \frac{1}{|x-2|^3} > |M|"></span>.
+            </p>
+          </div>
+
+          <!-- Step 5 Item -->
+          <div data-step="5" class="step-card group p-3.5 rounded-xl border transition cursor-pointer bg-slate-950/40 border-slate-800 hover:border-slate-700">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center space-x-2.5">
+                <span class="step-num-badge w-6 h-6 rounded-full bg-slate-800 text-slate-400 text-xs font-bold flex items-center justify-center">5</span>
+                <h3 class="text-sm font-semibold text-slate-300">5. Sign Inversion & Threshold</h3>
+              </div>
+              <span class="step-status text-xs font-mono text-slate-500">Pending</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-2 pl-8">
+              Since $(x-2)^3 < 0$, we conclude <span class="math-inline" data-math="f(x) = -\frac{1}{|x-2|^3} < -|M| = M"></span>.
+            </p>
+          </div>
+
+          <!-- Step 6 Item -->
+          <div data-step="6" class="step-card group p-3.5 rounded-xl border transition cursor-pointer bg-slate-950/40 border-slate-800 hover:border-slate-700">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center space-x-2.5">
+                <span class="step-num-badge w-6 h-6 rounded-full bg-slate-800 text-slate-400 text-xs font-bold flex items-center justify-center">6</span>
+                <h3 class="text-sm font-semibold text-slate-300">6. Proof Q.E.D.</h3>
+              </div>
+              <span class="step-status text-xs font-mono text-slate-500">Pending</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-2 pl-8">
+              Logic holds for all $M < 0$. Therefore, $\lim_{x \to 2^-} f(x) = -\infty$.
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Quick Info Box at bottom of left panel -->
+        <div class="mt-4 p-3.5 bg-indigo-950/30 border border-indigo-800/30 rounded-xl text-xs text-indigo-200 flex items-start space-x-2.5">
+          <i data-lucide="lightbulb" class="w-4 h-4 text-indigo-400 shrink-0 mt-0.5"></i>
+          <div>
+            <span class="font-semibold block text-indigo-300">Key Insight</span>
+            Why $\min(1, \frac{1}{|M|})$? $1$ forces $|x-2| < 1$ so $|x-2|^3 < |x-2|$, avoiding messy cube roots ($\sqrt[3]{|M|}$)!
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL: Interactive Workbench & Visualization Canvas (7 Cols on large screens) -->
+    <section class="lg:col-span-7 flex flex-col gap-6">
+
+      <!-- Interactive Step Controls Card -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl transition-all" id="workbench-card">
+        
+        <!-- Interactive Step Header -->
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3 mb-4">
+          <div>
+            <span id="step-tag" class="text-xs font-semibold uppercase tracking-wider text-indigo-400">Step 1 of 6</span>
+            <h2 id="step-title" class="text-lg font-bold text-white">Choose $M$ (Adversary's Challenge)</h2>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button id="btn-prev-step" class="px-3 py-1.5 text-xs font-medium bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:hover:bg-slate-800 text-slate-200 rounded-lg border border-slate-700 transition flex items-center space-x-1">
+              <i data-lucide="chevron-left" class="w-4 h-4"></i>
+              <span>Back</span>
+            </button>
+            <button id="btn-next-step" class="px-4 py-1.5 text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition shadow-md shadow-indigo-600/30 flex items-center space-x-1">
+              <span>Next Step</span>
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Dynamic Content Area depending on active step -->
+        <div id="step-content-area" class="min-h-[160px] flex flex-col justify-center">
+
+          <!-- Content Step 1: Pick M -->
+          <div id="step-view-1" class="step-view space-y-4">
+            <p class="text-sm text-slate-300">
+              The adversary challenges you with a lower limit bound <span id="math-m-def"></span>. Select or enter a negative value:
+            </p>
+            
+            <div class="flex flex-wrap items-center gap-2">
+              <button class="preset-m-btn px-3.5 py-2 text-xs font-semibold bg-slate-800 hover:bg-indigo-600 border border-slate-700 rounded-xl transition" data-val="-5">M = -5</button>
+              <button class="preset-m-btn px-3.5 py-2 text-xs font-semibold bg-slate-800 hover:bg-indigo-600 border border-slate-700 rounded-xl transition" data-val="-20">M = -20</button>
+              <button class="preset-m-btn px-3.5 py-2 text-xs font-semibold bg-indigo-600 border border-indigo-500 text-white rounded-xl transition" data-val="-100">M = -100</button>
+              <button class="preset-m-btn px-3.5 py-2 text-xs font-semibold bg-slate-800 hover:bg-indigo-600 border border-slate-700 rounded-xl transition" data-val="-500">M = -500</button>
+            </div>
+
+            <div class="flex items-center space-x-3 pt-1">
+              <label for="custom-m-input" class="text-xs font-medium text-slate-400">Custom $M$:</label>
+              <input type="number" id="custom-m-input" value="-100" max="-0.1" step="any" class="w-32 px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-indigo-500 font-mono">
+              <span class="text-xs text-slate-500">(Must be negative)</span>
+            </div>
+
+            <div class="p-3 bg-slate-950/60 border border-slate-800 rounded-xl text-xs text-slate-300 flex items-center justify-between">
+              <span>Selected Bound: <strong class="text-indigo-400 font-mono text-sm" id="m-val-display">M = -100</strong></span>
+              <span>Target: <strong class="text-indigo-300 font-mono" id="m-abs-display">|M| = 100</strong></span>
+            </div>
+          </div>
+
+          <!-- Content Step 2: Construct Delta -->
+          <div id="step-view-2" class="step-view space-y-4 hidden">
+            <p class="text-sm text-slate-300">
+              As the prover, compute $\delta$ based on $M = <span class="val-m-inline"></span>$:
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div class="p-3.5 bg-slate-950/80 border border-slate-800 rounded-xl space-y-1">
+                <span class="text-xs text-slate-400 block font-medium">Reciprocal Threshold</span>
+                <div id="math-delta-recip" class="text-sm text-indigo-300 font-mono"></div>
+              </div>
+              <div class="p-3.5 bg-indigo-950/40 border border-indigo-800/40 rounded-xl space-y-1">
+                <span class="text-xs text-indigo-300 block font-medium">Prover's Choice of Delta ($\delta$)</span>
+                <div id="math-delta-result" class="text-sm text-indigo-200 font-bold font-mono"></div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 space-y-1">
+              <div class="font-semibold text-indigo-400">Why $\delta = \min(1, \frac{1}{|M|})$ works:</div>
+              <ul class="list-disc list-inside space-y-0.5 text-slate-400">
+                <li>Because $\delta \le 1$, any $|x-2| < \delta \le 1$ implies $|x-2|^3 < |x-2|$ (cubing shrinks positive fractions).</li>
+                <li>Because $\delta \le \frac{1}{|M|}$, we ensure $|x-2| < \frac{1}{|M|}$.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Content Step 3: Pick x -->
+          <div id="step-view-3" class="step-view space-y-4 hidden">
+            <p class="text-sm text-slate-300">
+              Pick any value $x$ in the left interval <span id="math-interval-def"></span>:
+            </p>
+
+            <div class="space-y-2">
+              <div class="flex justify-between text-xs font-mono text-slate-400">
+                <span>Left limit: $2 - \delta \approx <span id="val-2-minus-delta"></span>$</span>
+                <span class="text-indigo-400 font-bold">x = <span id="val-x-current"></span></span>
+                <span>Asymptote: $2.0$</span>
+              </div>
+              <input type="range" id="x-slider" min="0" max="1" step="0.001" value="0.5" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+            </div>
+
+            <div class="flex flex-wrap gap-2 pt-1">
+              <button class="btn-x-preset px-2.5 py-1 text-xs bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300 border border-slate-700" data-fraction="0.95">Near Left Edge ($2 - 0.95\delta$)</button>
+              <button class="btn-x-preset px-2.5 py-1 text-xs bg-indigo-600/30 hover:bg-indigo-600/50 rounded-lg text-indigo-200 border border-indigo-500/30" data-fraction="0.5">Midpoint ($2 - 0.5\delta$)</button>
+              <button class="btn-x-preset px-2.5 py-1 text-xs bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300 border border-slate-700" data-fraction="0.05">Close to 2 ($2 - 0.05\delta$)</button>
+            </div>
+
+            <div class="p-3 bg-slate-950/60 border border-slate-800 rounded-xl text-xs flex justify-between font-mono">
+              <span class="text-slate-400">Distance $|x - 2| = <strong id="val-x-dist" class="text-indigo-300"></strong></span>
+              <span class="text-slate-400">Condition Check: <strong id="val-x-valid" class="text-emerald-400">0 < |x-2| < &delta; &#10003;</strong></span>
+            </div>
+          </div>
+
+          <!-- Content Step 4: Inequality Chain -->
+          <div id="step-view-4" class="step-view space-y-3 hidden">
+            <p class="text-sm text-slate-300">
+              Evaluating the inequality chain with our live numbers:
+            </p>
+
+            <div class="p-3 bg-slate-950/80 border border-slate-800 rounded-xl space-y-2 font-mono text-xs">
+              <div class="flex justify-between items-center border-b border-slate-800/80 pb-1.5">
+                <span class="text-slate-400">1. Base distance $|x - 2|$:</span>
+                <span id="chain-1" class="text-slate-200"></span>
+              </div>
+              <div class="flex justify-between items-center border-b border-slate-800/80 pb-1.5">
+                <span class="text-slate-400">2. Cubed distance $|x - 2|^3$:</span>
+                <span id="chain-2" class="text-slate-200"></span>
+              </div>
+              <div class="flex justify-between items-center border-b border-slate-800/80 pb-1.5">
+                <span class="text-slate-400">3. Compare with $\frac{1}{|M|}$:</span>
+                <span id="chain-3" class="text-emerald-400 font-semibold"></span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-400">4. Positive Reciprocal $\frac{1}{|x-2|^3}$:</span>
+                <span id="chain-4" class="text-indigo-300 font-bold"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Content Step 5: Sign Inversion -->
+          <div id="step-view-5" class="step-view space-y-3 hidden">
+            <p class="text-sm text-slate-300">
+              Finally, because $x < 2$, the term $(x - 2)$ is negative, so $(x - 2)^3 < 0$:
+            </p>
+
+            <div class="p-4 bg-emerald-950/30 border border-emerald-500/30 rounded-xl space-y-3">
+              <div id="math-final-eval" class="text-sm font-mono text-emerald-300"></div>
+              <div class="flex items-center space-x-2 text-xs text-emerald-400 font-semibold">
+                <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+                <span>Verified: $f(x) < M$ holds strictly!</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Content Step 6: Q.E.D. -->
+          <div id="step-view-6" class="step-view space-y-4 hidden">
+            <div class="p-4 bg-indigo-950/40 border border-indigo-500/30 rounded-xl space-y-2">
+              <div class="flex items-center space-x-2 text-indigo-300 font-bold text-sm">
+                <i data-lucide="award" class="w-5 h-5 text-indigo-400"></i>
+                <span>Formal Proof Completed ($\text{Q.E.D.}$)</span>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                For <strong>any arbitrary</strong> $M < 0$, by selecting $\delta = \min\left(1, \frac{1}{|M|}\right)$, every $x \in (2-\delta, 2)$ guarantees that $f(x) < M$. Thus, $\lim_{x \to 2^-} \frac{1}{(x-2)^3} = -\infty$.
+              </p>
+            </div>
+
+            <div class="flex items-center justify-center pt-2">
+              <button id="btn-restart-demo" class="px-5 py-2 text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-lg shadow-indigo-600/30 transition flex items-center space-x-2">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                <span>Test Another Value of M</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Visualization Canvas Card -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col space-y-4">
+        
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="line-chart" class="w-5 h-5 text-indigo-400"></i>
+            <h3 class="font-semibold text-slate-100 text-sm">Geometric Graph Visualizer</h3>
+          </div>
+
+          <!-- View controls -->
+          <div class="flex items-center space-x-3 text-xs">
+            <label class="flex items-center space-x-1.5 text-slate-400 cursor-pointer">
+              <input type="checkbox" id="chk-log-scale" class="rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-0">
+              <span>Compressed Curve View</span>
+            </label>
+            <button id="btn-zoom-reset" class="p-1 px-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 text-xs">
+              Reset Zoom
+            </button>
+          </div>
+        </div>
+
+        <!-- Canvas Container -->
+        <div class="relative w-full h-[320px] bg-slate-950 rounded-xl overflow-hidden border border-slate-800/80 shadow-inner group">
+          <canvas id="graph-canvas" class="w-full h-full block cursor-crosshair"></canvas>
+
+          <!-- Floating Coordinates Overlay -->
+          <div id="canvas-tooltip" class="absolute top-3 left-3 bg-slate-900/90 backdrop-blur border border-slate-800 px-3 py-1.5 rounded-lg text-xs font-mono text-slate-300 shadow-lg pointer-events-none transition-opacity opacity-100">
+            x: <span id="tip-x" class="text-indigo-400">--</span> | f(x): <span id="tip-y" class="text-emerald-400">--</span>
+          </div>
+
+          <!-- Status badge on bottom right -->
+          <div class="absolute bottom-3 right-3 bg-slate-900/80 backdrop-blur px-2.5 py-1 rounded-md border border-slate-800 text-[10px] font-mono text-slate-400">
+            Interval: [<span id="canvas-badge-interval">--</span>)
+          </div>
+        </div>
+
+        <!-- Visual Legend -->
+        <div class="flex flex-wrap items-center justify-between text-xs text-slate-400 gap-3 pt-1 px-1">
+          <div class="flex items-center space-x-1.5">
+            <span class="w-3 h-0.5 bg-indigo-500 rounded-full inline-block"></span>
+            <span>$f(x) = \frac{1}{(x-2)^3}$</span>
+          </div>
+          <div class="flex items-center space-x-1.5">
+            <span class="w-3 h-0.5 bg-rose-500 rounded-full inline-block border border-rose-500"></span>
+            <span>Threshold $y = M$</span>
+          </div>
+          <div class="flex items-center space-x-1.5">
+            <span class="w-3 h-3 bg-emerald-500/20 border border-emerald-500/60 rounded inline-block"></span>
+            <span>$\delta$-Interval $[2-\delta, 2)$</span>
+          </div>
+          <div class="flex items-center space-x-1.5">
+            <span class="w-2 h-2 bg-amber-400 rounded-full inline-block"></span>
+            <span>Test Point $(x, f(x))$</span>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Info / Help Modal -->
+  <div id="help-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-lucide="book-open" class="w-5 h-5 text-indigo-400"></i>
+          Understanding the M-&delta; Limit Definition
+        </h3>
+        <button id="btn-close-modal" class="text-slate-400 hover:text-white transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs text-slate-300 leading-relaxed">
+        <p>
+          To rigorously prove that <span class="math-inline" data-math="\lim_{x \to 2^-} \frac{1}{(x-2)^3} = -\infty"></span>, we must show that for <strong>every</strong> negative number $M < 0$, there exists a positive distance $\delta > 0$ such that whenever $x$ is within distance $\delta$ to the left of $2$ ($2 - \delta < x < 2$), the function value $f(x)$ drops strictly below $M$.
+        </p>
+
+        <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 font-mono text-indigo-300">
+          $$\forall M < 0, \exists \delta > 0 \text{ s.t. } 0 < 2 - x < \delta \implies \frac{1}{(x-2)^3} < M$$
+        </div>
+
+        <p>
+          <strong>Why $\delta = \min\left(1, \frac{1}{|M|}\right)$?</strong><br>
+          If we set $\delta \le 1$, then $|x-2| < 1$. When a positive fraction is less than $1$, cubing it makes it smaller ($|x-2|^3 < |x-2|$). Thus, we don't need cube root functions ($\sqrt[3]{|M|}$)! We simply guarantee $|x-2|^3 < |x-2| < \delta \le \frac{1}{|M|}$.
+        </p>
+      </div>
+
+      <div class="pt-2 text-right">
+        <button id="btn-modal-gotit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs rounded-xl shadow">
+          Got it!
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Application Script -->
+  <script>
+    // App State Management
+    const state = {
+      currentStep: 1,
+      M: -100,
+      delta: 0.01,
+      x: 1.995,
+      xRelFraction: 0.5, // 0 to 1 inside (2 - delta, 2)
+      isLogScale: false,
+      zoomLevel: 1.0,
+      animFrame: null
+    };
+
+    // Helper: Render Math via KaTeX
+    function renderMath(elementId, mathString, displayMode = false) {
+      const el = typeof elementId === 'string' ? document.getElementById(elementId) : elementId;
+      if (!el) return;
+      try {
+        katex.render(mathString, el, {
+          throwOnError: false,
+          displayMode: displayMode
+        });
+      } catch (e) {
+        el.textContent = mathString;
+      }
+    }
+
+    // Render static KaTeX inline elements
+    function renderAllStaticMath() {
+      renderMath('header-math-limit', '\\lim_{x \\to 2^-} \\frac{1}{(x-2)^3} = -\\infty');
+      
+      document.querySelectorAll('.math-inline').forEach(el => {
+        const formula = el.getAttribute('data-math');
+        if (formula) {
+          renderMath(el, formula, false);
+        }
+      });
+    }
+
+    // Calculate Delta based on M
+    function recalculateDelta() {
+      const absM = Math.abs(state.M);
+      const recip = 1 / absM;
+      state.delta = Math.min(1, recip);
+      
+      // Update x position based on fraction inside (2 - delta, 2)
+      // x = 2 - delta * (1 - fraction)
+      state.x = 2 - state.delta * (1 - state.xRelFraction);
+    }
+
+    // Update active step view and logic roadmap UI
+    function updateStepUI() {
+      // Step Tag and Title Text
+      const stepTitles = [
+        "Choose M (Adversary's Challenge)",
+        "Constructing Delta (Prover's Response)",
+        "Sampling x in Interval (2 - \\delta, 2)",
+        "Inequality Chain Step-by-Step",
+        "Sign Inversion & Threshold",
+        "Proof Verified (Q.E.D.)"
+      ];
+
+      document.getElementById('step-tag').textContent = `Step ${state.currentStep} of 6`;
+      renderMath('step-title', stepTitles[state.currentStep - 1]);
+      document.getElementById('roadmap-progress-badge').textContent = `Step ${state.currentStep} of 6`;
+
+      // Back & Next Buttons State
+      document.getElementById('btn-prev-step').disabled = (state.currentStep === 1);
+      const btnNext = document.getElementById('btn-next-step');
+      if (state.currentStep === 6) {
+        btnNext.style.display = 'none';
+      } else {
+        btnNext.style.display = 'flex';
+      }
+
+      // Hide all step view containers and show current
+      for (let i = 1; i <= 6; i++) {
+        const view = document.getElementById(`step-view-${i}`);
+        if (view) {
+          if (i === state.currentStep) {
+            view.classList.remove('hidden');
+          } else {
+            view.classList.add('hidden');
+          }
+        }
+      }
+
+      // Update Roadmap List Items styling
+      document.querySelectorAll('#roadmap-steps-container .step-card').forEach(card => {
+        const stepNum = parseInt(card.getAttribute('data-step'), 10);
+        const badge = card.querySelector('.step-num-badge');
+        const status = card.querySelector('.step-status');
+        const title = card.querySelector('h3');
+
+        if (stepNum === state.currentStep) {
+          card.className = "step-card group p-3.5 rounded-xl border transition cursor-pointer bg-slate-800/90 border-indigo-500 shadow-lg shadow-indigo-500/10";
+          badge.className = "step-num-badge w-6 h-6 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center";
+          status.className = "step-status text-xs font-mono text-indigo-400 font-semibold";
+          status.textContent = "Active";
+          if (title) title.className = "text-sm font-semibold text-white";
+        } else if (stepNum < state.currentStep) {
+          card.className = "step-card group p-3.5 rounded-xl border transition cursor-pointer bg-slate-900/60 border-slate-800/80 hover:border-slate-700";
+          badge.className = "step-num-badge w-6 h-6 rounded-full bg-emerald-600/30 text-emerald-400 text-xs font-bold flex items-center justify-center border border-emerald-500/30";
+          status.className = "step-status text-xs font-mono text-emerald-400";
+          status.textContent = "Done ✓";
+          if (title) title.className = "text-sm font-semibold text-slate-300";
+        } else {
+          card.className = "step-card group p-3.5 rounded-xl border transition cursor-pointer bg-slate-950/30 border-slate-800/40 hover:border-slate-800";
+          badge.className = "step-num-badge w-6 h-6 rounded-full bg-slate-800 text-slate-500 text-xs font-bold flex items-center justify-center";
+          status.className = "step-status text-xs font-mono text-slate-600";
+          status.textContent = "Pending";
+          if (title) title.className = "text-sm font-semibold text-slate-400";
+        }
+      });
+
+      // Render Dynamic Step Math & Data
+      renderStepDynamicMath();
+      drawCanvas();
+    }
+
+    function renderStepDynamicMath() {
+      const absM = Math.abs(state.M);
+      const recipM = 1 / absM;
+      const dist = 2 - state.x;
+      const distCubed = Math.pow(dist, 3);
+      const fx = -1 / distCubed;
+
+      // Step 1
+      renderMath('math-m-def', `M = ${state.M}`);
+      document.getElementById('m-val-display').textContent = `M = ${state.M}`;
+      document.getElementById('m-abs-display').textContent = `|M| = ${absM}`;
+      document.querySelectorAll('.val-m-inline').forEach(el => el.textContent = state.M);
+
+      // Step 2
+      renderMath('math-delta-recip', `\\frac{1}{|M|} = \\frac{1}{${absM}} = ${recipM < 0.0001 ? recipM.toExponential(4) : recipM.toFixed(5)}`);
+      renderMath('math-delta-result', `\\delta = \\min\\left(1, \\frac{1}{${absM}}\\right) = ${state.delta < 0.0001 ? state.delta.toExponential(4) : state.delta.toFixed(5)}`);
+
+      // Step 3
+      renderMath('math-interval-def', `(2 - \\delta, 2) = (${(2 - state.delta).toFixed(5)}, 2)`);
+      document.getElementById('val-2-minus-delta').textContent = (2 - state.delta).toFixed(5);
+      document.getElementById('val-x-current').textContent = state.x.toFixed(6);
+      document.getElementById('x-slider').value = state.xRelFraction;
+      document.getElementById('val-x-dist').textContent = dist.toFixed(6);
+
+      // Step 4
+      renderMath('chain-1', `|${state.x.toFixed(5)} - 2| = ${dist.toFixed(6)}`);
+      renderMath('chain-2', `|x-2|^3 = (${dist.toFixed(5)})^3 = ${distCubed < 0.00001 ? distCubed.toExponential(4) : distCubed.toFixed(6)}`);
+      renderMath('chain-3', `|x-2|^3 < \\delta \\le \\frac{1}{|M|} \\quad (${distCubed < 0.00001 ? distCubed.toExponential(3) : distCubed.toFixed(5)} < ${recipM < 0.0001 ? recipM.toExponential(3) : recipM.toFixed(5)}) \\quad \\checkmark`);
+      renderMath('chain-4', `\\frac{1}{|x-2|^3} = ${Math.abs(fx) > 10000 ? Math.abs(fx).toExponential(4) : Math.abs(fx).toFixed(2)} > |M| (${absM})`);
+
+      // Step 5
+      renderMath('math-final-eval', `f(x) = \\frac{1}{(x-2)^3} = -\\frac{1}{|x-2|^3} = ${fx < -10000 ? fx.toExponential(4) : fx.toFixed(2)} < M (${state.M})`, true);
+
+      // Canvas badge text
+      document.getElementById('canvas-badge-interval').textContent = `${(2 - state.delta).toFixed(4)}, 2`;
+    }
+
+    // Visualizer Canvas Drawing Function
+    function drawCanvas() {
+      const canvas = document.getElementById('graph-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      // Adjust for Device Pixel Ratio (Retina support)
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+
+      const width = rect.width;
+      const height = rect.height;
+
+      // Clear background
+      ctx.fillStyle = '#020617'; // slate-950
+      ctx.fillRect(0, 0, width, height);
+
+      // Define mathematical coordinate domain & range
+      // x domain: from (2 - 2.2 * delta) to (2 + 0.5 * delta)
+      const xMin = 2 - 2.2 * state.delta * state.zoomLevel;
+      const xMax = 2 + 0.6 * state.delta * state.zoomLevel;
+
+      // y range: from (1.5 * M) to (0.5 * |M|)
+      const absM = Math.abs(state.M);
+      let yMin = 1.6 * state.M * state.zoomLevel;
+      let yMax = 0.4 * absM * state.zoomLevel;
+
+      // Coordinate mapping functions
+      function toScreenX(x) {
+        return ((x - xMin) / (xMax - xMin)) * width;
+      }
+
+      function toScreenY(y) {
+        if (state.isLogScale) {
+          // Compressed logarithmic mapping for extreme values
+          // Transform y into non-linear scale
+          const sign = y < 0 ? -1 : 1;
+          const absY = Math.abs(y);
+          const logY = sign * Math.log10(1 + absY);
+          const logMin = -Math.log10(1 + Math.abs(yMin));
+          const logMax = Math.log10(1 + Math.abs(yMax));
+          return height - ((logY - logMin) / (logMax - logMin)) * height;
+        } else {
+          return height - ((y - yMin) / (yMax - yMin)) * height;
+        }
+      }
+
+      // Draw Grid Lines
+      ctx.strokeStyle = '#1e293b'; // slate-800
+      ctx.lineWidth = 1;
+
+      // Horizontal zero axis if visible
+      const yZeroScr = toScreenY(0);
+      if (yZeroScr >= 0 && yZeroScr <= height) {
+        ctx.strokeStyle = '#334155';
+        ctx.beginPath();
+        ctx.moveTo(0, yZeroScr);
+        ctx.lineTo(width, yZeroScr);
+        ctx.stroke();
+      }
+
+      // Draw Delta Interval Corridor Shading [2 - delta, 2]
+      const xStartScr = toScreenX(2 - state.delta);
+      const xEndScr = toScreenX(2);
+      const yMScr = toScreenY(state.M);
+
+      const grad = ctx.createLinearGradient(0, 0, 0, height);
+      grad.addColorStop(0, 'rgba(16, 185, 129, 0.05)');
+      grad.addColorStop(1, 'rgba(16, 185, 129, 0.20)');
+
+      ctx.fillStyle = grad;
+      ctx.fillRect(xStartScr, Math.min(yZeroScr, yMScr), xEndScr - xStartScr, Math.abs(yMScr - yZeroScr) + 200);
+
+      // Corridor border line at x = 2 - delta
+      ctx.strokeStyle = '#10b981'; // emerald-500
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(xStartScr, 0);
+      ctx.lineTo(xStartScr, height);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Draw Vertical Asymptote at x = 2
+      ctx.strokeStyle = '#f43f5e'; // rose-500
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 4]);
+      ctx.beginPath();
+      ctx.moveTo(xEndScr, 0);
+      ctx.lineTo(xEndScr, height);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Draw Horizontal Threshold Line y = M
+      ctx.strokeStyle = '#e11d48'; // rose-600
+      ctx.lineWidth = 2;
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      ctx.moveTo(0, yMScr);
+      ctx.lineTo(width, yMScr);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Label for y = M
+      ctx.fillStyle = '#f43f5e';
+      ctx.font = '600 11px inter, sans-serif';
+      ctx.fillText(`y = M (${state.M})`, 10, yMScr - 6);
+
+      // Label for Vertical Asymptote
+      ctx.fillStyle = '#f43f5e';
+      ctx.fillText('x = 2', xEndScr + 6, 18);
+
+      // Label for 2 - delta
+      ctx.fillStyle = '#10b981';
+      ctx.fillText(`2 - δ`, xStartScr - 28, height - 12);
+
+      // Draw Curve f(x) = 1 / (x - 2)^3 for x < 2
+      ctx.strokeStyle = '#6366f1'; // indigo-500
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+
+      let started = false;
+      const stepPixels = 2;
+      for (let px = 0; px <= width; px += stepPixels) {
+        // Calculate corresponding x
+        const xVal = xMin + (px / width) * (xMax - xMin);
+        if (xVal >= 1.999999) break; // Don't cross vertical asymptote
+
+        const distVal = 2 - xVal;
+        if (distVal <= 0) continue;
+
+        const yVal = -1 / Math.pow(distVal, 3);
+        const py = toScreenY(yVal);
+
+        if (!started) {
+          ctx.moveTo(px, py);
+          started = true;
+        } else {
+          ctx.lineTo(px, py);
+        }
+      }
+      ctx.stroke();
+
+      // Plot Test Point (state.x, f(state.x))
+      const testDist = 2 - state.x;
+      const testFx = -1 / Math.pow(testDist, 3);
+      const testPx = toScreenX(state.x);
+      const testPy = toScreenY(testFx);
+
+      // Projection lines for test point
+      ctx.strokeStyle = '#f59e0b'; // amber-500
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([3, 3]);
+
+      // Vertical line to x-axis
+      ctx.beginPath();
+      ctx.moveTo(testPx, yZeroScr >= 0 ? yZeroScr : height);
+      ctx.lineTo(testPx, testPy);
+      ctx.stroke();
+
+      // Horizontal line to y-axis
+      ctx.beginPath();
+      ctx.moveTo(0, testPy);
+      ctx.lineTo(testPx, testPy);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Draw Glowing Dot for Test Point
+      ctx.fillStyle = '#fbbf24'; // amber-400
+      ctx.beginPath();
+      ctx.arc(testPx, testPy, 6, 0, 2 * Math.PI);
+      ctx.fill();
+
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(testPx, testPy, 6, 0, 2 * Math.PI);
+      ctx.stroke();
+
+      // Update Hover/Tooltip default values
+      document.getElementById('tip-x').textContent = state.x.toFixed(6);
+      document.getElementById('tip-y').textContent = testFx < -10000 ? testFx.toExponential(3) : testFx.toFixed(2);
+    }
+
+    // Initialize Event Listeners
+    function setupEventListeners() {
+      // Step Navigation Buttons
+      document.getElementById('btn-prev-step').addEventListener('click', () => {
+        if (state.currentStep > 1) {
+          state.currentStep--;
+          updateStepUI();
+        }
+      });
+
+      document.getElementById('btn-next-step').addEventListener('click', () => {
+        if (state.currentStep < 6) {
+          state.currentStep++;
+          updateStepUI();
+        }
+      });
+
+      // Roadmap Step Cards Clickable
+      document.querySelectorAll('#roadmap-steps-container .step-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const stepNum = parseInt(card.getAttribute('data-step'), 10);
+          state.currentStep = stepNum;
+          updateStepUI();
+        });
+      });
+
+      // Step 1: Preset M buttons
+      document.querySelectorAll('.preset-m-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          document.querySelectorAll('.preset-m-btn').forEach(b => {
+            b.className = "preset-m-btn px-3.5 py-2 text-xs font-semibold bg-slate-800 hover:bg-indigo-600 border border-slate-700 rounded-xl transition";
+          });
+          e.target.className = "preset-m-btn px-3.5 py-2 text-xs font-semibold bg-indigo-600 border border-indigo-500 text-white rounded-xl transition";
+          
+          const val = parseFloat(e.target.getAttribute('data-val'));
+          state.M = val;
+          document.getElementById('custom-m-input').value = val;
+          recalculateDelta();
+          updateStepUI();
+        });
+      });
+
+      // Custom M Input
+      const customMInput = document.getElementById('custom-m-input');
+      customMInput.addEventListener('input', (e) => {
+        let val = parseFloat(e.target.value);
+        if (isNaN(val) || val >= 0) {
+          val = -0.1;
+        }
+        state.M = val;
+        recalculateDelta();
+        updateStepUI();
+      });
+
+      // Step 3: Slider for x
+      const xSlider = document.getElementById('x-slider');
+      xSlider.addEventListener('input', (e) => {
+        state.xRelFraction = parseFloat(e.target.value);
+        recalculateDelta();
+        renderStepDynamicMath();
+        drawCanvas();
+      });
+
+      // Step 3: Preset x buttons
+      document.querySelectorAll('.btn-x-preset').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const frac = parseFloat(e.target.getAttribute('data-fraction'));
+          state.xRelFraction = frac;
+          recalculateDelta();
+          renderStepDynamicMath();
+          drawCanvas();
+        });
+      });
+
+      // Graph View Toggle (Log scale)
+      document.getElementById('chk-log-scale').addEventListener('change', (e) => {
+        state.isLogScale = e.target.checked;
+        drawCanvas();
+      });
+
+      // Zoom Reset
+      document.getElementById('btn-zoom-reset').addEventListener('click', () => {
+        state.zoomLevel = 1.0;
+        drawCanvas();
+      });
+
+      // Reset Button
+      document.getElementById('btn-reset').addEventListener('click', () => {
+        state.currentStep = 1;
+        state.M = -100;
+        state.zoomLevel = 1.0;
+        document.getElementById('custom-m-input').value = "-100";
+        recalculateDelta();
+        updateStepUI();
+      });
+
+      // Restart Demo in Step 6
+      document.getElementById('btn-restart-demo').addEventListener('click', () => {
+        state.currentStep = 1;
+        updateStepUI();
+      });
+
+      // Help Modal Toggle
+      const modal = document.getElementById('help-modal');
+      document.getElementById('btn-toggle-help').addEventListener('click', () => {
+        modal.classList.remove('hidden');
+      });
+      document.getElementById('btn-close-modal').addEventListener('click', () => {
+        modal.classList.add('hidden');
+      });
+      document.getElementById('btn-modal-gotit').addEventListener('click', () => {
+        modal.classList.add('hidden');
+      });
+
+      // Responsive Window Resize Handler
+      window.addEventListener('resize', () => {
+        drawCanvas();
+      });
+    }
+
+    // Window Load Initialization
+    window.onload = function() {
+      // Initialize Lucide Icons
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+
+      // Render static LaTeX
+      renderAllStaticMath();
+
+      // Calculate initial state and attach listeners
+      recalculateDelta();
+      setupEventListeners();
+      updateStepUI();
+    };
+  </script>
+</body>
+</html>
