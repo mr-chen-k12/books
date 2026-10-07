@@ -1,4 +1,22 @@
 [
+{
+    "weekTitle": "Week 5 – October 5 to October 9",
+    "objectives": "By the end of the week, students will describe surface area as the total area of all the faces of a polyhedron, identify faces, edges, and vertices, and connect three-dimensional solids to their two-dimensional nets. Students will calculate surface area by adding the areas of all faces and label answers in square units. As an optional extension, students will distinguish surface area from volume.",
+    "agenda": [
+      "<strong>Day 1 – Monday: Lesson 12 – What Is Surface Area?</strong><br>Explore how much material is needed to cover the outside of a solid. Find surface area by adding the areas of every face, including faces hidden from view, and express the total in square units.",
+      "<strong>Day 2 – Tuesday: Lesson 13 – Polyhedra</strong><br>Identify and count faces, edges, and vertices. Describe and compare prisms and pyramids using the shapes of their faces and the way those faces meet.",
+      "<strong>Day 3 – Wednesday: Lesson 14 – Nets and Surface Area</strong><br>Match nets to the solids they form. Use a net to organize the areas of all faces and calculate the surface area, counting each face exactly once.",
+      "<strong>Day 4 – Thursday: Lesson 15 – More Nets, More Surface Area</strong><br>Use nets and labeled dimensions to find the surface areas of prisms and pyramids. Apply rectangle and triangle area formulas, choose corresponding bases and perpendicular heights, and explain your calculations.",
+      "<strong>Day 5 – Friday: Surface Area Review and Lesson 16 – Distinguishing Between Surface Area and Volume (Optional)</strong><br>Review finding surface area with nets and compare solution strategies. As an optional extension, distinguish the area covering a solid from the space it occupies and explain when to use square units or cubic units."
+    ],
+    "homework": "Complete assigned DeltaMath practice. Review rectangle and triangle area formulas, the parts of polyhedra, and how nets help organize surface-area calculations. Bring your notebook, paper, and a sharpened pencil to class every day.",
+    "languageObjectives": [
+      "Students will describe and compare solids using the terms polyhedron, face, edge, vertex, prism, and pyramid.",
+      "Students will explain how a net represents a solid and justify surface-area calculations using the terms face area, total area, and square units.",
+      "As an optional extension, students will compare surface area and volume using the phrases covering the outside and occupying space, and distinguish square units from cubic units."
+    ]
+  },
+     
      {
     "weekTitle": "Week 4 – September 28 to October 2",
     "objectives": "By the end of the week, students will explain how triangle area relates to parallelogram area, identify a base and its corresponding perpendicular height, use A = (b × h) ÷ 2 to find triangle areas, and find polygon areas by decomposing them into simpler shapes. Students will explain their reasoning and label areas in square units.",
