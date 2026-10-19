@@ -1,5 +1,22 @@
 [
-
+  {
+    "weekTitle": "Week 7 – October 19 to October 23",
+    "objectives": "Students will review and demonstrate their understanding of area, quadrilateral properties, polyhedra, nets, and surface area. They will choose appropriate formulas and strategies, identify corresponding bases and perpendicular heights, decompose figures, and account for every face of a solid. Students will explain their reasoning, correct errors, and use appropriate units as they prepare for Friday's test.",
+    "agenda": [
+      "<strong>Monday, October 19: Area and Quadrilateral Review</strong><br>Review quadrilateral classifications and parallelogram side and angle relationships. Practice finding the areas of rectangles, parallelograms, and triangles using corresponding bases and perpendicular heights. Find polygon areas by decomposing, rearranging, or subtracting simpler shapes.",
+      "<strong>Tuesday, October 20: Polyhedra, Nets, and Surface Area Review</strong><br>Identify prisms and pyramids and count their faces, edges, and vertices. Match solids to nets and calculate surface area by adding the areas of all faces, including hidden faces. Check that each face is counted exactly once.",
+      "<strong>Wednesday, October 21: Mixed Review and Test Preparation</strong><br>Complete mixed practice covering the topics learned so far. Compare strategies, correct mistakes, and ask questions. Review the difference between surface area and volume, including square units versus cubic units. Identify which skills you need to practice before Friday's test.",
+      "<strong>Thursday, October 22: Field Trip to Fenway Park</strong>",
+      "<strong>Friday, October 23: Test – Area, Surface Area, and Geometry</strong><br>Demonstrate your understanding of the topics reviewed this week. Work independently, show your calculations and reasoning, label answers with the correct units, and check your work."
+    ],
+    "homework": "Complete assigned DeltaMath review practice. Study your class notes and corrected review problems for Friday's test, focusing on skills you still find challenging. Bring your notebook, paper, and a sharpened pencil to every class.",
+    "languageObjectives": [
+      "Students will explain and justify area strategies using the terms base, perpendicular height, decompose, and square units.",
+      "Students will describe quadrilateral properties and polyhedra using precise vocabulary, including parallel, congruent, supplementary, face, edge, vertex, prism, pyramid, and net.",
+      "Students will compare solutions, explain corrections, and distinguish surface area from volume using appropriate mathematical terms and units."
+    ]
+  }
+,
 
   {
     "weekTitle": "Week 6 – October 12 to October 16",
