@@ -1,11 +1,11 @@
 [
-{
+  {
     "weekTitle": "Week 8 – October 26 to October 30",
     "objectives": "Students will demonstrate their understanding of Unit 1 concepts on the delayed test and begin Unit 2 by exploring ratios. Students will compare two quantities, use ratio language accurately, and represent ratios with words, symbols, collections, and diagrams. A readiness check will help identify strengths and areas that need support before beginning the new unit.",
     "agenda": [
       "<strong>Monday, October 26: Unit 1 Test – Area, Surface Area, and Geometry</strong><br>Complete the delayed Unit 1 test. Work independently, show calculations and reasoning, label answers with the correct units, and check each response before turning in the test.",
       "<strong>Tuesday, October 27: Unit 2 Check Your Understanding</strong><br>Complete a short readiness check for Unit 2: Introducing Ratios. Compare quantities, organize objects into categories, describe relationships between groups, and explain your thinking. This activity will show what we already understand and what we need to review.",
-      "<strong>Wednesday, October 28: Lesson 1 – Introducing Ratios and Ratio Language</strong><br>Sort collections into categories and compare the amounts. Write ratio statements using words and symbols, including “to,” “for every,” and the colon notation a:b.",
+      "<strong>Wednesday, October 28: Lesson 1 – Introducing Ratios and Ratio Language</strong><br>Sort collections into categories and compare the amounts. Write ratio statements using words and symbols, including the words to and for every, as well as the colon notation a:b.",
       "<strong>Thursday, October 29: Lesson 1 – Describing and Displaying Ratios</strong><br>Describe the same collection with more than one correct ratio statement. Create a visual display that matches a ratio and explain how the display represents the relationship between two quantities.",
       "<strong>Friday, October 30: Lesson 2 – Representing Ratios with Diagrams</strong><br>Use diagrams to represent ratios. Match ratio statements to diagrams, create diagrams for given ratios, and explain how the groups in a diagram show the relationship between quantities."
     ],
@@ -15,8 +15,7 @@
       "Students will read, write, and say ratio statements using the phrases ratio of, to, and for every, as well as colon notation.",
       "Students will describe how a collection or diagram represents a relationship between two quantities and compare equivalent descriptions of the same ratio."
     ]
-  }
-  ,
+  },
   {
     "weekTitle": "Week 7 – October 19 to October 23",
     "objectives": "Students will review and demonstrate their understanding of area, quadrilateral properties, polyhedra, nets, and surface area. They will choose appropriate formulas and strategies, identify corresponding bases and perpendicular heights, decompose figures, and account for every face of a solid. Students will explain their reasoning, correct errors, and use appropriate units as they prepare for Friday's test.",
@@ -33,9 +32,7 @@
       "Students will describe quadrilateral properties and polyhedra using precise vocabulary, including parallel, congruent, supplementary, face, edge, vertex, prism, pyramid, and net.",
       "Students will compare solutions, explain corrections, and distinguish surface area from volume using appropriate mathematical terms and units."
     ]
-  }
-,
-
+  },
   {
     "weekTitle": "Week 6 – October 12 to October 16",
     "objectives": "By the end of the week, students will identify faces, edges, and vertices of polyhedra; connect solids to their nets; and calculate the surface area of prisms and pyramids by adding the areas of all faces. Students will explain their calculations and label answers in square units. If time allows, students will distinguish surface area from volume.",
@@ -52,12 +49,8 @@
       "Students will explain and compare surface-area strategies, stating how each face was counted and why the total is measured in square units.",
       "If ready for the optional extension, students will explain the difference between surface area and volume using the phrases covering the outside and occupying space, and the terms square units and cubic units."
     ]
-  }
-
-  ,
-
-    
-{
+  },
+  {
     "weekTitle": "Week 5 – October 5 to October 9",
     "objectives": "By the end of the week, students will describe surface area as the total area of all the faces of a polyhedron, identify faces, edges, and vertices, and connect three-dimensional solids to their two-dimensional nets. Students will calculate surface area by adding the areas of all faces and label answers in square units. As an optional extension, students will distinguish surface area from volume.",
     "agenda": [
@@ -74,8 +67,7 @@
       "As an optional extension, students will compare surface area and volume using the phrases covering the outside and occupying space, and distinguish square units from cubic units."
     ]
   },
-     
-     {
+  {
     "weekTitle": "Week 4 – September 28 to October 2",
     "objectives": "By the end of the week, students will explain how triangle area relates to parallelogram area, identify a base and its corresponding perpendicular height, use A = (b × h) ÷ 2 to find triangle areas, and find polygon areas by decomposing them into simpler shapes. Students will explain their reasoning and label areas in square units.",
     "agenda": [
@@ -92,8 +84,7 @@
       "Students will compare and justify polygon area strategies using the terms decompose, non-overlapping, polygon, and square units."
     ]
   },
-
-    {
+  {
     "weekTitle": "Week 3 – September 21 to September 25",
     "objectives": "By the end of the week, students will calculate the area of parallelograms, use the properties of parallelograms to find missing side and angle measures, and classify different types of quadrilaterals.",
     "agenda": [
@@ -109,7 +100,7 @@
       "Students will justify missing measures and classifications using the terms opposite, consecutive, parallel, congruent, supplementary, and quadrilateral."
     ]
   },
-    {
+  {
     "weekTitle": "Week 2 – September 14 to September 18",
     "objectives": "By the end of the week, students will explain the meaning of area and use tiling, decomposing, rearranging, enclosing, and subtracting to find and compare the areas of two-dimensional figures.",
     "agenda": [
@@ -124,10 +115,7 @@
       "Students will explain that area is the amount of the plane covered by a two-dimensional region.",
       "Students will compare and explain area strategies using the terms tile, compose, decompose, rearrange, and square units."
     ]
-  }
-
-,
-
+  },
   {
     "weekTitle": "Week 1 – September 8 to September 11",
     "objectives": "By the end of the week, students will build our classroom community, learn the routines and materials needed for math class, set up DeltaMath, and demonstrate what they remember from Grade 5 math.",
@@ -145,6 +133,4 @@
       "Students will explain their mathematical thinking and describe the strategies they use."
     ]
   }
-
-  
 ]
