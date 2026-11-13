@@ -3,1155 +3,801 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>10x10 3-Locker Pattern Pad</title>
+  <title>10x10 Swipe Pattern Data Vault</title>
   <style>
     :root {
       --bg: #0f172a;
       --panel: #1e293b;
-      --panel-alt: #162032;
-      --border: #334155;
+      --panel-border: #334155;
       --text: #f8fafc;
       --muted: #94a3b8;
       --accent: #38bdf8;
       --accent-glow: rgba(56, 189, 248, 0.35);
-      --success: #34d399;
-      --danger: #f87171;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --node-bg: #0f172a;
+      --node-border: #475569;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
-      align-items: center;
       justify-content: center;
-      padding: 16px;
+      align-items: flex-start;
+      padding: 24px 16px;
     }
 
     .container {
       width: 100%;
-      max-width: 460px;
+      max-width: 520px;
       background: var(--panel);
-      border: 1px solid var(--border);
+      border: 1px solid var(--panel-border);
       border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
     }
 
     .header {
-      text-align: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 12px;
     }
 
     .header h1 {
       font-size: 1.2rem;
       font-weight: 600;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.01em;
     }
 
-    .header p {
-      font-size: 0.84rem;
+    .btn {
+      background: #334155;
+      color: var(--text);
+      border: 1px solid #475569;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn:hover {
+      background: #475569;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0f172a;
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      background: #7dd3fc;
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #052e16;
+      border-color: var(--success);
+      font-weight: 600;
+    }
+
+    .btn-success:hover {
+      background: #4ade80;
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 0.78rem;
+    }
+
+    /* Data Display & Setup Rows */
+    .section-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
       color: var(--muted);
-      margin-top: 4px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    /* 3-Locker Combination Display */
-    .lockers-display {
-      width: 100%;
+    .rows-container {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      padding: 12px 14px;
-      border-radius: 12px;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
-    .locker-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
       gap: 10px;
     }
 
-    .locker-label {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--muted);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      min-width: 68px;
-    }
-
-    .tumbler-group {
-      display: flex;
+    .data-row {
+      display: grid;
+      grid-template-columns: 64px repeat(3, 1fr);
       align-items: center;
       gap: 8px;
     }
 
-    .tumbler {
-      background: var(--panel-alt);
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      width: 54px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.25rem;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-      color: var(--accent);
-      letter-spacing: 0.04em;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .tumbler.active {
-      border-color: var(--accent);
-      box-shadow: 0 0 10px var(--accent-glow);
-    }
-
-    .dash {
+    .row-label {
+      font-size: 0.85rem;
       color: var(--muted);
-      font-weight: 700;
+      font-weight: 500;
+    }
+
+    .value-box {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .value-box.placeholder {
+      color: #475569;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--node-border);
+      border-radius: 8px;
+      padding: 9px 6px;
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 1rem;
+      text-align: center;
+      outline: none;
+    }
+
+    input[type="number"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-glow);
     }
 
     /* 10x10 Swipe Grid */
     .grid-wrapper {
+      position: relative;
       width: 100%;
       aspect-ratio: 1 / 1;
       background: var(--bg);
-      border: 1px solid var(--border);
+      border: 1px solid var(--panel-border);
       border-radius: 12px;
-      position: relative;
-      overflow: hidden;
+      touch-action: none;
       user-select: none;
-      -webkit-user-select: none;
+      overflow: hidden;
     }
 
-    canvas {
+    .swipe-svg {
+      position: absolute;
+      inset: 0;
       width: 100%;
       height: 100%;
-      display: block;
-      touch-action: none;
-      cursor: crosshair;
-      user-select: none;
-      -webkit-user-select: none;
+      pointer-events: none;
+      z-index: 1;
     }
 
-    .controls {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-
-    button {
-      background: var(--bg);
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-      user-select: none;
-      -webkit-user-select: none;
-      transition: border-color 0.2s, background 0.2s;
-    }
-
-    button:hover {
-      border-color: var(--accent);
-      background: #172338;
-    }
-
-    button.primary {
-      background: rgba(56, 189, 248, 0.16);
-      border-color: var(--accent);
-      color: var(--accent);
-      font-weight: 600;
-    }
-
-    button.primary:hover {
-      background: rgba(56, 189, 248, 0.28);
-    }
-
-    button.success {
-      background: rgba(52, 211, 153, 0.16);
-      border-color: var(--success);
-      color: var(--success);
-      font-weight: 600;
-    }
-
-    button.success:hover {
-      background: rgba(52, 211, 153, 0.26);
-    }
-
-    /* Step-by-Step Setup Wizard */
-    .setup-panel {
-      display: none;
-      width: 100%;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      flex-direction: column;
-      gap: 14px;
-      font-size: 0.85rem;
-    }
-
-    .setup-panel.visible {
-      display: flex;
-    }
-
-    .progress-bar {
+    .grid-nodes {
+      position: relative;
+      z-index: 2;
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
-    }
-
-    .step-chip {
-      background: var(--panel-alt);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 6px 4px;
-      text-align: center;
-      font-size: 0.74rem;
-      font-weight: 600;
-      color: var(--muted);
-      cursor: pointer;
-    }
-
-    .step-chip.current {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: rgba(56, 189, 248, 0.12);
-    }
-
-    .step-chip.done {
-      border-color: rgba(52, 211, 153, 0.5);
-      color: var(--success);
-    }
-
-    .saved-summary {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .summary-pill {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: var(--panel-alt);
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      padding: 6px 10px;
-      font-size: 0.8rem;
-      cursor: pointer;
-    }
-
-    .summary-pill:hover {
-      border-color: var(--accent);
-    }
-
-    .summary-pill strong {
-      color: var(--success);
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 0.85rem;
-    }
-
-    .wizard-card {
-      background: var(--panel-alt);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .wizard-title {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    .hint {
-      color: var(--muted);
-      font-size: 0.8rem;
-      line-height: 1.4;
-    }
-
-    .single-lock-inputs {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin: 4px 0;
-    }
-
-    .field-col {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .field-col label {
-      font-size: 0.72rem;
-      color: var(--muted);
-    }
-
-    input[type="text"],
-    input[type="number"],
-    textarea {
-      user-select: text !important;
-      -webkit-user-select: text !important;
-      touch-action: manipulation;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      border-radius: 8px;
-      font-size: 16px;
-      outline: none;
-    }
-
-    input[type="text"]:focus,
-    input[type="number"]:focus,
-    textarea:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
-    }
-
-    .single-lock-inputs input {
-      width: 68px;
-      height: 48px;
-      text-align: center;
-      font-size: 1.2rem;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .wizard-actions {
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    .wizard-actions button {
-      flex: 1;
-    }
-
-    .swipe-status-box {
-      background: var(--bg);
-      border: 1px dashed var(--border);
-      border-radius: 8px;
-      padding: 10px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 0.8rem;
-      color: var(--accent);
-      text-align: center;
-      word-break: break-all;
-    }
-
-    .swipe-status-box.paired {
-      border-style: solid;
-      border-color: var(--success);
-      color: var(--success);
-    }
-
-    .decoy-setting {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    .decoy-setting input {
-      width: 74px;
-      height: 36px;
-      text-align: center;
-    }
-
-    textarea {
+      grid-template-columns: repeat(10, 1fr);
+      grid-template-rows: repeat(10, 1fr);
       width: 100%;
-      height: 120px;
-      background: #090e1a;
+      height: 100%;
       padding: 8px;
-      color: #a5f3fc;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 11px;
-      resize: vertical;
     }
 
-    .feedback {
-      font-size: 0.8rem;
+    .node-cell {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .node-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--node-bg);
+      border: 2px solid var(--node-border);
+      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+    }
+
+    .node-dot.active {
+      background: var(--accent);
+      border-color: #e0f2fe;
+      transform: scale(1.35);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .node-dot.start {
+      background: var(--success);
+      border-color: #dcfce7;
+    }
+
+    .status-bar {
+      margin-top: 12px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 24px;
+    }
+
+    .status-msg.error {
       color: var(--danger);
-      min-height: 1.1em;
+    }
+
+    .status-msg.ok {
+      color: var(--success);
+    }
+
+    .setup-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .setup-actions .btn {
+      flex: 1;
       text-align: center;
+    }
+
+    .hidden {
+      display: none !important;
     }
   </style>
 </head>
 <body>
-
   <div class="container">
     <div class="header">
-      <h1>Locker Combination Pad</h1>
-      <p id="subtitleText">Swipe your secret pattern on the 10&times;10 grid to view all 3 locks</p>
+      <h1 id="modeTitle">Swipe Pattern Input</h1>
+      <button id="toggleModeBtn" class="btn">Setup Mode</button>
     </div>
 
-    <!-- 3 Lockers x 3 Numbers Display -->
-    <div class="lockers-display">
-      <div class="locker-row">
-        <span class="locker-label">Lock 1</span>
-        <div class="tumbler-group">
-          <div class="tumbler" id="t0_0">--</div>
-          <span class="dash">-</span>
-          <div class="tumbler" id="t0_1">--</div>
-          <span class="dash">-</span>
-          <div class="tumbler" id="t0_2">--</div>
-        </div>
+    <!-- UNLOCK / DISPLAY VIEW -->
+    <div id="unlockSection" class="section-card">
+      <div class="section-title">
+        <span>Output Data (0 – 30)</span>
+        <span id="outputStateLabel">Awaiting Swipe</span>
       </div>
-      <div class="locker-row">
-        <span class="locker-label">Lock 2</span>
-        <div class="tumbler-group">
-          <div class="tumbler" id="t1_0">--</div>
-          <span class="dash">-</span>
-          <div class="tumbler" id="t1_1">--</div>
-          <span class="dash">-</span>
-          <div class="tumbler" id="t1_2">--</div>
-        </div>
-      </div>
-      <div class="locker-row">
-        <span class="locker-label">Lock 3</span>
-        <div class="tumbler-group">
-          <div class="tumbler" id="t2_0">--</div>
-          <span class="dash">-</span>
-          <div class="tumbler" id="t2_1">--</div>
-          <span class="dash">-</span>
-          <div class="tumbler" id="t2_2">--</div>
-        </div>
-      </div>
+      <div id="outputRows" class="rows-container"></div>
     </div>
 
-    <div class="grid-wrapper">
-      <canvas id="patternCanvas"></canvas>
-    </div>
-
-    <div class="controls">
-      <button id="clearBtn" type="button">Clear Display</button>
-      <button id="toggleSetupBtn" type="button">Setup Mode</button>
-    </div>
-
-    <!-- Guided Step-by-Step Setup Wizard -->
-    <div class="setup-panel" id="setupPanel">
-      <div class="progress-bar">
-        <div class="step-chip current" data-step="0">1. Lock 1</div>
-        <div class="step-chip" data-step="1">2. Lock 2</div>
-        <div class="step-chip" data-step="2">3. Lock 3</div>
-        <div class="step-chip" data-step="3">4. Swipe &amp; JSON</div>
-      </div>
-
-      <!-- Summary of already-entered locks -->
-      <div class="saved-summary" id="savedSummary"></div>
-
-      <!-- Steps 0, 1, 2: Enter one lock at a time -->
-      <div class="wizard-card" id="lockStepCard">
-        <div class="wizard-title" id="lockStepTitle">Step 1: Set Lock 1 Combination</div>
-        <div class="hint">Enter the 3 integers for <strong id="lockStepLabel">Lock 1</strong> (each between <strong>0</strong> and <strong>30</strong> inclusive):</div>
-
-        <div class="single-lock-inputs">
-          <div class="field-col">
-            <label for="numInput0">1st #</label>
-            <input type="text" id="numInput0" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="0–30" />
-          </div>
-          <span class="dash" style="margin-top:16px;">-</span>
-          <div class="field-col">
-            <label for="numInput1">2nd #</label>
-            <input type="text" id="numInput1" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="0–30" />
-          </div>
-          <span class="dash" style="margin-top:16px;">-</span>
-          <div class="field-col">
-            <label for="numInput2">3rd #</label>
-            <input type="text" id="numInput2" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="0–30" />
-          </div>
-        </div>
-
-        <div class="feedback" id="stepFeedback"></div>
-
-        <div class="wizard-actions">
-          <button type="button" id="prevStepBtn" style="display:none;">&larr; Back</button>
-          <button type="button" id="nextStepBtn" class="primary">Save Lock 1 &amp; Next &rarr;</button>
+    <!-- SETUP VIEW -->
+    <div id="setupSection" class="section-card hidden">
+      <div class="section-title">
+        <span>Step 1: Enter Row Values (0 – 30)</span>
+        <div>
+          <button id="toggleRowCountBtn" class="btn btn-sm" type="button">Use 5 Rows</button>
         </div>
       </div>
+      <div id="setupRows" class="rows-container"></div>
+    </div>
 
-      <!-- Step 3: Pair Swipe & Download JSON -->
-      <div class="wizard-card" id="swipeStepCard" style="display:none;">
-        <div class="wizard-title">Step 4: Pair Secret Swipe &amp; Download JSON</div>
-        <div class="hint">Draw your secret swipe pattern on the 10&times;10 grid above to associate it with all 3 locks:</div>
+    <!-- SHARED 10x10 SWIPE PAD -->
+    <div class="section-card" style="margin-bottom: 0;">
+      <div class="section-title">
+        <span id="gridInstruction">Draw 10×10 Pattern to Retrieve Data</span>
+        <button id="clearPatternBtn" class="btn btn-sm hidden" type="button">Clear Swipe</button>
+      </div>
 
-        <div class="swipe-status-box" id="swipeStatusBox">Waiting for swipe on the 10&times;10 grid above...</div>
+      <div id="gridWrapper" class="grid-wrapper">
+        <svg id="swipeSvg" class="swipe-svg"></svg>
+        <div id="gridNodes" class="grid-nodes"></div>
+      </div>
 
-        <div class="decoy-setting">
-          <span class="hint">Scrambled decoy entries in JSON:</span>
-          <input type="number" id="decoyCountInput" min="10" max="250" value="50" />
-        </div>
+      <div class="status-bar">
+        <span id="statusMsg" class="status-msg">Drag across dots on the 10×10 grid.</span>
+        <span id="nodeCountBadge"></span>
+      </div>
 
-        <div class="feedback" id="exportFeedback"></div>
-
-        <div class="wizard-actions">
-          <button type="button" id="backToLock3Btn">&larr; Edit Locks</button>
-          <button type="button" id="downloadJsonBtn" class="success">Download .JSON</button>
-        </div>
-        <div class="wizard-actions">
-          <button type="button" id="copyJsonBtn">Copy JSON</button>
-          <button type="button" id="testLiveBtn">Test Live Now</button>
-        </div>
-
-        <textarea id="jsonPreviewArea" readonly placeholder="Swipe your pattern above to generate the JSON with real + scrambled values..."></textarea>
+      <div id="setupActions" class="setup-actions hidden">
+        <button id="applySessionBtn" class="btn btn-primary" type="button">Save & Test Now</button>
+        <button id="downloadJsonBtn" class="btn btn-success" type="button">Download JSON</button>
       </div>
     </div>
   </div>
 
   <script>
-    /**
-     * =========================================================================
-     * HARDCODE YOUR DOWNLOADED JSON OBJECT HERE
-     * Replace the object assigned to LOCKER_CONFIG with the contents of your
-     * downloaded `locker-config.json` file.
-     * =========================================================================
-     */
-    const LOCKER_CONFIG = {
-      "wrongSwipeStaticCombos": [
-        ["07", "19", "28"],
-        ["14", "03", "25"],
-        ["22", "11", "30"]
-      ],
-      "entries": [
-        {
-          "pattern": [31, 41, 52, 63, 64, 54],
-          "combos": [
-            ["19", "04", "27"],
-            ["08", "23", "15"],
-            ["30", "12", "01"]
-          ]
-        },
-        {
-          "pattern": [0, 1, 2, 12, 22, 23, 24],
-          "combos": [
-            ["05", "18", "29"],
-            ["12", "03", "24"],
-            ["27", "14", "08"]
-          ]
-        },
-        {
-          "pattern": [88, 77, 66, 65, 55, 45],
-          "combos": [
-            ["21", "10", "02"],
-            ["16", "28", "09"],
-            ["04", "26", "17"]
-          ]
-        }
+    // =========================================================================
+    // HARDCODED CONFIGURATION
+    // After downloading your JSON file from Setup Mode, open it and paste its
+    // contents to replace the object assigned to HARDCODED_CONFIG below.
+    // =========================================================================
+    const HARDCODED_CONFIG = {
+      "pattern": [11, 12, 13, 23, 33, 43, 44, 45],
+      "rows": [
+        [7, 19, 28],
+        [3, 14, 30],
+        [22, 0, 16]
       ]
     };
 
-    // =========================================================================
-    // APPLICATION STATE & DOM REFERENCES
-    // =========================================================================
-    const GRID_SIZE = 10;
-    const MIN_VAL = 0;
-    const MAX_VAL = 30;
-
-    let activeConfig = JSON.parse(JSON.stringify(LOCKER_CONFIG));
-
-    const canvas = document.getElementById("patternCanvas");
-    const ctx = canvas.getContext("2d");
-    const subtitleText = document.getElementById("subtitleText");
-
-    const tumblerGrid = [
-      [document.getElementById("t0_0"), document.getElementById("t0_1"), document.getElementById("t0_2")],
-      [document.getElementById("t1_0"), document.getElementById("t1_1"), document.getElementById("t1_2")],
-      [document.getElementById("t2_0"), document.getElementById("t2_1"), document.getElementById("t2_2")]
+    // Static decoy values shown whenever any non-matching swipe is entered
+    const STATIC_DECOY_ROWS = [
+      [11, 24, 6],
+      [18, 9, 27],
+      [4, 21, 15]
     ];
 
-    const clearBtn = document.getElementById("clearBtn");
-    const toggleSetupBtn = document.getElementById("toggleSetupBtn");
-    const setupPanel = document.getElementById("setupPanel");
-
-    // Wizard DOM elements
-    const stepChips = Array.from(document.querySelectorAll(".step-chip"));
-    const savedSummary = document.getElementById("savedSummary");
-    const lockStepCard = document.getElementById("lockStepCard");
-    const swipeStepCard = document.getElementById("swipeStepCard");
-    const lockStepTitle = document.getElementById("lockStepTitle");
-    const lockStepLabel = document.getElementById("lockStepLabel");
-    const stepInputs = [
-      document.getElementById("numInput0"),
-      document.getElementById("numInput1"),
-      document.getElementById("numInput2")
-    ];
-    const stepFeedback = document.getElementById("stepFeedback");
-    const prevStepBtn = document.getElementById("prevStepBtn");
-    const nextStepBtn = document.getElementById("nextStepBtn");
-
-    const swipeStatusBox = document.getElementById("swipeStatusBox");
-    const decoyCountInput = document.getElementById("decoyCountInput");
-    const exportFeedback = document.getElementById("exportFeedback");
-    const backToLock3Btn = document.getElementById("backToLock3Btn");
-    const downloadJsonBtn = document.getElementById("downloadJsonBtn");
-    const copyJsonBtn = document.getElementById("copyJsonBtn");
-    const testLiveBtn = document.getElementById("testLiveBtn");
-    const jsonPreviewArea = document.getElementById("jsonPreviewArea");
-
-    let nodes = [];
-    let selectedNodes = [];
-    let isDragging = false;
-    let pointerPos = null;
+    // =========================================================================
+    // APPLICATION STATE
+    // =========================================================================
+    let activeConfig = JSON.parse(JSON.stringify(HARDCODED_CONFIG));
     let isSetupMode = false;
+    let setupRowCount = 3; // Defaults to 3 rows; can toggle between 3 and 5
+    let isDrawing = false;
+    let currentPattern = [];
+    let setupPattern = [];
+    let pointerPos = null;
 
-    // Wizard state
-    let currentStep = 0; // 0 = Lock 1, 1 = Lock 2, 2 = Lock 3, 3 = Swipe & Export
-    let stagedCombos = [null, null, null];
-    let pairedSwipePattern = null;
-    let latestJsonString = "";
+    // DOM Elements
+    const modeTitle = document.getElementById("modeTitle");
+    const toggleModeBtn = document.getElementById("toggleModeBtn");
+    const unlockSection = document.getElementById("unlockSection");
+    const setupSection = document.getElementById("setupSection");
+    const outputRowsEl = document.getElementById("outputRows");
+    const outputStateLabel = document.getElementById("outputStateLabel");
+    const setupRowsEl = document.getElementById("setupRows");
+    const toggleRowCountBtn = document.getElementById("toggleRowCountBtn");
+    const gridInstruction = document.getElementById("gridInstruction");
+    const clearPatternBtn = document.getElementById("clearPatternBtn");
+    const gridWrapper = document.getElementById("gridWrapper");
+    const gridNodesEl = document.getElementById("gridNodes");
+    const swipeSvg = document.getElementById("swipeSvg");
+    const statusMsg = document.getElementById("statusMsg");
+    const nodeCountBadge = document.getElementById("nodeCountBadge");
+    const setupActions = document.getElementById("setupActions");
+    const applySessionBtn = document.getElementById("applySessionBtn");
+    const downloadJsonBtn = document.getElementById("downloadJsonBtn");
 
     // =========================================================================
-    // CANVAS & SWIPE LOGIC
+    // INITIALIZE 10x10 GRID
     // =========================================================================
-    function resizeCanvas() {
-      const rect = canvas.parentElement.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      computeNodes(rect.width);
-      draw();
-    }
+    const nodeElements = [];
 
-    function computeNodes(size) {
-      nodes = [];
-      const padding = size * 0.075;
-      const usableSpan = size - padding * 2;
-      const step = usableSpan / (GRID_SIZE - 1);
-      const hitRadius = step * 0.32;
+    function buildGrid() {
+      gridNodesEl.innerHTML = "";
+      nodeElements.length = 0;
 
-      for (let row = 0; row < GRID_SIZE; row++) {
-        for (let col = 0; col < GRID_SIZE; col++) {
-          nodes.push({
-            id: row * GRID_SIZE + col,
-            x: padding + col * step,
-            y: padding + row * step,
-            hitRadius
-          });
-        }
+      for (let i = 0; i < 100; i++) {
+        const cell = document.createElement("div");
+        cell.className = "node-cell";
+
+        const dot = document.createElement("div");
+        dot.className = "node-dot";
+        dot.dataset.index = i;
+
+        cell.appendChild(dot);
+        gridNodesEl.appendChild(cell);
+        nodeElements.push(dot);
       }
     }
 
-    function getPointerCoords(e) {
-      const rect = canvas.getBoundingClientRect();
+    // =========================================================================
+    // RENDER OUTPUT & SETUP INPUTS
+    // =========================================================================
+    function renderPlaceholderOutput(rowCount = activeConfig.rows.length) {
+      outputRowsEl.innerHTML = "";
+      for (let r = 0; r < rowCount; r++) {
+        const rowDiv = document.createElement("div");
+        rowDiv.className = "data-row";
+        rowDiv.innerHTML = `
+          <span class="row-label">Row ${r + 1}</span>
+          <div class="value-box placeholder">--</div>
+          <div class="value-box placeholder">--</div>
+          <div class="value-box placeholder">--</div>
+        `;
+        outputRowsEl.appendChild(rowDiv);
+      }
+    }
+
+    function renderResultRows(rows) {
+      outputRowsEl.innerHTML = "";
+      rows.forEach((triple, idx) => {
+        const rowDiv = document.createElement("div");
+        rowDiv.className = "data-row";
+        rowDiv.innerHTML = `
+          <span class="row-label">Row ${idx + 1}</span>
+          <div class="value-box">${String(triple[0]).padStart(2, "0")}</div>
+          <div class="value-box">${String(triple[1]).padStart(2, "0")}</div>
+          <div class="value-box">${String(triple[2]).padStart(2, "0")}</div>
+        `;
+        outputRowsEl.appendChild(rowDiv);
+      });
+      outputStateLabel.textContent = "Data Loaded";
+    }
+
+    function renderSetupInputs() {
+      // Preserve any already-typed values if toggling row count
+      const existingValues = readSetupInputsRaw();
+      setupRowsEl.innerHTML = "";
+
+      for (let r = 0; r < setupRowCount; r++) {
+        const rowDiv = document.createElement("div");
+        rowDiv.className = "data-row";
+
+        const label = document.createElement("span");
+        label.className = "row-label";
+        label.textContent = `Row ${r + 1}`;
+        rowDiv.appendChild(label);
+
+        for (let c = 0; c < 3; c++) {
+          const input = document.createElement("input");
+          input.type = "number";
+          input.min = "0";
+          input.max = "30";
+          input.step = "1";
+          input.placeholder = "0-30";
+          input.dataset.row = r;
+          input.dataset.col = c;
+
+          if (existingValues[r] && existingValues[r][c] !== "") {
+            input.value = existingValues[r][c];
+          } else if (activeConfig.rows[r] && activeConfig.rows[r][c] !== undefined) {
+            input.value = activeConfig.rows[r][c];
+          }
+
+          rowDiv.appendChild(input);
+        }
+        setupRowsEl.appendChild(rowDiv);
+      }
+    }
+
+    function readSetupInputsRaw() {
+      const matrix = [];
+      const inputs = setupRowsEl.querySelectorAll("input[type='number']");
+      inputs.forEach((inp) => {
+        const r = Number(inp.dataset.row);
+        const c = Number(inp.dataset.col);
+        if (!matrix[r]) matrix[r] = [];
+        matrix[r][c] = inp.value.trim();
+      });
+      return matrix;
+    }
+
+    function validateSetupData() {
+      const raw = readSetupInputsRaw();
+      const parsedRows = [];
+
+      for (let r = 0; r < setupRowCount; r++) {
+        const row = [];
+        for (let c = 0; c < 3; c++) {
+          const valStr = raw[r]?.[c] ?? "";
+          if (valStr === "") {
+            return { ok: false, error: `Row ${r + 1}, Value ${c + 1} is empty.` };
+          }
+          const num = Number(valStr);
+          if (!Number.isInteger(num) || num < 0 || num > 30) {
+            return { ok: false, error: `Row ${r + 1}, Value ${c + 1} must be an integer between 0 and 30.` };
+          }
+          row.push(num);
+        }
+        parsedRows.push(row);
+      }
+
+      if (setupPattern.length < 2) {
+        return { ok: false, error: "Draw a swipe pattern connecting at least 2 dots at the bottom." };
+      }
+
       return {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
+        ok: true,
+        config: {
+          pattern: [...setupPattern],
+          rows: parsedRows
+        }
       };
     }
 
-    function checkNodeHit(pos) {
-      for (const node of nodes) {
-        if (selectedNodes.includes(node.id)) continue;
-        const dx = pos.x - node.x;
-        const dy = pos.y - node.y;
-        if (Math.hypot(dx, dy) <= node.hitRadius) {
-          selectedNodes.push(node.id);
+    // =========================================================================
+    // SWIPE GEOMETRY & DRAWING
+    // =========================================================================
+    function getNodeCenter(index) {
+      const wrapperRect = gridWrapper.getBoundingClientRect();
+      const dotRect = nodeElements[index].getBoundingClientRect();
+      return {
+        x: dotRect.left - wrapperRect.left + dotRect.width / 2,
+        y: dotRect.top - wrapperRect.top + dotRect.height / 2
+      };
+    }
+
+    function getHitRadius() {
+      const wrapperRect = gridWrapper.getBoundingClientRect();
+      const cellSize = wrapperRect.width / 10;
+      return cellSize * 0.34;
+    }
+
+    function getRelativePointer(clientX, clientY) {
+      const rect = gridWrapper.getBoundingClientRect();
+      return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+      };
+    }
+
+    function checkNodeHit(pt) {
+      const radius = getHitRadius();
+      for (let i = 0; i < 100; i++) {
+        if (currentPattern.includes(i)) continue;
+        const center = getNodeCenter(i);
+        const dist = Math.hypot(pt.x - center.x, pt.y - center.y);
+        if (dist <= radius) {
+          currentPattern.push(i);
+          updateGridVisuals(currentPattern, isDrawing ? pt : null);
           break;
         }
       }
     }
 
-    function resolveThreeCombos(pattern) {
-      const matchedEntry = activeConfig.entries.find(
-        (entry) =>
-          entry.pattern.length === pattern.length &&
-          entry.pattern.every((val, idx) => val === pattern[idx])
-      );
-      return matchedEntry
-        ? matchedEntry.combos
-        : activeConfig.wrongSwipeStaticCombos;
-    }
-
-    function displayThreeCombos(combosMatrix) {
-      tumblerGrid.forEach((rowEls, lockerIdx) => {
-        rowEls.forEach((el, numIdx) => {
-          el.classList.remove("active");
-          let ticks = 0;
-          const totalTicks = 5 + lockerIdx * 2 + numIdx;
-          const interval = setInterval(() => {
-            el.textContent = String(Math.floor(Math.random() * 31)).padStart(2, "0");
-            ticks++;
-            if (ticks >= totalTicks) {
-              clearInterval(interval);
-              el.textContent = combosMatrix[lockerIdx][numIdx];
-              el.classList.add("active");
-            }
-          }, 26);
-        });
-      });
-    }
-
-    function resetDisplay() {
-      selectedNodes = [];
-      tumblerGrid.forEach((rowEls) => {
-        rowEls.forEach((el) => {
-          el.textContent = "--";
-          el.classList.remove("active");
-        });
-      });
-      draw();
-    }
-
-    function draw() {
-      const size = canvas.getBoundingClientRect().width;
-      ctx.clearRect(0, 0, size, size);
-
-      if (selectedNodes.length > 0) {
-        ctx.save();
-        ctx.strokeStyle = "#38bdf8";
-        ctx.lineWidth = 3;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.shadowColor = "rgba(56, 189, 248, 0.5)";
-        ctx.shadowBlur = 8;
-
-        ctx.beginPath();
-        selectedNodes.forEach((id, index) => {
-          const n = nodes[id];
-          if (index === 0) ctx.moveTo(n.x, n.y);
-          else ctx.lineTo(n.x, n.y);
-        });
-
-        if (isDragging && pointerPos) {
-          ctx.lineTo(pointerPos.x, pointerPos.y);
-        }
-        ctx.stroke();
-        ctx.restore();
-      }
-
-      for (const node of nodes) {
-        const isSelected = selectedNodes.includes(node.id);
-        const isStart = selectedNodes[0] === node.id;
-
-        if (isSelected) {
-          ctx.beginPath();
-          ctx.arc(node.x, node.y, isStart ? 9 : 7, 0, Math.PI * 2);
-          ctx.fillStyle = "rgba(56, 189, 248, 0.25)";
-          ctx.fill();
-        }
-
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, isSelected ? 4.5 : 3.2, 0, Math.PI * 2);
-        ctx.fillStyle = isSelected ? "#38bdf8" : "#475569";
-        ctx.fill();
-
-        if (isSetupMode) {
-          ctx.fillStyle = isSelected ? "#f8fafc" : "#64748b";
-          ctx.font = "9px monospace";
-          ctx.textAlign = "center";
-          ctx.fillText(node.id, node.x, node.y - 7);
-        }
-      }
-    }
-
-    canvas.addEventListener("pointerdown", (e) => {
-      canvas.setPointerCapture(e.pointerId);
-      isDragging = true;
-      selectedNodes = [];
-      pointerPos = getPointerCoords(e);
-      checkNodeHit(pointerPos);
-      draw();
-    });
-
-    canvas.addEventListener("pointermove", (e) => {
-      if (!isDragging) return;
-      pointerPos = getPointerCoords(e);
-      checkNodeHit(pointerPos);
-      draw();
-    });
-
-    function endSwipe() {
-      if (!isDragging) return;
-      isDragging = false;
-      pointerPos = null;
-
-      if (selectedNodes.length >= 2) {
-        if (isSetupMode) {
-          // If user swipes while still entering locks, save the swipe and jump to Step 4 if all 3 locks are ready
-          pairedSwipePattern = [...selectedNodes];
-          if (stagedCombos.every((c) => c !== null)) {
-            goToStep(3);
+    function updateGridVisuals(pattern, trailingPt = null) {
+      nodeElements.forEach((dot, idx) => {
+        dot.classList.remove("active", "start");
+        if (pattern.includes(idx)) {
+          dot.classList.add("active");
+          if (pattern[0] === idx) {
+            dot.classList.add("start");
           }
-          updateSwipePairedUI();
+        }
+      });
+
+      // Render SVG connecting lines
+      swipeSvg.innerHTML = "";
+      if (pattern.length === 0) {
+        nodeCountBadge.textContent = "";
+        return;
+      }
+
+      nodeCountBadge.textContent = `${pattern.length} dots`;
+
+      const points = pattern.map((idx) => {
+        const c = getNodeCenter(idx);
+        return `${c.x},${c.y}`;
+      });
+
+      if (trailingPt) {
+        points.push(`${trailingPt.x},${trailingPt.y}`);
+      }
+
+      const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+      polyline.setAttribute("points", points.join(" "));
+      polyline.setAttribute("fill", "none");
+      polyline.setAttribute("stroke", "#38bdf8");
+      polyline.setAttribute("stroke-width", "3");
+      polyline.setAttribute("stroke-linecap", "round");
+      polyline.setAttribute("stroke-linejoin", "round");
+      polyline.setAttribute("opacity", "0.85");
+      swipeSvg.appendChild(polyline);
+    }
+
+    function patternsMatch(a, b) {
+      if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false;
+      for (let i = 0; i < a.length; i++) {
+        if (a[i] !== b[i]) return false;
+      }
+      return true;
+    }
+
+    function getDecoyRows(targetRowCount) {
+      const decoy = [];
+      for (let r = 0; r < targetRowCount; r++) {
+        decoy.push(STATIC_DECOY_ROWS[r % STATIC_DECOY_ROWS.length]);
+      }
+      return decoy;
+    }
+
+    function handleSwipeComplete() {
+      if (currentPattern.length < 2) {
+        currentPattern = [];
+        updateGridVisuals([]);
+        return;
+      }
+
+      if (isSetupMode) {
+        setupPattern = [...currentPattern];
+        updateGridVisuals(setupPattern, null);
+        setStatus(`Pattern recorded (${setupPattern.length} dots). Ready to save or download JSON.`, "ok");
+      } else {
+        const isMatch = patternsMatch(currentPattern, activeConfig.pattern);
+        if (isMatch) {
+          renderResultRows(activeConfig.rows);
         } else {
-          const resultMatrix = resolveThreeCombos(selectedNodes);
-          displayThreeCombos(resultMatrix);
+          renderResultRows(getDecoyRows(activeConfig.rows.length));
         }
-      } else {
-        selectedNodes = [];
-      }
-      draw();
-    }
+        setStatus("Swipe processed.", "");
 
-    canvas.addEventListener("pointerup", endSwipe);
-    canvas.addEventListener("pointercancel", endSwipe);
-
-    // =========================================================================
-    // GUIDED ONE-LOCK-AT-A-TIME SETUP WIZARD
-    // =========================================================================
-    stepInputs.forEach((input, idx) => {
-      input.addEventListener("input", () => {
-        const digits = input.value.replace(/\D/g, "").slice(0, 2);
-        input.value = digits;
-        stepFeedback.textContent = "";
-        if (digits.length === 2 && idx < stepInputs.length - 1) {
-          stepInputs[idx + 1].focus();
-        }
-      });
-
-      input.addEventListener("keydown", (e) => {
-        if (e.key === "Backspace" && input.value.length === 0 && idx > 0) {
-          stepInputs[idx - 1].focus();
-        } else if (e.key === "Enter") {
-          nextStepBtn.click();
-        }
-      });
-    });
-
-    function readCurrentLockInputs() {
-      const parsed = [];
-      for (let i = 0; i < 3; i++) {
-        const raw = stepInputs[i].value.trim();
-        if (raw === "" || !/^\d{1,2}$/.test(raw)) {
-          stepFeedback.textContent = `Please enter all 3 numbers for Lock ${currentStep + 1}.`;
-          stepInputs[i].focus();
-          return null;
-        }
-        const num = parseInt(raw, 10);
-        if (num < MIN_VAL || num > MAX_VAL) {
-          stepFeedback.textContent = `Number ${num} is out of range. Each integer must be between 0 and 30 inclusive.`;
-          stepInputs[i].focus();
-          return null;
-        }
-        parsed.push(String(num).padStart(2, "0"));
-      }
-      return parsed;
-    }
-
-    function renderSavedSummary() {
-      savedSummary.innerHTML = "";
-      stagedCombos.forEach((combo, idx) => {
-        if (!combo) return;
-        const pill = document.createElement("div");
-        pill.className = "summary-pill";
-        pill.innerHTML = `<span>Lock ${idx + 1} saved (tap to edit)</span><strong>${combo.join(" - ")}</strong>`;
-        pill.addEventListener("click", () => goToStep(idx));
-        savedSummary.appendChild(pill);
-      });
-    }
-
-    function goToStep(stepIdx) {
-      currentStep = stepIdx;
-      stepFeedback.textContent = "";
-      exportFeedback.textContent = "";
-
-      stepChips.forEach((chip, idx) => {
-        chip.classList.toggle("current", idx === currentStep);
-        const isDone = idx < 3 ? stagedCombos[idx] !== null : pairedSwipePattern !== null;
-        chip.classList.toggle("done", isDone && idx !== currentStep);
-      });
-
-      renderSavedSummary();
-
-      if (currentStep < 3) {
-        lockStepCard.style.display = "flex";
-        swipeStepCard.style.display = "none";
-
-        const lockNum = currentStep + 1;
-        lockStepTitle.textContent = `Step ${lockNum}: Set Lock ${lockNum} Combination`;
-        lockStepLabel.textContent = `Lock ${lockNum}`;
-        prevStepBtn.style.display = currentStep > 0 ? "block" : "none";
-        nextStepBtn.textContent =
-          currentStep < 2
-            ? `Save Lock ${lockNum} & Next →`
-            : "Save Lock 3 & Pair Swipe →";
-
-        const existing = stagedCombos[currentStep];
-        stepInputs.forEach((inp, i) => {
-          inp.value = existing ? existing[i] : "";
-        });
-        setTimeout(() => stepInputs[0].focus(), 30);
-      } else {
-        lockStepCard.style.display = "none";
-        swipeStepCard.style.display = "flex";
-        updateSwipePairedUI();
-      }
-    }
-
-    stepChips.forEach((chip) => {
-      chip.addEventListener("click", () => {
-        const target = parseInt(chip.dataset.step, 10);
-        // Save current lock inputs if valid before jumping
-        if (currentStep < 3 && stepInputs.every((inp) => inp.value.trim() !== "")) {
-          const valid = readCurrentLockInputs();
-          if (valid) stagedCombos[currentStep] = valid;
-        }
-        if (target === 3 && stagedCombos.some((c) => c === null)) {
-          const firstMissing = stagedCombos.findIndex((c) => c === null);
-          goToStep(firstMissing);
-          stepFeedback.textContent = `Finish entering Lock ${firstMissing + 1} first.`;
-          return;
-        }
-        goToStep(target);
-      });
-    });
-
-    prevStepBtn.addEventListener("click", () => {
-      if (currentStep > 0) goToStep(currentStep - 1);
-    });
-
-    nextStepBtn.addEventListener("click", () => {
-      const combo = readCurrentLockInputs();
-      if (!combo) return;
-      stagedCombos[currentStep] = combo;
-      goToStep(currentStep + 1);
-    });
-
-    backToLock3Btn.addEventListener("click", () => goToStep(2));
-
-    // =========================================================================
-    // SCRAMBLED DECOY GENERATION & JSON EXPORT
-    // =========================================================================
-    function generateRealisticDecoyPattern(usedPatternKeys) {
-      for (let attempt = 0; attempt < 200; attempt++) {
-        const targetLen = 5 + Math.floor(Math.random() * 6);
-        const visited = new Set();
-        const path = [];
-
-        let current = Math.floor(Math.random() * (GRID_SIZE * GRID_SIZE));
-        visited.add(current);
-        path.push(current);
-
-        while (path.length < targetLen) {
-          const r = Math.floor(current / GRID_SIZE);
-          const c = current % GRID_SIZE;
-          const neighbors = [];
-
-          for (let dr = -2; dr <= 2; dr++) {
-            for (let dc = -2; dc <= 2; dc++) {
-              if (dr === 0 && dc === 0) continue;
-              const nr = r + dr;
-              const nc = c + dc;
-              if (nr >= 0 && nr < GRID_SIZE && nc >= 0 && nc < GRID_SIZE) {
-                const nid = nr * GRID_SIZE + nc;
-                if (!visited.has(nid)) {
-                  const dist = Math.hypot(dr, dc);
-                  if (dist <= 1.5) {
-                    neighbors.push(nid, nid, nid);
-                  } else if (dist <= 2.25) {
-                    neighbors.push(nid);
-                  }
-                }
-              }
-            }
+        // Clear trail shortly after swipe completes
+        const snapshot = [...currentPattern];
+        updateGridVisuals(snapshot, null);
+        setTimeout(() => {
+          if (!isDrawing && !isSetupMode) {
+            updateGridVisuals([]);
           }
-
-          if (neighbors.length === 0) break;
-          const nextNode = neighbors[Math.floor(Math.random() * neighbors.length)];
-          visited.add(nextNode);
-          path.push(nextNode);
-          current = nextNode;
-        }
-
-        const key = path.join(",");
-        if (path.length >= 4 && !usedPatternKeys.has(key)) {
-          usedPatternKeys.add(key);
-          return path;
-        }
+        }, 450);
       }
-      return null;
+
+      currentPattern = [];
     }
 
-    function generateScrambledCombos() {
-      return [0, 1, 2].map(() =>
-        [0, 1, 2].map(() =>
-          String(Math.floor(Math.random() * (MAX_VAL + 1))).padStart(2, "0")
-        )
-      );
+    function setStatus(text, type = "") {
+      statusMsg.textContent = text;
+      statusMsg.className = "status-msg" + (type ? ` ${type}` : "");
     }
 
-    function shuffleArray(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
+    // =========================================================================
+    // POINTER EVENTS (MOUSE & TOUCH)
+    // =========================================================================
+    function onPointerStart(clientX, clientY) {
+      isDrawing = true;
+      currentPattern = [];
+      const pt = getRelativePointer(clientX, clientY);
+      pointerPos = pt;
+      checkNodeHit(pt);
     }
 
-    function buildExportJson() {
-      if (stagedCombos.some((c) => c === null)) {
-        exportFeedback.style.color = "var(--danger)";
-        exportFeedback.textContent = "Please complete all 3 locks first.";
-        return null;
+    function onPointerMove(clientX, clientY) {
+      if (!isDrawing) return;
+      const pt = getRelativePointer(clientX, clientY);
+      pointerPos = pt;
+      checkNodeHit(pt);
+      if (currentPattern.length > 0) {
+        updateGridVisuals(currentPattern, pt);
       }
-      if (!pairedSwipePattern || pairedSwipePattern.length < 2) {
-        exportFeedback.style.color = "var(--danger)";
-        exportFeedback.textContent = "Swipe your secret pattern on the 10×10 grid above first.";
-        return null;
-      }
-
-      const decoyCount = Math.min(250, Math.max(10, parseInt(decoyCountInput.value, 10) || 50));
-      const usedPatternKeys = new Set([pairedSwipePattern.join(",")]);
-
-      const allEntries = [
-        {
-          pattern: [...pairedSwipePattern],
-          combos: stagedCombos.map((c) => [...c])
-        }
-      ];
-
-      for (let i = 0; i < decoyCount; i++) {
-        const fakePattern = generateRealisticDecoyPattern(usedPatternKeys);
-        if (fakePattern) {
-          allEntries.push({
-            pattern: fakePattern,
-            combos: generateScrambledCombos()
-          });
-        }
-      }
-
-      shuffleArray(allEntries);
-
-      const wrongSwipeFallback = generateScrambledCombos();
-
-      const formattedEntries = allEntries
-        .map((entry) => {
-          const combosStr = entry.combos.map((c) => JSON.stringify(c)).join(", ");
-          return `    { "pattern": ${JSON.stringify(entry.pattern)}, "combos": [${combosStr}] }`;
-        })
-        .join(",\n");
-
-      const fallbackStr = wrongSwipeFallback.map((c) => JSON.stringify(c)).join(",\n    ");
-
-      latestJsonString =
-`{
-  "wrongSwipeStaticCombos": [
-    ${fallbackStr}
-  ],
-  "entries": [
-${formattedEntries}
-  ]
-}`;
-
-      jsonPreviewArea.value = latestJsonString;
-      return { json: latestJsonString, total: allEntries.length };
     }
 
-    function updateSwipePairedUI() {
-      if (pairedSwipePattern && pairedSwipePattern.length >= 2) {
-        swipeStatusBox.classList.add("paired");
-        swipeStatusBox.textContent = `✓ Paired with swipe (${pairedSwipePattern.length} nodes): [${pairedSwipePattern.join(", ")}]`;
-        buildExportJson();
+    function onPointerEnd() {
+      if (!isDrawing) return;
+      isDrawing = false;
+      pointerPos = null;
+      handleSwipeComplete();
+    }
+
+    gridWrapper.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      onPointerStart(e.clientX, e.clientY);
+    });
+
+    window.addEventListener("mousemove", (e) => {
+      onPointerMove(e.clientX, e.clientY);
+    });
+
+    window.addEventListener("mouseup", () => {
+      onPointerEnd();
+    });
+
+    gridWrapper.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      onPointerStart(touch.clientX, touch.clientY);
+    }, { passive: false });
+
+    gridWrapper.addEventListener("touchmove", (e) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      onPointerMove(touch.clientX, touch.clientY);
+    }, { passive: false });
+
+    window.addEventListener("touchend", () => {
+      onPointerEnd();
+    });
+
+    window.addEventListener("resize", () => {
+      if (isSetupMode && setupPattern.length > 0) {
+        updateGridVisuals(setupPattern);
+      }
+    });
+
+    // =========================================================================
+    // MODE SWITCHING & BUTTON HANDLERS
+    // =========================================================================
+    toggleModeBtn.addEventListener("click", () => {
+      isSetupMode = !isSetupMode;
+      currentPattern = [];
+
+      if (isSetupMode) {
+        modeTitle.textContent = "Setup Mode";
+        toggleModeBtn.textContent = "Back to Swipe View";
+        unlockSection.classList.add("hidden");
+        setupSection.classList.remove("hidden");
+        setupActions.classList.remove("hidden");
+        clearPatternBtn.classList.remove("hidden");
+        gridInstruction.textContent = "Step 2: Draw Swipe Pattern at Bottom";
+        setupRowCount = activeConfig.rows.length === 5 ? 5 : 3;
+        toggleRowCountBtn.textContent = setupRowCount === 3 ? "Use 5 Rows" : "Use 3 Rows";
+        renderSetupInputs();
+        setupPattern = [...activeConfig.pattern];
+        updateGridVisuals(setupPattern);
+        setStatus("Enter numbers (0-30) above, then draw your pattern.", "");
       } else {
-        swipeStatusBox.classList.remove("paired");
-        swipeStatusBox.textContent = "Waiting for swipe on the 10×10 grid above...";
-        jsonPreviewArea.value = "";
+        modeTitle.textContent = "Swipe Pattern Input";
+        toggleModeBtn.textContent = "Setup Mode";
+        setupSection.classList.add("hidden");
+        setupActions.classList.add("hidden");
+        clearPatternBtn.classList.add("hidden");
+        unlockSection.classList.remove("hidden");
+        gridInstruction.textContent = "Draw 10×10 Pattern to Retrieve Data";
+        outputStateLabel.textContent = "Awaiting Swipe";
+        renderPlaceholderOutput();
+        updateGridVisuals([]);
+        setStatus("Drag across dots on the 10×10 grid.", "");
       }
-    }
+    });
 
-    decoyCountInput.addEventListener("change", () => {
-      if (pairedSwipePattern) buildExportJson();
+    toggleRowCountBtn.addEventListener("click", () => {
+      setupRowCount = setupRowCount === 3 ? 5 : 3;
+      toggleRowCountBtn.textContent = setupRowCount === 3 ? "Use 5 Rows" : "Use 3 Rows";
+      renderSetupInputs();
+    });
+
+    clearPatternBtn.addEventListener("click", () => {
+      setupPattern = [];
+      currentPattern = [];
+      updateGridVisuals([]);
+      setStatus("Pattern cleared. Draw a new swipe pattern.", "");
+    });
+
+    applySessionBtn.addEventListener("click", () => {
+      const result = validateSetupData();
+      if (!result.ok) {
+        setStatus(result.error, "error");
+        return;
+      }
+      activeConfig = result.config;
+      setStatus("Saved to active session! Switching to Swipe View...", "ok");
+      setTimeout(() => {
+        toggleModeBtn.click();
+      }, 500);
     });
 
     downloadJsonBtn.addEventListener("click", () => {
-      const built = buildExportJson();
-      if (!built) return;
+      const result = validateSetupData();
+      if (!result.ok) {
+        setStatus(result.error, "error");
+        return;
+      }
 
-      const blob = new Blob([built.json], { type: "application/json" });
+      activeConfig = result.config;
+      const jsonString = JSON.stringify(result.config, null, 2);
+      const blob = new Blob([jsonString], { type: "application/json" });
       const url = URL.createObjectURL(blob);
+
       const a = document.createElement("a");
       a.href = url;
-      a.download = "locker-config.json";
+      a.download = "swipe-config.json";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 1500);
+      URL.revokeObjectURL(url);
 
-      exportFeedback.style.color = "var(--success)";
-      exportFeedback.textContent = `Downloaded locker-config.json (${built.total} real + scrambled entries).`;
+      setStatus("Downloaded swipe-config.json!", "ok");
     });
 
-    copyJsonBtn.addEventListener("click", async () => {
-      const built = buildExportJson();
-      if (!built) return;
-      try {
-        await navigator.clipboard.writeText(built.json);
-      } catch (e) {
-        jsonPreviewArea.focus();
-        jsonPreviewArea.select();
-        document.execCommand("copy");
-      }
-      exportFeedback.style.color = "var(--success)";
-      exportFeedback.textContent = "Copied JSON! Paste it over LOCKER_CONFIG in your HTML file.";
-    });
-
-    testLiveBtn.addEventListener("click", () => {
-      const built = buildExportJson();
-      if (!built) return;
-      activeConfig = JSON.parse(built.json);
-      exitSetupMode();
-    });
-
-    // =========================================================================
-    // MAIN CONTROLS
-    // =========================================================================
-    function exitSetupMode() {
-      isSetupMode = false;
-      setupPanel.classList.remove("visible");
-      toggleSetupBtn.textContent = "Setup Mode";
-      subtitleText.textContent = "Swipe your secret pattern on the 10×10 grid to view all 3 locks";
-      resetDisplay();
-    }
-
-    clearBtn.addEventListener("click", resetDisplay);
-
-    toggleSetupBtn.addEventListener("click", () => {
-      if (isSetupMode) {
-        exitSetupMode();
-      } else {
-        isSetupMode = true;
-        setupPanel.classList.add("visible");
-        toggleSetupBtn.textContent = "Exit Setup";
-        subtitleText.textContent = "Setup Mode: Enter each lock one at a time, then swipe";
-        resetDisplay();
-        goToStep(0);
-      }
-    });
-
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
+    // Boot
+    buildGrid();
+    renderPlaceholderOutput();
   </script>
 </body>
 </html>
