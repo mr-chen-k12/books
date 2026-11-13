@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>10x10 Multi-Locker Pattern Pad</title>
+  <title>10x10 5-Locker Pattern Pad</title>
   <style>
     :root {
       --bg: #0f172a;
@@ -33,7 +33,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 14px;
     }
 
     .container {
@@ -42,12 +42,12 @@
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 16px;
-      padding: 20px;
+      padding: 18px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
     }
 
     .header {
@@ -55,26 +55,26 @@
     }
 
     .header h1 {
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       font-weight: 600;
       letter-spacing: 0.02em;
     }
 
     .header p {
-      font-size: 0.84rem;
+      font-size: 0.82rem;
       color: var(--muted);
-      margin-top: 4px;
+      margin-top: 3px;
     }
 
-    /* 3-Locker Combination Display */
+    /* 5-Locker Combination Display */
     .lockers-display {
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
       background: var(--bg);
       border: 1px solid var(--border);
-      padding: 12px 14px;
+      padding: 10px 14px;
       border-radius: 12px;
       user-select: none;
       -webkit-user-select: none;
@@ -88,7 +88,7 @@
     }
 
     .locker-label {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 600;
       color: var(--muted);
       letter-spacing: 0.03em;
@@ -99,19 +99,19 @@
     .tumbler-group {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
     }
 
     .tumbler {
       background: var(--panel-alt);
       border: 1px solid var(--border);
-      border-radius: 7px;
-      width: 54px;
-      height: 40px;
+      border-radius: 6px;
+      width: 50px;
+      height: 34px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.25rem;
+      font-size: 1.15rem;
       font-weight: 700;
       font-variant-numeric: tabular-nums;
       color: var(--accent);
@@ -127,7 +127,7 @@
     .dash {
       color: var(--muted);
       font-weight: 700;
-      font-size: 1.05rem;
+      font-size: 1rem;
     }
 
     /* 10x10 Swipe Grid */
@@ -210,7 +210,7 @@
     .setup-section {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 9px;
       padding-bottom: 14px;
       border-bottom: 1px solid var(--border);
     }
@@ -274,8 +274,8 @@
     }
 
     .combo-inputs input {
-      width: 52px;
-      height: 40px;
+      width: 50px;
+      height: 38px;
       padding: 4px;
       text-align: center;
       font-weight: 700;
@@ -343,10 +343,10 @@
   <div class="container">
     <div class="header">
       <h1>Locker Combination Pad</h1>
-      <p id="subtitleText">Swipe pattern on the 10&times;10 grid to unlock all 3 combinations</p>
+      <p id="subtitleText">Swipe pattern on the 10&times;10 grid to unlock all 5 combinations</p>
     </div>
 
-    <!-- 3 Lockers x 3 Numbers Display -->
+    <!-- 5 Lockers x 3 Numbers Display -->
     <div class="lockers-display">
       <div class="locker-row">
         <span class="locker-label">Locker 1</span>
@@ -378,6 +378,26 @@
           <div class="tumbler" id="t2_2">--</div>
         </div>
       </div>
+      <div class="locker-row">
+        <span class="locker-label">Locker 4</span>
+        <div class="tumbler-group">
+          <div class="tumbler" id="t3_0">--</div>
+          <span class="dash">-</span>
+          <div class="tumbler" id="t3_1">--</div>
+          <span class="dash">-</span>
+          <div class="tumbler" id="t3_2">--</div>
+        </div>
+      </div>
+      <div class="locker-row">
+        <span class="locker-label">Locker 5</span>
+        <div class="tumbler-group">
+          <div class="tumbler" id="t4_0">--</div>
+          <span class="dash">-</span>
+          <div class="tumbler" id="t4_1">--</div>
+          <span class="dash">-</span>
+          <div class="tumbler" id="t4_2">--</div>
+        </div>
+      </div>
     </div>
 
     <div class="grid-wrapper">
@@ -392,7 +412,7 @@
     <!-- Setup & Export Mode Panel -->
     <div class="setup-panel" id="setupPanel">
       <div class="setup-section">
-        <div class="section-title">1. Enter Your 3 Locker Combinations (0–30 Inclusive)</div>
+        <div class="section-title">1. Enter Your 5 Locker Combinations (0–30 Inclusive)</div>
         <div class="hint">Each locker takes three integers between <strong>0</strong> and <strong>30</strong> inclusive.</div>
 
         <div class="setup-locker-row">
@@ -427,11 +447,33 @@
             <input type="text" class="real-num" data-locker="2" data-idx="2" inputmode="numeric" maxlength="2" placeholder="00" />
           </div>
         </div>
+
+        <div class="setup-locker-row">
+          <span class="row-name">Locker 4:</span>
+          <div class="combo-inputs">
+            <input type="text" class="real-num" data-locker="3" data-idx="0" inputmode="numeric" maxlength="2" placeholder="00" />
+            <span class="dash">-</span>
+            <input type="text" class="real-num" data-locker="3" data-idx="1" inputmode="numeric" maxlength="2" placeholder="00" />
+            <span class="dash">-</span>
+            <input type="text" class="real-num" data-locker="3" data-idx="2" inputmode="numeric" maxlength="2" placeholder="00" />
+          </div>
+        </div>
+
+        <div class="setup-locker-row">
+          <span class="row-name">Locker 5:</span>
+          <div class="combo-inputs">
+            <input type="text" class="real-num" data-locker="4" data-idx="0" inputmode="numeric" maxlength="2" placeholder="00" />
+            <span class="dash">-</span>
+            <input type="text" class="real-num" data-locker="4" data-idx="1" inputmode="numeric" maxlength="2" placeholder="00" />
+            <span class="dash">-</span>
+            <input type="text" class="real-num" data-locker="4" data-idx="2" inputmode="numeric" maxlength="2" placeholder="00" />
+          </div>
+        </div>
       </div>
 
       <div class="setup-section">
         <div class="section-title">2. Assign Your Secret Swipe Pattern</div>
-        <div class="hint">Draw your swipe pattern on the 10&times;10 grid above to associate it with those 3 combinations.</div>
+        <div class="hint">Draw your swipe pattern on the 10&times;10 grid above to associate it with those 5 combinations.</div>
         <div class="status-pill" id="currentSwipePreview">Assigned pattern: (swipe on grid above)</div>
       </div>
 
@@ -472,6 +514,28 @@
           </div>
         </div>
 
+        <div class="setup-locker-row">
+          <span class="row-name">Fake 4:</span>
+          <div class="combo-inputs">
+            <input type="text" class="fallback-num" data-locker="3" data-idx="0" inputmode="numeric" maxlength="2" value="05" />
+            <span>-</span>
+            <input type="text" class="fallback-num" data-locker="3" data-idx="1" inputmode="numeric" maxlength="2" value="27" />
+            <span>-</span>
+            <input type="text" class="fallback-num" data-locker="3" data-idx="2" inputmode="numeric" maxlength="2" value="16" />
+          </div>
+        </div>
+
+        <div class="setup-locker-row">
+          <span class="row-name">Fake 5:</span>
+          <div class="combo-inputs">
+            <input type="text" class="fallback-num" data-locker="4" data-idx="0" inputmode="numeric" maxlength="2" value="18" />
+            <span>-</span>
+            <input type="text" class="fallback-num" data-locker="4" data-idx="1" inputmode="numeric" maxlength="2" value="09" />
+            <span>-</span>
+            <input type="text" class="fallback-num" data-locker="4" data-idx="2" inputmode="numeric" maxlength="2" value="24" />
+          </div>
+        </div>
+
         <div class="decoy-row" style="margin-top:4px;">
           <span class="hint">Randomly generated decoy pairings in JSON:</span>
           <input type="number" id="decoyCountInput" min="5" max="250" value="50" />
@@ -498,7 +562,7 @@
      * =========================================================================
      * HARDCODED LOCKER CONFIGURATION
      * Paste your downloaded JSON object between LOCKER_CONFIG_START and END.
-     * Each entry maps a swipe pattern to 3 combinations (integers 00–30).
+     * Each entry maps a swipe pattern to 5 combinations (integers 00–30).
      * =========================================================================
      */
     /* LOCKER_CONFIG_START */
@@ -506,7 +570,9 @@
       "wrongSwipeStaticCombos": [
         ["07", "19", "28"],
         ["14", "03", "25"],
-        ["22", "11", "30"]
+        ["22", "11", "30"],
+        ["05", "27", "16"],
+        ["18", "09", "24"]
       ],
       "entries": [
         {
@@ -514,7 +580,9 @@
           "combos": [
             ["19", "04", "27"],
             ["08", "23", "15"],
-            ["30", "12", "01"]
+            ["30", "12", "01"],
+            ["14", "29", "06"],
+            ["22", "09", "17"]
           ]
         },
         {
@@ -522,7 +590,9 @@
           "combos": [
             ["05", "18", "29"],
             ["12", "03", "24"],
-            ["27", "14", "08"]
+            ["27", "14", "08"],
+            ["19", "02", "21"],
+            ["09", "25", "11"]
           ]
         },
         {
@@ -530,7 +600,9 @@
           "combos": [
             ["21", "10", "02"],
             ["16", "28", "09"],
-            ["04", "26", "17"]
+            ["04", "26", "17"],
+            ["13", "07", "29"],
+            ["24", "15", "03"]
           ]
         }
       ]
@@ -541,6 +613,7 @@
     // APPLICATION STATE & DOM REFERENCES
     // =========================================================================
     const GRID_SIZE = 10;
+    const NUM_LOCKERS = 5;
     const MIN_VAL = 0;
     const MAX_VAL = 30;
 
@@ -550,11 +623,11 @@
     const ctx = canvas.getContext("2d");
     const subtitleText = document.getElementById("subtitleText");
 
-    const tumblerGrid = [
-      [document.getElementById("t0_0"), document.getElementById("t0_1"), document.getElementById("t0_2")],
-      [document.getElementById("t1_0"), document.getElementById("t1_1"), document.getElementById("t1_2")],
-      [document.getElementById("t2_0"), document.getElementById("t2_1"), document.getElementById("t2_2")]
-    ];
+    const tumblerGrid = Array.from({ length: NUM_LOCKERS }, (_, lockerIdx) => [
+      document.getElementById(`t${lockerIdx}_0`),
+      document.getElementById(`t${lockerIdx}_1`),
+      document.getElementById(`t${lockerIdx}_2`)
+    ]);
 
     const clearBtn = document.getElementById("clearBtn");
     const toggleSetupBtn = document.getElementById("toggleSetupBtn");
@@ -630,7 +703,7 @@
       }
     }
 
-    function resolveThreeCombos(pattern) {
+    function resolveCombos(pattern) {
       const matchedEntry = activeConfig.entries.find(
         (entry) =>
           entry.pattern.length === pattern.length &&
@@ -641,7 +714,7 @@
         : activeConfig.wrongSwipeStaticCombos;
     }
 
-    function displayThreeCombos(combosMatrix) {
+    function displayCombos(combosMatrix) {
       tumblerGrid.forEach((rowEls, lockerIdx) => {
         rowEls.forEach((el, numIdx) => {
           el.classList.remove("active");
@@ -655,7 +728,7 @@
               el.textContent = combosMatrix[lockerIdx][numIdx];
               el.classList.add("active");
             }
-          }, 28);
+          }, 26);
         });
       });
     }
@@ -749,8 +822,8 @@
         if (isSetupMode) {
           currentSwipePreview.textContent = `Assigned pattern (${selectedNodes.length} nodes): [${selectedNodes.join(", ")}]`;
         } else {
-          const resultMatrix = resolveThreeCombos(selectedNodes);
-          displayThreeCombos(resultMatrix);
+          const resultMatrix = resolveCombos(selectedNodes);
+          displayCombos(resultMatrix);
         }
       } else {
         selectedNodes = [];
@@ -794,17 +867,13 @@
     bindNumericInputs(realInputs);
     bindNumericInputs(fallbackInputs);
 
-    function readThreeCombosMatrix(inputs, labelName) {
-      const matrix = [
-        ["", "", ""],
-        ["", "", ""],
-        ["", "", ""]
-      ];
+    function readCombosMatrix(inputs, labelName) {
+      const matrix = Array.from({ length: NUM_LOCKERS }, () => ["", "", ""]);
 
       for (const el of inputs) {
         const raw = el.value.trim();
         if (raw === "" || !/^\d{1,2}$/.test(raw)) {
-          showFeedback(`Please fill in all 9 numbers for ${labelName}.`, true);
+          showFeedback(`Please fill in all ${NUM_LOCKERS * 3} numbers for ${labelName}.`, true);
           el.focus();
           return null;
         }
@@ -881,7 +950,7 @@
     }
 
     function generateRandomZeroToThirtyMatrix() {
-      return [0, 1, 2].map(() =>
+      return Array.from({ length: NUM_LOCKERS }, () =>
         [0, 1, 2].map(() =>
           String(Math.floor(Math.random() * (MAX_VAL + 1))).padStart(2, "0")
         )
@@ -897,7 +966,7 @@
     }
 
     function buildFormattedJson() {
-      const realCombos = readThreeCombosMatrix(realInputs, "your 3 lockers");
+      const realCombos = readCombosMatrix(realInputs, "your 5 lockers");
       if (!realCombos) return null;
 
       if (selectedNodes.length < 2) {
@@ -905,7 +974,7 @@
         return null;
       }
 
-      const fallbackCombos = readThreeCombosMatrix(fallbackInputs, "the wrong-swipe static fallback");
+      const fallbackCombos = readCombosMatrix(fallbackInputs, "the wrong-swipe static fallback");
       if (!fallbackCombos) return null;
 
       const decoyCount = Math.min(250, Math.max(5, parseInt(decoyCountInput.value, 10) || 50));
@@ -984,7 +1053,7 @@ ${formattedEntries}
       if (clonedToggle) clonedToggle.textContent = "Setup & Export Mode";
 
       const clonedSubtitle = docClone.querySelector("#subtitleText");
-      if (clonedSubtitle) clonedSubtitle.textContent = "Swipe pattern on the 10×10 grid to unlock all 3 combinations";
+      if (clonedSubtitle) clonedSubtitle.textContent = "Swipe pattern on the 10×10 grid to unlock all 5 combinations";
 
       const clonedTextarea = docClone.querySelector("#exportedJsonArea");
       if (clonedTextarea) clonedTextarea.textContent = "";
@@ -1033,7 +1102,7 @@ ${formattedEntries}
         isSetupMode = false;
         setupPanel.classList.remove("visible");
         toggleSetupBtn.textContent = "Setup & Export Mode";
-        subtitleText.textContent = "Swipe pattern on the 10×10 grid to unlock all 3 combinations";
+        subtitleText.textContent = "Swipe pattern on the 10×10 grid to unlock all 5 combinations";
         resetDisplay();
       } catch (err) {
         showFeedback("Invalid JSON format.", true);
@@ -1050,8 +1119,8 @@ ${formattedEntries}
       setupPanel.classList.toggle("visible", isSetupMode);
       toggleSetupBtn.textContent = isSetupMode ? "Exit Setup Mode" : "Setup & Export Mode";
       subtitleText.textContent = isSetupMode
-        ? "Setup Mode: Enter your 3 combinations (0–30) & swipe pattern"
-        : "Swipe pattern on the 10×10 grid to unlock all 3 combinations";
+        ? "Setup Mode: Enter your 5 combinations (0–30) & swipe pattern"
+        : "Swipe pattern on the 10×10 grid to unlock all 5 combinations";
       resetDisplay();
     });
 
