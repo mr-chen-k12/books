@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>10x10 Multi-Locker Pattern Pad</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --panel-alt: #162032;
+      --border: #334155;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.35);
+      --success: #34d399;
+      --danger: #f87171;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header {
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .header p {
+      font-size: 0.84rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* 3-Locker Combination Display */
+    .lockers-display {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 12px 14px;
+      border-radius: 12px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .locker-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .locker-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      min-width: 72px;
+    }
+
+    .tumbler-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tumbler {
+      background: var(--panel-alt);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      width: 54px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .tumbler.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .dash {
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+
+    /* 10x10 Swipe Grid */
+    .grid-wrapper {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+      cursor: crosshair;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .controls {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    button {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    button:hover {
+      border-color: var(--accent);
+      background: #172338;
+    }
+
+    button.primary {
+      background: rgba(56, 189, 248, 0.16);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    button.primary:hover {
+      background: rgba(56, 189, 248, 0.26);
+    }
+
+    /* Setup & Export Drawer */
+    .setup-panel {
+      display: none;
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      flex-direction: column;
+      gap: 16px;
+      font-size: 0.85rem;
+    }
+
+    .setup-panel.visible {
+      display: flex;
+    }
+
+    .setup-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .setup-section:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .section-title {
+      font-weight: 600;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.4;
+    }
+
+    .setup-locker-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .setup-locker-row span.row-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+      min-width: 68px;
+    }
+
+    .combo-inputs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea {
+      user-select: text !important;
+      -webkit-user-select: text !important;
+      touch-action: manipulation;
+      background: var(--panel-alt);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+    }
+
+    .combo-inputs input {
+      width: 52px;
+      height: 40px;
+      padding: 4px;
+      text-align: center;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .small-inputs .combo-inputs input {
+      width: 44px;
+      height: 34px;
+      font-size: 15px;
+    }
+
+    .decoy-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .decoy-row input[type="number"] {
+      width: 76px;
+      height: 38px;
+      padding: 6px;
+      text-align: center;
+    }
+
+    .status-pill {
+      background: var(--panel-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.78rem;
+      color: var(--accent);
+      word-break: break-all;
+    }
+
+    .btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 150px;
+      background: #090e1a;
+      padding: 10px;
+      color: #a5f3fc;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      resize: vertical;
+    }
+
+    .feedback {
+      font-size: 0.8rem;
+      color: var(--success);
+      min-height: 1.1em;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <h1>Locker Combination Pad</h1>
+      <p id="subtitleText">Swipe pattern on the 10&times;10 grid to unlock all 3 combinations</p>
+    </div>
+
+    <!-- 3 Lockers x 3 Numbers Display -->
+    <div class="lockers-display">
+      <div class="locker-row">
+        <span class="locker-label">Locker 1</span>
+        <div class="tumbler-group">
+          <div class="tumbler" id="t0_0">--</div>
+          <span class="dash">-</span>
+          <div class="tumbler" id="t0_1">--</div>
+          <span class="dash">-</span>
+          <div class="tumbler" id="t0_2">--</div>
+        </div>
+      </div>
+      <div class="locker-row">
+        <span class="locker-label">Locker 2</span>
+        <div class="tumbler-group">
+          <div class="tumbler" id="t1_0">--</div>
+          <span class="dash">-</span>
+          <div class="tumbler" id="t1_1">--</div>
+          <span class="dash">-</span>
+          <div class="tumbler" id="t1_2">--</div>
+        </div>
+      </div>
+      <div class="locker-row">
+        <span class="locker-label">Locker 3</span>
+        <div class="tumbler-group">
+          <div class="tumbler" id="t2_0">--</div>
+          <span class="dash">-</span>
+          <div class="tumbler" id="t2_1">--</div>
+          <span class="dash">-</span>
+          <div class="tumbler" id="t2_2">--</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-wrapper">
+      <canvas id="patternCanvas"></canvas>
+    </div>
+
+    <div class="controls">
+      <button id="clearBtn" type="button">Clear Display</button>
+      <button id="toggleSetupBtn" type="button">Setup &amp; Export Mode</button>
+    </div>
+
+    <!-- Setup & Export Mode Panel -->
+    <div class="setup-panel" id="setupPanel">
+      <div class="setup-section">
+        <div class="section-title">1. Enter Your 3 Locker Combinations (0–30 Inclusive)</div>
+        <div class="hint">Each locker takes three integers between <strong>0</strong> and <strong>30</strong> inclusive.</div>
+
+        <div class="setup-locker-row">
+          <span class="row-name">Locker 1:</span>
+          <div class="combo-inputs">
+            <input type="text" class="real-num" data-locker="0" data-idx="0" inputmode="numeric" maxlength="2" placeholder="00" />
+            <span class="dash">-</span>
+            <input type="text" class="real-num" data-locker="0" data-idx="1" inputmode="numeric" maxlength="2" placeholder="00" />
+            <span class="dash">-</span>
+            <input type="text" class="real-num" data-locker="0" data-idx="2" inputmode="numeric" maxlength="2" placeholder="00" />
+          </div>
+        </div>
+
+        <div class="setup-locker-row">
+          <span class="row-name">Locker 2:</span>
+          <div class="combo-inputs">
+            <input type="text" class="real-num" data-locker="1" data-idx="0" inputmode="numeric" maxlength="2" placeholder="00" />
+            <span class="dash">-</span>
+            <input type="text" class="real-num" data-locker="1" data-idx="1" inputmode="numeric" maxlength="2" placeholder="00" />
+            <span class="dash">-</span>
+            <input type="text" class="real-num" data-locker="1" data-idx="2" inputmode="numeric" maxlength="2" placeholder="00" />
+          </div>
+        </div>
+
+        <div class="setup-locker-row">
+          <span class="row-name">Locker 3:</span>
+          <div class="combo-inputs">
+            <input type="text" class="real-num" data-locker="2" data-idx="0" inputmode="numeric" maxlength="2" placeholder="00" />
+            <span class="dash">-</span>
+            <input type="text" class="real-num" data-locker="2" data-idx="1" inputmode="numeric" maxlength="2" placeholder="00" />
+            <span class="dash">-</span>
+            <input type="text" class="real-num" data-locker="2" data-idx="2" inputmode="numeric" maxlength="2" placeholder="00" />
+          </div>
+        </div>
+      </div>
+
+      <div class="setup-section">
+        <div class="section-title">2. Assign Your Secret Swipe Pattern</div>
+        <div class="hint">Draw your swipe pattern on the 10&times;10 grid above to associate it with those 3 combinations.</div>
+        <div class="status-pill" id="currentSwipePreview">Assigned pattern: (swipe on grid above)</div>
+      </div>
+
+      <div class="setup-section small-inputs">
+        <div class="section-title">3. Wrong-Swipe Static Values &amp; Random Decoys</div>
+        <div class="hint">Any unrecognized wrong swipe returns these static fake combinations (0–30):</div>
+
+        <div class="setup-locker-row">
+          <span class="row-name">Fake 1:</span>
+          <div class="combo-inputs">
+            <input type="text" class="fallback-num" data-locker="0" data-idx="0" inputmode="numeric" maxlength="2" value="07" />
+            <span>-</span>
+            <input type="text" class="fallback-num" data-locker="0" data-idx="1" inputmode="numeric" maxlength="2" value="19" />
+            <span>-</span>
+            <input type="text" class="fallback-num" data-locker="0" data-idx="2" inputmode="numeric" maxlength="2" value="28" />
+          </div>
+        </div>
+
+        <div class="setup-locker-row">
+          <span class="row-name">Fake 2:</span>
+          <div class="combo-inputs">
+            <input type="text" class="fallback-num" data-locker="1" data-idx="0" inputmode="numeric" maxlength="2" value="14" />
+            <span>-</span>
+            <input type="text" class="fallback-num" data-locker="1" data-idx="1" inputmode="numeric" maxlength="2" value="03" />
+            <span>-</span>
+            <input type="text" class="fallback-num" data-locker="1" data-idx="2" inputmode="numeric" maxlength="2" value="25" />
+          </div>
+        </div>
+
+        <div class="setup-locker-row">
+          <span class="row-name">Fake 3:</span>
+          <div class="combo-inputs">
+            <input type="text" class="fallback-num" data-locker="2" data-idx="0" inputmode="numeric" maxlength="2" value="22" />
+            <span>-</span>
+            <input type="text" class="fallback-num" data-locker="2" data-idx="1" inputmode="numeric" maxlength="2" value="11" />
+            <span>-</span>
+            <input type="text" class="fallback-num" data-locker="2" data-idx="2" inputmode="numeric" maxlength="2" value="30" />
+          </div>
+        </div>
+
+        <div class="decoy-row" style="margin-top:4px;">
+          <span class="hint">Randomly generated decoy pairings in JSON:</span>
+          <input type="number" id="decoyCountInput" min="5" max="250" value="50" />
+        </div>
+      </div>
+
+      <div class="setup-section">
+        <div class="section-title">4. Download &amp; Hardcode</div>
+        <div class="hint">Download the JSON to paste into <code>LOCKER_CONFIG</code> in your HTML, or download the pre-hardcoded HTML directly:</div>
+        <div class="btn-grid">
+          <button type="button" id="downloadJsonBtn" class="primary">Download .JSON</button>
+          <button type="button" id="downloadHtmlBtn" class="primary">Download .HTML</button>
+          <button type="button" id="copyJsonBtn">Copy JSON</button>
+          <button type="button" id="applyLiveBtn">Test Live Now</button>
+        </div>
+        <div class="feedback" id="setupFeedback"></div>
+        <textarea id="exportedJsonArea" readonly placeholder="Your generated JSON (with shuffled random 0–30 decoy entries) will appear here..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <script id="appScript">
+    /**
+     * =========================================================================
+     * HARDCODED LOCKER CONFIGURATION
+     * Paste your downloaded JSON object between LOCKER_CONFIG_START and END.
+     * Each entry maps a swipe pattern to 3 combinations (integers 00–30).
+     * =========================================================================
+     */
+    /* LOCKER_CONFIG_START */
+    const LOCKER_CONFIG = {
+      "wrongSwipeStaticCombos": [
+        ["07", "19", "28"],
+        ["14", "03", "25"],
+        ["22", "11", "30"]
+      ],
+      "entries": [
+        {
+          "pattern": [31, 41, 52, 63, 64, 54],
+          "combos": [
+            ["19", "04", "27"],
+            ["08", "23", "15"],
+            ["30", "12", "01"]
+          ]
+        },
+        {
+          "pattern": [0, 1, 2, 12, 22, 23, 24],
+          "combos": [
+            ["05", "18", "29"],
+            ["12", "03", "24"],
+            ["27", "14", "08"]
+          ]
+        },
+        {
+          "pattern": [88, 77, 66, 65, 55, 45],
+          "combos": [
+            ["21", "10", "02"],
+            ["16", "28", "09"],
+            ["04", "26", "17"]
+          ]
+        }
+      ]
+    };
+    /* LOCKER_CONFIG_END */
+
+    // =========================================================================
+    // APPLICATION STATE & DOM REFERENCES
+    // =========================================================================
+    const GRID_SIZE = 10;
+    const MIN_VAL = 0;
+    const MAX_VAL = 30;
+
+    let activeConfig = JSON.parse(JSON.stringify(LOCKER_CONFIG));
+
+    const canvas = document.getElementById("patternCanvas");
+    const ctx = canvas.getContext("2d");
+    const subtitleText = document.getElementById("subtitleText");
+
+    const tumblerGrid = [
+      [document.getElementById("t0_0"), document.getElementById("t0_1"), document.getElementById("t0_2")],
+      [document.getElementById("t1_0"), document.getElementById("t1_1"), document.getElementById("t1_2")],
+      [document.getElementById("t2_0"), document.getElementById("t2_1"), document.getElementById("t2_2")]
+    ];
+
+    const clearBtn = document.getElementById("clearBtn");
+    const toggleSetupBtn = document.getElementById("toggleSetupBtn");
+    const setupPanel = document.getElementById("setupPanel");
+
+    const realInputs = Array.from(document.querySelectorAll(".real-num"));
+    const fallbackInputs = Array.from(document.querySelectorAll(".fallback-num"));
+
+    const currentSwipePreview = document.getElementById("currentSwipePreview");
+    const decoyCountInput = document.getElementById("decoyCountInput");
+    const downloadJsonBtn = document.getElementById("downloadJsonBtn");
+    const downloadHtmlBtn = document.getElementById("downloadHtmlBtn");
+    const copyJsonBtn = document.getElementById("copyJsonBtn");
+    const applyLiveBtn = document.getElementById("applyLiveBtn");
+    const exportedJsonArea = document.getElementById("exportedJsonArea");
+    const setupFeedback = document.getElementById("setupFeedback");
+
+    let nodes = [];
+    let selectedNodes = [];
+    let isDragging = false;
+    let pointerPos = null;
+    let isSetupMode = false;
+
+    // =========================================================================
+    // CANVAS & SWIPE LOGIC
+    // =========================================================================
+    function resizeCanvas() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      computeNodes(rect.width);
+      draw();
+    }
+
+    function computeNodes(size) {
+      nodes = [];
+      const padding = size * 0.075;
+      const usableSpan = size - padding * 2;
+      const step = usableSpan / (GRID_SIZE - 1);
+      const hitRadius = step * 0.32;
+
+      for (let row = 0; row < GRID_SIZE; row++) {
+        for (let col = 0; col < GRID_SIZE; col++) {
+          nodes.push({
+            id: row * GRID_SIZE + col,
+            x: padding + col * step,
+            y: padding + row * step,
+            hitRadius
+          });
+        }
+      }
+    }
+
+    function getPointerCoords(e) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    }
+
+    function checkNodeHit(pos) {
+      for (const node of nodes) {
+        if (selectedNodes.includes(node.id)) continue;
+        const dx = pos.x - node.x;
+        const dy = pos.y - node.y;
+        if (Math.hypot(dx, dy) <= node.hitRadius) {
+          selectedNodes.push(node.id);
+          break;
+        }
+      }
+    }
+
+    function resolveThreeCombos(pattern) {
+      const matchedEntry = activeConfig.entries.find(
+        (entry) =>
+          entry.pattern.length === pattern.length &&
+          entry.pattern.every((val, idx) => val === pattern[idx])
+      );
+      return matchedEntry
+        ? matchedEntry.combos
+        : activeConfig.wrongSwipeStaticCombos;
+    }
+
+    function displayThreeCombos(combosMatrix) {
+      tumblerGrid.forEach((rowEls, lockerIdx) => {
+        rowEls.forEach((el, numIdx) => {
+          el.classList.remove("active");
+          let ticks = 0;
+          const totalTicks = 5 + lockerIdx * 2 + numIdx;
+          const interval = setInterval(() => {
+            el.textContent = String(Math.floor(Math.random() * 31)).padStart(2, "0");
+            ticks++;
+            if (ticks >= totalTicks) {
+              clearInterval(interval);
+              el.textContent = combosMatrix[lockerIdx][numIdx];
+              el.classList.add("active");
+            }
+          }, 28);
+        });
+      });
+    }
+
+    function resetDisplay() {
+      selectedNodes = [];
+      currentSwipePreview.textContent = "Assigned pattern: (swipe on grid above)";
+      tumblerGrid.forEach((rowEls) => {
+        rowEls.forEach((el) => {
+          el.textContent = "--";
+          el.classList.remove("active");
+        });
+      });
+      draw();
+    }
+
+    function draw() {
+      const size = canvas.getBoundingClientRect().width;
+      ctx.clearRect(0, 0, size, size);
+
+      if (selectedNodes.length > 0) {
+        ctx.save();
+        ctx.strokeStyle = "#38bdf8";
+        ctx.lineWidth = 3;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.shadowColor = "rgba(56, 189, 248, 0.5)";
+        ctx.shadowBlur = 8;
+
+        ctx.beginPath();
+        selectedNodes.forEach((id, index) => {
+          const n = nodes[id];
+          if (index === 0) ctx.moveTo(n.x, n.y);
+          else ctx.lineTo(n.x, n.y);
+        });
+
+        if (isDragging && pointerPos) {
+          ctx.lineTo(pointerPos.x, pointerPos.y);
+        }
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      for (const node of nodes) {
+        const isSelected = selectedNodes.includes(node.id);
+        const isStart = selectedNodes[0] === node.id;
+
+        if (isSelected) {
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, isStart ? 9 : 7, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(56, 189, 248, 0.25)";
+          ctx.fill();
+        }
+
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, isSelected ? 4.5 : 3.2, 0, Math.PI * 2);
+        ctx.fillStyle = isSelected ? "#38bdf8" : "#475569";
+        ctx.fill();
+
+        if (isSetupMode) {
+          ctx.fillStyle = isSelected ? "#f8fafc" : "#64748b";
+          ctx.font = "9px monospace";
+          ctx.textAlign = "center";
+          ctx.fillText(node.id, node.x, node.y - 7);
+        }
+      }
+    }
+
+    canvas.addEventListener("pointerdown", (e) => {
+      canvas.setPointerCapture(e.pointerId);
+      isDragging = true;
+      selectedNodes = [];
+      pointerPos = getPointerCoords(e);
+      checkNodeHit(pointerPos);
+      draw();
+    });
+
+    canvas.addEventListener("pointermove", (e) => {
+      if (!isDragging) return;
+      pointerPos = getPointerCoords(e);
+      checkNodeHit(pointerPos);
+      draw();
+    });
+
+    function endSwipe() {
+      if (!isDragging) return;
+      isDragging = false;
+      pointerPos = null;
+
+      if (selectedNodes.length >= 2) {
+        if (isSetupMode) {
+          currentSwipePreview.textContent = `Assigned pattern (${selectedNodes.length} nodes): [${selectedNodes.join(", ")}]`;
+        } else {
+          const resultMatrix = resolveThreeCombos(selectedNodes);
+          displayThreeCombos(resultMatrix);
+        }
+      } else {
+        selectedNodes = [];
+      }
+      draw();
+    }
+
+    canvas.addEventListener("pointerup", endSwipe);
+    canvas.addEventListener("pointercancel", endSwipe);
+
+    // =========================================================================
+    // SETUP MODE, 0–30 VALIDATION & JSON EXPORT LOGIC
+    // =========================================================================
+    function bindNumericInputs(inputs) {
+      inputs.forEach((input, idx) => {
+        input.addEventListener("input", () => {
+          const digits = input.value.replace(/\D/g, "").slice(0, 2);
+          input.value = digits;
+          if (digits.length === 2 && idx < inputs.length - 1) {
+            inputs[idx + 1].focus();
+          }
+        });
+
+        input.addEventListener("blur", () => {
+          if (input.value !== "") {
+            const num = parseInt(input.value, 10);
+            if (!Number.isNaN(num) && num >= MIN_VAL && num <= MAX_VAL) {
+              input.value = String(num).padStart(2, "0");
+            }
+          }
+        });
+
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Backspace" && input.value.length === 0 && idx > 0) {
+            inputs[idx - 1].focus();
+          }
+        });
+      });
+    }
+
+    bindNumericInputs(realInputs);
+    bindNumericInputs(fallbackInputs);
+
+    function readThreeCombosMatrix(inputs, labelName) {
+      const matrix = [
+        ["", "", ""],
+        ["", "", ""],
+        ["", "", ""]
+      ];
+
+      for (const el of inputs) {
+        const raw = el.value.trim();
+        if (raw === "" || !/^\d{1,2}$/.test(raw)) {
+          showFeedback(`Please fill in all 9 numbers for ${labelName}.`, true);
+          el.focus();
+          return null;
+        }
+        const num = parseInt(raw, 10);
+        if (num < MIN_VAL || num > MAX_VAL) {
+          showFeedback(`Invalid number (${num}) in ${labelName}: must be between 0 and 30 inclusive.`, true);
+          el.focus();
+          return null;
+        }
+        const lockerIdx = parseInt(el.dataset.locker, 10);
+        const numIdx = parseInt(el.dataset.idx, 10);
+        matrix[lockerIdx][numIdx] = String(num).padStart(2, "0");
+      }
+
+      return matrix;
+    }
+
+    function showFeedback(msg, isError = false) {
+      setupFeedback.style.color = isError ? "var(--danger)" : "var(--success)";
+      setupFeedback.textContent = msg;
+      setTimeout(() => {
+        if (setupFeedback.textContent === msg) setupFeedback.textContent = "";
+      }, 4500);
+    }
+
+    function generateRealisticDecoyPattern(usedPatternKeys) {
+      for (let attempt = 0; attempt < 200; attempt++) {
+        const targetLen = 5 + Math.floor(Math.random() * 6);
+        const visited = new Set();
+        const path = [];
+
+        let current = Math.floor(Math.random() * (GRID_SIZE * GRID_SIZE));
+        visited.add(current);
+        path.push(current);
+
+        while (path.length < targetLen) {
+          const r = Math.floor(current / GRID_SIZE);
+          const c = current % GRID_SIZE;
+          const neighbors = [];
+
+          for (let dr = -2; dr <= 2; dr++) {
+            for (let dc = -2; dc <= 2; dc++) {
+              if (dr === 0 && dc === 0) continue;
+              const nr = r + dr;
+              const nc = c + dc;
+              if (nr >= 0 && nr < GRID_SIZE && nc >= 0 && nc < GRID_SIZE) {
+                const nid = nr * GRID_SIZE + nc;
+                if (!visited.has(nid)) {
+                  const dist = Math.hypot(dr, dc);
+                  if (dist <= 1.5) {
+                    neighbors.push(nid, nid, nid);
+                  } else if (dist <= 2.25) {
+                    neighbors.push(nid);
+                  }
+                }
+              }
+            }
+          }
+
+          if (neighbors.length === 0) break;
+          const nextNode = neighbors[Math.floor(Math.random() * neighbors.length)];
+          visited.add(nextNode);
+          path.push(nextNode);
+          current = nextNode;
+        }
+
+        const key = path.join(",");
+        if (path.length >= 4 && !usedPatternKeys.has(key)) {
+          usedPatternKeys.add(key);
+          return path;
+        }
+      }
+      return null;
+    }
+
+    function generateRandomZeroToThirtyMatrix() {
+      return [0, 1, 2].map(() =>
+        [0, 1, 2].map(() =>
+          String(Math.floor(Math.random() * (MAX_VAL + 1))).padStart(2, "0")
+        )
+      );
+    }
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function buildFormattedJson() {
+      const realCombos = readThreeCombosMatrix(realInputs, "your 3 lockers");
+      if (!realCombos) return null;
+
+      if (selectedNodes.length < 2) {
+        showFeedback("Swipe a pattern of at least 2 nodes on the grid first.", true);
+        return null;
+      }
+
+      const fallbackCombos = readThreeCombosMatrix(fallbackInputs, "the wrong-swipe static fallback");
+      if (!fallbackCombos) return null;
+
+      const decoyCount = Math.min(250, Math.max(5, parseInt(decoyCountInput.value, 10) || 50));
+      const usedPatternKeys = new Set([selectedNodes.join(",")]);
+
+      const allEntries = [
+        {
+          pattern: [...selectedNodes],
+          combos: realCombos
+        }
+      ];
+
+      for (let i = 0; i < decoyCount; i++) {
+        const fakePattern = generateRealisticDecoyPattern(usedPatternKeys);
+        if (fakePattern) {
+          allEntries.push({
+            pattern: fakePattern,
+            combos: generateRandomZeroToThirtyMatrix()
+          });
+        }
+      }
+
+      shuffleArray(allEntries);
+
+      const formattedEntries = allEntries
+        .map((entry) => {
+          const combosStr = entry.combos.map((c) => JSON.stringify(c)).join(", ");
+          return `        { "pattern": ${JSON.stringify(entry.pattern)}, "combos": [${combosStr}] }`;
+        })
+        .join(",\n");
+
+      const fallbackStr = fallbackCombos.map((c) => JSON.stringify(c)).join(",\n        ");
+
+      const jsonText =
+`{
+      "wrongSwipeStaticCombos": [
+        ${fallbackStr}
+      ],
+      "entries": [
+${formattedEntries}
+      ]
+    }`;
+
+      exportedJsonArea.value = jsonText;
+      return { jsonText, totalCount: allEntries.length };
+    }
+
+    function triggerDownload(filename, content, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+    }
+
+    downloadJsonBtn.addEventListener("click", () => {
+      const built = buildFormattedJson();
+      if (!built) return;
+      triggerDownload("locker-config.json", built.jsonText, "application/json");
+      showFeedback(`Downloaded locker-config.json (${built.totalCount} shuffled entries, all 00–30).`);
+    });
+
+    downloadHtmlBtn.addEventListener("click", () => {
+      const built = buildFormattedJson();
+      if (!built) return;
+
+      const docClone = document.documentElement.cloneNode(true);
+      const clonedSetup = docClone.querySelector("#setupPanel");
+      if (clonedSetup) clonedSetup.classList.remove("visible");
+
+      const clonedToggle = docClone.querySelector("#toggleSetupBtn");
+      if (clonedToggle) clonedToggle.textContent = "Setup & Export Mode";
+
+      const clonedSubtitle = docClone.querySelector("#subtitleText");
+      if (clonedSubtitle) clonedSubtitle.textContent = "Swipe pattern on the 10×10 grid to unlock all 3 combinations";
+
+      const clonedTextarea = docClone.querySelector("#exportedJsonArea");
+      if (clonedTextarea) clonedTextarea.textContent = "";
+
+      const clonedFeedback = docClone.querySelector("#setupFeedback");
+      if (clonedFeedback) clonedFeedback.textContent = "";
+
+      docClone.querySelectorAll(".real-num").forEach((inp) => {
+        inp.setAttribute("value", "");
+      });
+
+      const clonedScript = docClone.querySelector("#appScript");
+      if (clonedScript) {
+        const replacement =
+          `/* LOCKER_CONFIG_START */\n    const LOCKER_CONFIG = ${built.jsonText};\n    /* LOCKER_CONFIG_END */`;
+        clonedScript.textContent = clonedScript.textContent.replace(
+          /\/\* LOCKER_CONFIG_START \*\/[\s\S]*?\/\* LOCKER_CONFIG_END \*\//,
+          replacement
+        );
+      }
+
+      const fullHtml = "<!DOCTYPE html>\n" + docClone.outerHTML;
+      triggerDownload("locker-pad.html", fullHtml, "text/html");
+      showFeedback(`Downloaded locker-pad.html with ${built.totalCount} shuffled entries hardcoded!`);
+    });
+
+    copyJsonBtn.addEventListener("click", async () => {
+      const built = buildFormattedJson();
+      if (!built) return;
+      try {
+        await navigator.clipboard.writeText(built.jsonText);
+        showFeedback("Copied JSON to clipboard!");
+      } catch (e) {
+        exportedJsonArea.focus();
+        exportedJsonArea.select();
+        document.execCommand("copy");
+        showFeedback("Copied JSON to clipboard!");
+      }
+    });
+
+    applyLiveBtn.addEventListener("click", () => {
+      const built = buildFormattedJson();
+      if (!built) return;
+      try {
+        activeConfig = JSON.parse(built.jsonText);
+        isSetupMode = false;
+        setupPanel.classList.remove("visible");
+        toggleSetupBtn.textContent = "Setup & Export Mode";
+        subtitleText.textContent = "Swipe pattern on the 10×10 grid to unlock all 3 combinations";
+        resetDisplay();
+      } catch (err) {
+        showFeedback("Invalid JSON format.", true);
+      }
+    });
+
+    // =========================================================================
+    // MAIN CONTROLS
+    // =========================================================================
+    clearBtn.addEventListener("click", resetDisplay);
+
+    toggleSetupBtn.addEventListener("click", () => {
+      isSetupMode = !isSetupMode;
+      setupPanel.classList.toggle("visible", isSetupMode);
+      toggleSetupBtn.textContent = isSetupMode ? "Exit Setup Mode" : "Setup & Export Mode";
+      subtitleText.textContent = isSetupMode
+        ? "Setup Mode: Enter your 3 combinations (0–30) & swipe pattern"
+        : "Swipe pattern on the 10×10 grid to unlock all 3 combinations";
+      resetDisplay();
+    });
+
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+  </script>
+</body>
+</html>
