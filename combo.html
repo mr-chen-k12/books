@@ -1,0 +1,1878 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>10x10 Swipe Pattern Data Vault</title>
+    <style>
+      :root {
+        --bg: #0f172a;
+        --panel: #1e293b;
+        --panel-border: #334155;
+        --text: #f8fafc;
+        --muted: #94a3b8;
+        --accent: #38bdf8;
+        --accent-glow: rgba(56, 189, 248, 0.35);
+        --success: #22c55e;
+        --danger: #ef4444;
+        --node-bg: #0f172a;
+        --node-border: #475569;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 24px 16px;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 520px;
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        gap: 12px;
+      }
+
+      .header h1 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+      }
+
+      .btn {
+        background: #334155;
+        color: var(--text);
+        border: 1px solid #475569;
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+
+      .btn:hover {
+        background: #475569;
+      }
+
+      .btn-primary {
+        background: var(--accent);
+        color: #0f172a;
+        border-color: var(--accent);
+        font-weight: 600;
+      }
+
+      .btn-primary:hover {
+        background: #7dd3fc;
+      }
+
+      .btn-success {
+        background: var(--success);
+        color: #052e16;
+        border-color: var(--success);
+        font-weight: 600;
+      }
+
+      .btn-success:hover {
+        background: #4ade80;
+      }
+
+      .btn-sm {
+        padding: 5px 10px;
+        font-size: 0.78rem;
+      }
+
+      /* Data Display & Setup Rows */
+      .section-card {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid var(--panel-border);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 20px;
+      }
+
+      .section-title {
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .rows-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .data-row {
+        display: grid;
+        grid-template-columns: 64px repeat(3, 1fr);
+        align-items: center;
+        gap: 8px;
+      }
+
+      .row-label {
+        font-size: 0.85rem;
+        color: var(--muted);
+        font-weight: 500;
+      }
+
+      .value-box {
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--accent);
+      }
+
+      .value-box.placeholder {
+        color: #475569;
+      }
+
+      input[type="number"] {
+        width: 100%;
+        background: var(--bg);
+        border: 1px solid var(--node-border);
+        border-radius: 8px;
+        padding: 9px 6px;
+        color: var(--text);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 1rem;
+        text-align: center;
+        outline: none;
+      }
+
+      input[type="number"]:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px var(--accent-glow);
+      }
+
+      /* 10x10 Swipe Grid */
+      .grid-wrapper {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        background: var(--bg);
+        border: 1px solid var(--panel-border);
+        border-radius: 12px;
+        touch-action: none;
+        user-select: none;
+        overflow: hidden;
+      }
+
+      .swipe-svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      .grid-nodes {
+        position: relative;
+        z-index: 2;
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        grid-template-rows: repeat(10, 1fr);
+        width: 100%;
+        height: 100%;
+        padding: 8px;
+      }
+
+      .node-cell {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .node-dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--node-bg);
+        border: 2px solid var(--node-border);
+        transition:
+          transform 0.12s ease,
+          background 0.12s ease,
+          border-color 0.12s ease;
+      }
+
+      .node-dot.active {
+        background: var(--accent);
+        border-color: #e0f2fe;
+        transform: scale(1.35);
+        box-shadow: 0 0 10px var(--accent-glow);
+      }
+
+      .node-dot.start {
+        background: var(--success);
+        border-color: #dcfce7;
+      }
+
+      .status-bar {
+        margin-top: 12px;
+        font-size: 0.85rem;
+        color: var(--muted);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 24px;
+      }
+
+      .status-msg.error {
+        color: var(--danger);
+      }
+
+      .status-msg.ok {
+        color: var(--success);
+      }
+
+      .setup-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .setup-actions .btn {
+        flex: 1;
+        text-align: center;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1 id="modeTitle">Swipe Pattern Input</h1>
+        <button id="toggleModeBtn" class="btn">Setup Mode</button>
+      </div>
+
+      <!-- UNLOCK / DISPLAY VIEW -->
+      <div id="unlockSection" class="section-card">
+        <div class="section-title">
+          <span>Output Data (0 – 30)</span>
+          <span id="outputStateLabel">Awaiting Swipe</span>
+        </div>
+        <div id="outputRows" class="rows-container"></div>
+      </div>
+
+      <!-- SETUP VIEW -->
+      <div id="setupSection" class="section-card hidden">
+        <div class="section-title">
+          <span>Step 1: Enter Row Values (0 – 30)</span>
+          <div>
+            <button id="toggleRowCountBtn" class="btn btn-sm" type="button">Use 3 Rows</button>
+          </div>
+        </div>
+        <div id="setupRows" class="rows-container"></div>
+      </div>
+
+      <!-- SHARED 10x10 SWIPE PAD -->
+      <div class="section-card" style="margin-bottom: 0">
+        <div class="section-title">
+          <span id="gridInstruction">Draw 10×10 Pattern to Retrieve Data</span>
+          <button id="clearPatternBtn" class="btn btn-sm hidden" type="button">Clear Swipe</button>
+        </div>
+
+        <div id="gridWrapper" class="grid-wrapper">
+          <svg id="swipeSvg" class="swipe-svg"></svg>
+          <div id="gridNodes" class="grid-nodes"></div>
+        </div>
+
+        <div class="status-bar">
+          <span id="statusMsg" class="status-msg">Drag across dots on the 10×10 grid.</span>
+          <span id="nodeCountBadge"></span>
+        </div>
+
+        <div id="setupActions" class="setup-actions hidden">
+          <button id="applySessionBtn" class="btn btn-primary" type="button">Save & Test Now</button>
+          <button id="downloadJsonBtn" class="btn btn-success" type="button">Download JSON</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // =========================================================================
+      // STORED PATTERN ENTRIES
+      // Every entry uses the same { pattern, rows } format.
+      // =========================================================================
+      const DECOY = [
+        {
+          pattern: [96, 87, 78, 68, 58, 59, 48, 49, 38, 29, 39, 28, 19],
+          rows: [
+            [2, 2, 5],
+            [12, 7, 5],
+            [3, 10, 0],
+            [23, 23, 9],
+            [15, 15, 2],
+          ],
+        },
+        {
+          pattern: [29, 19, 9, 8, 18, 28, 27, 17, 7, 6, 5, 4, 3, 2, 1, 0],
+          rows: [
+            [19, 27, 9],
+            [22, 26, 9],
+            [25, 9, 17],
+            [29, 2, 11],
+            [17, 11, 9],
+          ],
+        },
+        {
+          pattern: [6, 5, 4, 14, 15, 16, 26, 25, 24, 34, 44, 54, 64, 74, 84],
+          rows: [
+            [21, 28, 10],
+            [0, 14, 18],
+            [10, 11, 8],
+            [17, 1, 29],
+            [12, 5, 30],
+          ],
+        },
+        {
+          pattern: [7, 8, 9, 18, 19, 29, 28, 27, 17, 37, 47, 57, 67, 77, 87, 97],
+          rows: [
+            [26, 11, 14],
+            [11, 16, 4],
+            [12, 6, 7],
+            [29, 13, 3],
+            [0, 27, 9],
+          ],
+        },
+        {
+          pattern: [6, 7, 8, 18, 17, 16, 26, 27, 28, 38, 48, 58, 68, 78, 88, 98],
+          rows: [
+            [16, 7, 30],
+            [4, 7, 16],
+            [11, 5, 19],
+            [6, 17, 3],
+            [25, 3, 0],
+          ],
+        },
+        {
+          pattern: [46, 47, 56, 57, 67, 66, 55, 64, 73, 62, 52, 53, 43, 42, 33, 32, 41],
+          rows: [
+            [12, 27, 25],
+            [2, 19, 21],
+            [11, 29, 5],
+            [22, 10, 20],
+            [16, 29, 6],
+          ],
+        },
+        {
+          pattern: [6, 7, 8, 17, 18, 28, 27, 26, 16, 36, 46, 56, 66, 76, 86, 96],
+          rows: [
+            [14, 6, 21],
+            [25, 1, 21],
+            [12, 21, 24],
+            [23, 24, 6],
+            [3, 3, 25],
+          ],
+        },
+        {
+          pattern: [15, 26, 36, 47, 38, 49, 58, 57, 66, 65, 54, 63, 53, 44],
+          rows: [
+            [4, 5, 29],
+            [4, 24, 24],
+            [7, 24, 16],
+            [28, 18, 29],
+            [5, 13, 25],
+          ],
+        },
+        {
+          pattern: [8, 17, 27, 26, 25, 35, 45, 46, 55, 66, 65, 76, 86, 77],
+          rows: [
+            [7, 6, 7],
+            [21, 2, 30],
+            [15, 15, 17],
+            [17, 11, 21],
+            [8, 23, 29],
+          ],
+        },
+        {
+          pattern: [91, 81, 70, 80, 71, 60, 51, 41, 42, 43, 52, 63, 64, 74, 73],
+          rows: [
+            [3, 29, 8],
+            [7, 0, 30],
+            [12, 25, 15],
+            [15, 0, 15],
+            [22, 4, 8],
+          ],
+        },
+        {
+          pattern: [31, 42, 32, 22, 21, 12, 1, 0, 10, 11, 20, 30, 40, 50],
+          rows: [
+            [15, 27, 18],
+            [5, 1, 6],
+            [20, 1, 11],
+            [22, 11, 8],
+            [7, 20, 0],
+          ],
+        },
+        {
+          pattern: [79, 69, 59, 58, 68, 78, 77, 67, 57, 56, 55, 54, 53, 52, 51, 50],
+          rows: [
+            [6, 24, 21],
+            [22, 21, 5],
+            [9, 12, 15],
+            [23, 2, 8],
+            [12, 3, 6],
+          ],
+        },
+        {
+          pattern: [2, 3, 4, 14, 13, 12, 22, 23, 24, 34, 44, 54, 64, 74, 84],
+          rows: [
+            [27, 9, 1],
+            [14, 28, 17],
+            [20, 1, 17],
+            [25, 15, 16],
+            [9, 10, 10],
+          ],
+        },
+        {
+          pattern: [74, 83, 73, 84, 85, 94, 95, 96, 86, 77, 66, 55, 44, 35, 36, 37],
+          rows: [
+            [17, 10, 15],
+            [28, 28, 11],
+            [20, 7, 16],
+            [5, 9, 5],
+            [21, 3, 3],
+          ],
+        },
+        {
+          pattern: [39, 29, 19, 18, 28, 38, 37, 27, 17, 16, 15, 14, 13, 12, 11, 10],
+          rows: [
+            [21, 11, 8],
+            [9, 17, 12],
+            [14, 26, 17],
+            [23, 25, 6],
+            [5, 27, 0],
+          ],
+        },
+        {
+          pattern: [62, 71, 70, 60, 51, 52, 53, 63, 73, 74, 84, 94, 95, 86],
+          rows: [
+            [13, 9, 8],
+            [5, 27, 23],
+            [2, 3, 29],
+            [23, 22, 28],
+            [17, 30, 9],
+          ],
+        },
+        {
+          pattern: [23, 14, 24, 15, 6, 16, 27, 17, 26, 36, 35, 45, 55],
+          rows: [
+            [17, 23, 27],
+            [15, 24, 10],
+            [19, 4, 6],
+            [6, 17, 5],
+            [22, 16, 29],
+          ],
+        },
+        {
+          pattern: [84, 85, 86, 76, 75, 74, 64, 65, 66, 56, 46, 36, 26, 16, 6],
+          rows: [
+            [27, 29, 8],
+            [13, 9, 11],
+            [6, 9, 10],
+            [16, 1, 19],
+            [1, 27, 6],
+          ],
+        },
+        {
+          pattern: [42, 53, 52, 41, 32, 43, 44, 45, 55, 64, 65, 54, 63, 62, 73, 83, 92],
+          rows: [
+            [25, 25, 30],
+            [1, 19, 21],
+            [11, 0, 16],
+            [10, 27, 3],
+            [6, 5, 9],
+          ],
+        },
+        {
+          pattern: [13, 3, 2, 1, 12, 11, 20, 31, 32, 42, 43, 52, 53],
+          rows: [
+            [8, 27, 1],
+            [13, 28, 17],
+            [12, 12, 3],
+            [10, 5, 10],
+            [28, 30, 22],
+          ],
+        },
+        {
+          pattern: [81, 91, 92, 93, 82, 72, 62, 53, 43, 44, 35, 26, 36, 47, 57, 48],
+          rows: [
+            [16, 19, 18],
+            [7, 4, 1],
+            [28, 25, 20],
+            [20, 8, 22],
+            [21, 21, 22],
+          ],
+        },
+        {
+          pattern: [22, 13, 3, 2, 12, 23, 14, 4, 15, 25, 35, 26, 17, 8],
+          rows: [
+            [5, 21, 30],
+            [14, 23, 3],
+            [26, 6, 27],
+            [13, 2, 8],
+            [16, 27, 13],
+          ],
+        },
+        {
+          pattern: [71, 72, 63, 64, 74, 85, 94, 83, 73, 82, 91, 92, 93],
+          rows: [
+            [7, 30, 16],
+            [10, 0, 18],
+            [6, 20, 7],
+            [6, 9, 18],
+            [13, 8, 18],
+          ],
+        },
+        {
+          pattern: [78, 67, 68, 69, 59, 48, 37, 38, 27, 36, 45, 34, 35],
+          rows: [
+            [1, 5, 24],
+            [8, 6, 22],
+            [20, 11, 17],
+            [14, 21, 23],
+            [29, 5, 21],
+          ],
+        },
+        {
+          pattern: [78, 88, 98, 97, 87, 77, 76, 86, 96, 95, 94, 93, 92, 91, 90],
+          rows: [
+            [28, 14, 6],
+            [6, 24, 27],
+            [16, 4, 22],
+            [30, 18, 18],
+            [14, 16, 15],
+          ],
+        },
+        {
+          pattern: [94, 95, 96, 97, 88, 77, 86, 75, 66, 57, 56, 65, 74, 83, 92],
+          rows: [
+            [0, 23, 10],
+            [30, 7, 20],
+            [23, 19, 18],
+            [13, 7, 7],
+            [28, 27, 22],
+          ],
+        },
+        {
+          pattern: [19, 29, 39, 28, 38, 37, 27, 17, 18, 16, 15, 14, 13, 12, 11, 10],
+          rows: [
+            [30, 18, 3],
+            [8, 1, 5],
+            [29, 26, 25],
+            [26, 26, 10],
+            [22, 23, 20],
+          ],
+        },
+        {
+          pattern: [20, 30, 40, 31, 41, 42, 32, 22, 21, 23, 24, 25, 26, 27, 28, 29],
+          rows: [
+            [24, 21, 21],
+            [13, 12, 22],
+            [19, 29, 28],
+            [9, 22, 5],
+            [27, 11, 23],
+          ],
+        },
+        {
+          pattern: [0, 1, 2, 11, 12, 22, 21, 20, 10, 30, 40, 50, 60, 70, 80, 90],
+          rows: [
+            [10, 16, 30],
+            [27, 8, 1],
+            [2, 20, 6],
+            [3, 12, 29],
+            [22, 8, 2],
+          ],
+        },
+        {
+          pattern: [69, 79, 89, 88, 78, 68, 67, 77, 87, 86, 85, 84, 83, 82, 81, 80],
+          rows: [
+            [2, 7, 13],
+            [21, 28, 6],
+            [21, 28, 18],
+            [27, 15, 17],
+            [22, 27, 3],
+          ],
+        },
+        {
+          pattern: [62, 61, 52, 53, 44, 54, 65, 66, 76, 67, 57, 56, 55, 46, 35, 25, 15],
+          rows: [
+            [22, 0, 8],
+            [12, 13, 11],
+            [0, 26, 21],
+            [4, 14, 3],
+            [30, 25, 27],
+          ],
+        },
+        {
+          pattern: [9, 8, 7, 18, 17, 27, 28, 29, 19, 39, 49, 59, 69, 79, 89, 99],
+          rows: [
+            [14, 25, 3],
+            [8, 19, 28],
+            [30, 4, 17],
+            [11, 23, 9],
+            [6, 15, 21],
+          ],
+        },
+        {
+          pattern: [9, 19, 29, 18, 28, 27, 17, 7, 8, 6, 5, 4, 3, 2, 1, 0],
+          rows: [
+            [15, 4, 27],
+            [13, 3, 11],
+            [8, 21, 1],
+            [5, 10, 16],
+            [26, 13, 6],
+          ],
+        },
+        {
+          pattern: [3, 2, 1, 11, 12, 13, 23, 22, 21, 31, 41, 51, 61, 71, 81],
+          rows: [
+            [2, 4, 26],
+            [12, 0, 26],
+            [20, 18, 12],
+            [2, 10, 28],
+            [19, 26, 30],
+          ],
+        },
+        {
+          pattern: [99, 98, 97, 88, 87, 77, 78, 79, 89, 69, 59, 49, 39, 29, 19, 9],
+          rows: [
+            [8, 21, 13],
+            [30, 15, 2],
+            [19, 4, 26],
+            [7, 28, 11],
+            [23, 9, 17],
+          ],
+        },
+        {
+          pattern: [7, 8, 9, 19, 18, 17, 27, 28, 29, 39, 49, 59, 69, 79, 89, 99],
+          rows: [
+            [20, 26, 23],
+            [22, 8, 3],
+            [18, 13, 19],
+            [1, 11, 12],
+            [15, 16, 16],
+          ],
+        },
+        {
+          pattern: [19, 29, 18, 28, 38, 49, 48, 57, 67, 66, 56, 47, 37, 46, 45, 55],
+          rows: [
+            [27, 19, 7],
+            [16, 25, 23],
+            [4, 11, 7],
+            [3, 26, 20],
+            [8, 27, 0],
+          ],
+        },
+        {
+          pattern: [52, 51, 50, 41, 32, 31, 22, 13, 23, 33, 43, 34, 25, 16, 6, 17],
+          rows: [
+            [1, 25, 14],
+            [6, 30, 20],
+            [12, 3, 0],
+            [25, 0, 23],
+            [27, 22, 10],
+          ],
+        },
+        {
+          pattern: [46, 56, 66, 75, 65, 54, 55, 64, 73, 74, 84, 85, 95, 96, 86, 76],
+          rows: [
+            [3, 16, 29],
+            [18, 26, 3],
+            [27, 11, 6],
+            [30, 12, 5],
+            [27, 15, 30],
+          ],
+        },
+        {
+          pattern: [18, 28, 38, 37, 27, 17, 16, 26, 36, 35, 34, 33, 32, 31, 30],
+          rows: [
+            [30, 25, 6],
+            [26, 29, 30],
+            [0, 8, 15],
+            [14, 24, 17],
+            [9, 4, 30],
+          ],
+        },
+        {
+          pattern: [20, 10, 0, 1, 11, 21, 22, 12, 2, 3, 4, 5, 6, 7, 8, 9],
+          rows: [
+            [6, 9, 18],
+            [16, 14, 27],
+            [24, 30, 8],
+            [20, 28, 30],
+            [27, 9, 0],
+          ],
+        },
+        {
+          pattern: [90, 80, 70, 71, 81, 91, 92, 82, 72, 73, 74, 75, 76, 77, 78, 79],
+          rows: [
+            [20, 30, 15],
+            [16, 15, 16],
+            [10, 25, 5],
+            [30, 29, 19],
+            [24, 14, 4],
+          ],
+        },
+        {
+          pattern: [40, 51, 50, 60, 70, 61, 52, 41, 31, 42, 43, 44, 54, 45],
+          rows: [
+            [7, 24, 11],
+            [12, 25, 21],
+            [27, 21, 29],
+            [30, 14, 21],
+            [8, 15, 28],
+          ],
+        },
+        {
+          pattern: [40, 30, 20, 21, 31, 41, 42, 32, 22, 23, 24, 25, 26, 27, 28, 29],
+          rows: [
+            [12, 15, 15],
+            [9, 0, 0],
+            [12, 27, 1],
+            [22, 20, 17],
+            [18, 20, 9],
+          ],
+        },
+        {
+          pattern: [63, 73, 64, 75, 65, 55, 66, 57, 56, 47, 38, 27, 26],
+          rows: [
+            [30, 23, 20],
+            [1, 3, 17],
+            [28, 20, 2],
+            [17, 21, 16],
+            [26, 1, 9],
+          ],
+        },
+        {
+          pattern: [89, 79, 69, 78, 68, 67, 77, 87, 88, 86, 85, 84, 83, 82, 81, 80],
+          rows: [
+            [11, 12, 8],
+            [11, 4, 8],
+            [8, 30, 16],
+            [17, 26, 22],
+            [30, 0, 9],
+          ],
+        },
+        {
+          pattern: [5, 6, 7, 17, 16, 15, 25, 26, 27, 37, 47, 57, 67, 77, 87, 97],
+          rows: [
+            [20, 3, 19],
+            [3, 27, 11],
+            [0, 8, 17],
+            [29, 7, 20],
+            [17, 20, 17],
+          ],
+        },
+        {
+          pattern: [77, 88, 99, 89, 98, 97, 96, 85, 75, 76, 67, 56, 45, 34],
+          rows: [
+            [30, 5, 1],
+            [30, 19, 10],
+            [6, 12, 26],
+            [15, 14, 16],
+            [16, 17, 3],
+          ],
+        },
+        {
+          pattern: [8, 7, 6, 17, 16, 26, 27, 28, 18, 38, 48, 58, 68, 78, 88, 98],
+          rows: [
+            [4, 27, 16],
+            [1, 20, 10],
+            [27, 29, 10],
+            [21, 27, 26],
+            [29, 23, 2],
+          ],
+        },
+        {
+          pattern: [92, 83, 94, 93, 84, 75, 64, 53, 44, 33, 43, 34, 35, 36, 45, 56],
+          rows: [
+            [25, 23, 14],
+            [15, 12, 20],
+            [22, 9, 12],
+            [19, 24, 15],
+            [27, 18, 5],
+          ],
+        },
+        {
+          pattern: [38, 27, 26, 37, 48, 58, 49, 59, 69, 78, 68, 57, 66, 77],
+          rows: [
+            [16, 10, 15],
+            [14, 11, 30],
+            [26, 8, 17],
+            [3, 27, 16],
+            [29, 1, 30],
+          ],
+        },
+        {
+          pattern: [69, 79, 89, 88, 78, 68, 67, 77, 87, 86, 85, 84, 83, 82, 81],
+          rows: [
+            [4, 0, 16],
+            [13, 13, 1],
+            [23, 4, 27],
+            [1, 26, 15],
+            [6, 27, 9],
+          ],
+        },
+        {
+          pattern: [0, 1, 2, 12, 22, 21, 20, 10, 32, 43, 54, 65, 76, 87, 98],
+          rows: [
+            [23, 5, 18],
+            [12, 28, 0],
+            [7, 16, 25],
+            [30, 9, 14],
+            [1, 20, 11],
+          ],
+        },
+        {
+          pattern: [0, 1, 2, 12, 22, 21, 20, 10, 11, 33, 44, 55, 66, 77, 88, 99],
+          rows: [
+            [3, 26, 10],
+            [22, 4, 19],
+            [2, 27, 21],
+            [30, 10, 29],
+            [12, 2, 11],
+          ],
+        },
+        {
+          pattern: [92, 91, 90, 80, 81, 82, 72, 71, 70, 60, 50, 40, 30, 20, 10, 0],
+          rows: [
+            [17, 21, 24],
+            [13, 23, 10],
+            [11, 18, 5],
+            [0, 18, 16],
+            [1, 21, 27],
+          ],
+        },
+        {
+          pattern: [84, 83, 82, 72, 73, 74, 64, 63, 62, 52, 42, 32, 22, 12, 2],
+          rows: [
+            [6, 30, 26],
+            [18, 18, 6],
+            [9, 4, 15],
+            [14, 12, 17],
+            [18, 14, 6],
+          ],
+        },
+        {
+          pattern: [20, 31, 30, 40, 50, 51, 62, 71, 80, 91, 92, 93, 84, 75, 74, 73],
+          rows: [
+            [20, 13, 21],
+            [5, 8, 28],
+            [27, 4, 7],
+            [17, 4, 27],
+            [15, 20, 30],
+          ],
+        },
+        {
+          pattern: [96, 95, 94, 85, 84, 74, 75, 76, 86, 66, 56, 46, 36, 26, 16, 6],
+          rows: [
+            [22, 17, 28],
+            [13, 19, 25],
+            [13, 17, 20],
+            [20, 9, 5],
+            [24, 15, 9],
+          ],
+        },
+        {
+          pattern: [93, 92, 91, 82, 81, 71, 72, 73, 83, 63, 53, 43, 33, 23, 13, 3],
+          rows: [
+            [13, 4, 0],
+            [23, 6, 9],
+            [23, 9, 29],
+            [24, 1, 1],
+            [21, 21, 26],
+          ],
+        },
+        {
+          pattern: [72, 83, 73, 62, 53, 54, 45, 44, 34, 43, 52, 42, 33, 32],
+          rows: [
+            [6, 1, 25],
+            [7, 18, 10],
+            [19, 17, 12],
+            [26, 4, 15],
+            [5, 7, 26],
+          ],
+        },
+        {
+          pattern: [8, 17, 7, 6, 5, 4, 3, 13, 24, 14, 15, 26, 27, 36, 37, 47],
+          rows: [
+            [25, 22, 24],
+            [17, 0, 21],
+            [2, 4, 17],
+            [8, 18, 29],
+            [5, 27, 10],
+          ],
+        },
+        {
+          pattern: [62, 71, 72, 61, 60, 70, 80, 81, 90, 91, 92, 93, 83, 73, 84, 85, 96],
+          rows: [
+            [2, 28, 15],
+            [0, 17, 25],
+            [13, 1, 1],
+            [24, 22, 14],
+            [10, 12, 11],
+          ],
+        },
+        {
+          pattern: [89, 88, 87, 78, 67, 76, 85, 84, 95, 86, 75, 66, 56, 47, 37],
+          rows: [
+            [8, 14, 8],
+            [8, 14, 3],
+            [12, 27, 15],
+            [24, 8, 30],
+            [12, 12, 17],
+          ],
+        },
+        {
+          pattern: [83, 74, 73, 84, 95, 85, 75, 86, 97, 98, 99, 88, 79, 68, 67],
+          rows: [
+            [29, 11, 12],
+            [28, 29, 26],
+            [18, 5, 22],
+            [3, 3, 15],
+            [14, 13, 28],
+          ],
+        },
+        {
+          pattern: [9, 8, 7, 17, 27, 28, 29, 19, 18, 36, 45, 54, 63, 72, 81, 90],
+          rows: [
+            [20, 24, 22],
+            [4, 18, 21],
+            [8, 30, 19],
+            [2, 26, 7],
+            [4, 29, 26],
+          ],
+        },
+        {
+          pattern: [97, 98, 99, 88, 89, 79, 78, 77, 87, 67, 57, 47, 37, 27, 17, 7],
+          rows: [
+            [11, 11, 28],
+            [24, 22, 26],
+            [4, 30, 17],
+            [8, 5, 1],
+            [19, 6, 10],
+          ],
+        },
+        {
+          pattern: [33, 44, 55, 54, 53, 52, 41, 30, 21, 22, 32, 43, 34],
+          rows: [
+            [24, 22, 30],
+            [3, 23, 0],
+            [6, 9, 11],
+            [15, 18, 3],
+            [12, 11, 0],
+          ],
+        },
+        {
+          pattern: [50, 40, 51, 60, 71, 82, 81, 70, 80, 90, 91, 92, 83, 73],
+          rows: [
+            [12, 15, 4],
+            [0, 18, 9],
+            [8, 26, 3],
+            [17, 5, 5],
+            [25, 28, 26],
+          ],
+        },
+        {
+          pattern: [17, 18, 19, 29, 28, 27, 37, 38, 39, 49, 59, 69, 79, 89, 99],
+          rows: [
+            [0, 3, 23],
+            [20, 26, 9],
+            [1, 12, 2],
+            [30, 17, 29],
+            [25, 24, 30],
+          ],
+        },
+        {
+          pattern: [94, 93, 82, 81, 92, 91, 90, 80, 71, 60, 70, 61, 52, 51, 50],
+          rows: [
+            [5, 7, 23],
+            [8, 4, 10],
+            [17, 9, 13],
+            [28, 20, 11],
+            [8, 7, 20],
+          ],
+        },
+        {
+          pattern: [98, 97, 96, 87, 86, 76, 77, 78, 88, 68, 58, 48, 38, 28, 18, 8],
+          rows: [
+            [18, 10, 26],
+            [25, 27, 24],
+            [7, 17, 18],
+            [6, 16, 5],
+            [20, 14, 2],
+          ],
+        },
+        {
+          pattern: [99, 89, 79, 78, 77, 87, 97, 98, 88, 66, 55, 44, 33, 22, 11, 0],
+          rows: [
+            [26, 22, 27],
+            [5, 26, 14],
+            [9, 4, 9],
+            [26, 6, 22],
+            [30, 3, 15],
+          ],
+        },
+        {
+          pattern: [5, 14, 25, 26, 37, 47, 57, 56, 65, 76, 66, 75, 84, 94, 95, 85],
+          rows: [
+            [13, 27, 4],
+            [0, 20, 6],
+            [25, 27, 20],
+            [28, 2, 30],
+            [20, 26, 15],
+          ],
+        },
+        {
+          pattern: [22, 33, 44, 54, 45, 36, 46, 57, 67, 77, 86, 95, 94, 83, 92, 81, 70],
+          rows: [
+            [24, 18, 26],
+            [2, 30, 10],
+            [24, 12, 14],
+            [8, 15, 18],
+            [23, 2, 25],
+          ],
+        },
+        {
+          pattern: [97, 88, 87, 78, 67, 77, 66, 75, 64, 74, 84, 95, 85, 94, 93, 82],
+          rows: [
+            [0, 14, 28],
+            [27, 22, 19],
+            [16, 5, 9],
+            [25, 3, 21],
+            [12, 16, 23],
+          ],
+        },
+        {
+          pattern: [60, 51, 41, 42, 43, 32, 23, 34, 45, 36, 47, 57, 56, 46, 35],
+          rows: [
+            [20, 8, 24],
+            [30, 7, 8],
+            [1, 18, 17],
+            [21, 25, 26],
+            [8, 23, 21],
+          ],
+        },
+        {
+          pattern: [85, 84, 83, 73, 74, 75, 65, 64, 63, 53, 43, 33, 23, 13, 3],
+          rows: [
+            [2, 20, 13],
+            [16, 14, 18],
+            [11, 30, 17],
+            [15, 14, 26],
+            [21, 10, 0],
+          ],
+        },
+        {
+          pattern: [99, 98, 97, 87, 77, 78, 79, 89, 88, 66, 55, 44, 33, 22, 11, 0],
+          rows: [
+            [17, 9, 13],
+            [19, 14, 13],
+            [3, 14, 11],
+            [30, 2, 19],
+            [29, 19, 14],
+          ],
+        },
+        {
+          pattern: [21, 31, 41, 42, 32, 22, 23, 33, 43, 44, 45, 46, 47, 48, 49],
+          rows: [
+            [29, 15, 30],
+            [25, 1, 10],
+            [2, 19, 16],
+            [25, 13, 23],
+            [5, 4, 13],
+          ],
+        },
+        {
+          pattern: [8, 18, 28, 27, 17, 7, 6, 16, 26, 25, 24, 23, 22, 21, 20],
+          rows: [
+            [23, 14, 24],
+            [19, 14, 16],
+            [16, 25, 17],
+            [6, 14, 24],
+            [26, 20, 20],
+          ],
+        },
+        {
+          pattern: [21, 11, 1, 2, 12, 22, 23, 13, 3, 4, 5, 6, 7, 8, 9],
+          rows: [
+            [16, 1, 7],
+            [14, 4, 7],
+            [3, 3, 4],
+            [10, 13, 5],
+            [29, 8, 26],
+          ],
+        },
+        {
+          pattern: [53, 54, 64, 55, 66, 57, 56, 47, 38, 28, 29, 39, 49, 58, 69],
+          rows: [
+            [2, 25, 12],
+            [17, 16, 0],
+            [21, 4, 23],
+            [7, 3, 4],
+            [29, 11, 24],
+          ],
+        },
+        {
+          pattern: [28, 18, 8, 7, 17, 27, 26, 16, 6, 5, 4, 3, 2, 1, 0],
+          rows: [
+            [28, 1, 24],
+            [22, 3, 24],
+            [9, 24, 29],
+            [3, 8, 17],
+            [21, 8, 27],
+          ],
+        },
+        {
+          pattern: [91, 90, 80, 70, 81, 71, 60, 61, 50, 51, 62, 53, 43, 32, 21, 22],
+          rows: [
+            [26, 2, 0],
+            [7, 7, 24],
+            [23, 17, 27],
+            [2, 18, 13],
+            [6, 24, 30],
+          ],
+        },
+        {
+          pattern: [11, 12, 13, 22, 23, 33, 32, 31, 21, 41, 51, 61, 71, 81, 91],
+          rows: [
+            [6, 24, 15],
+            [29, 3, 19],
+            [11, 27, 8],
+            [17, 1, 22],
+            [13, 30, 5],
+          ],
+        },
+        {
+          pattern: [99, 89, 79, 88, 78, 77, 87, 97, 98, 96, 95, 94, 93, 92, 91, 90],
+          rows: [
+            [15, 9, 25],
+            [11, 2, 26],
+            [3, 14, 17],
+            [8, 24, 27],
+            [3, 0, 15],
+          ],
+        },
+        {
+          pattern: [68, 79, 89, 99, 98, 97, 87, 88, 77, 66, 55, 56, 45, 34, 35, 36, 26],
+          rows: [
+            [25, 29, 18],
+            [22, 5, 17],
+            [1, 27, 20],
+            [2, 19, 23],
+            [2, 1, 14],
+          ],
+        },
+        {
+          pattern: [3, 14, 24, 25, 35, 36, 46, 47, 48, 39, 49, 38, 27, 18, 17],
+          rows: [
+            [11, 9, 1],
+            [10, 3, 1],
+            [26, 25, 27],
+            [17, 11, 4],
+            [23, 22, 30],
+          ],
+        },
+        {
+          pattern: [91, 92, 93, 82, 83, 73, 72, 71, 81, 61, 51, 41, 31, 21, 11, 1],
+          rows: [
+            [27, 8, 3],
+            [4, 18, 20],
+            [20, 23, 5],
+            [1, 18, 10],
+            [23, 27, 22],
+          ],
+        },
+        {
+          pattern: [49, 59, 69, 58, 68, 67, 57, 47, 48, 46, 45, 44, 43, 42, 41, 40],
+          rows: [
+            [23, 9, 15],
+            [24, 15, 11],
+            [0, 25, 0],
+            [12, 23, 12],
+            [25, 8, 15],
+          ],
+        },
+        {
+          pattern: [69, 59, 49, 48, 58, 68, 67, 57, 47, 46, 45, 44, 43, 42, 41, 40],
+          rows: [
+            [22, 4, 8],
+            [24, 20, 8],
+            [26, 28, 23],
+            [8, 12, 21],
+            [22, 14, 7],
+          ],
+        },
+        {
+          pattern: [43, 32, 33, 42, 53, 44, 34, 23, 24, 35, 26, 36, 25, 15, 4],
+          rows: [
+            [13, 12, 25],
+            [1, 24, 21],
+            [6, 13, 3],
+            [18, 12, 7],
+            [16, 13, 4],
+          ],
+        },
+        {
+          pattern: [33, 23, 22, 32, 42, 31, 21, 11, 1, 12, 3, 13, 4],
+          rows: [
+            [23, 9, 7],
+            [25, 12, 27],
+            [20, 29, 0],
+            [19, 24, 28],
+            [1, 27, 8],
+          ],
+        },
+        {
+          pattern: [93, 83, 74, 84, 95, 96, 87, 77, 88, 89, 98, 97, 86],
+          rows: [
+            [22, 14, 13],
+            [14, 18, 20],
+            [2, 4, 23],
+            [16, 4, 12],
+            [26, 26, 2],
+          ],
+        },
+        {
+          pattern: [87, 86, 85, 75, 76, 77, 67, 66, 65, 55, 45, 35, 25, 15, 5],
+          rows: [
+            [23, 23, 12],
+            [9, 20, 27],
+            [26, 4, 23],
+            [21, 11, 3],
+            [8, 15, 12],
+          ],
+        },
+        {
+          pattern: [97, 96, 95, 85, 86, 87, 77, 76, 75, 65, 55, 45, 35, 25, 15, 5],
+          rows: [
+            [6, 10, 21],
+            [11, 7, 12],
+            [21, 1, 20],
+            [9, 2, 14],
+            [28, 13, 29],
+          ],
+        },
+        {
+          pattern: [3, 2, 1, 12, 11, 21, 22, 23, 13, 33, 43, 53, 63, 73, 83, 93],
+          rows: [
+            [13, 8, 11],
+            [13, 23, 6],
+            [4, 14, 13],
+            [8, 13, 11],
+            [13, 15, 1],
+          ],
+        },
+        {
+          pattern: [20, 10, 21, 11, 2, 13, 12, 23, 33, 32, 22, 31, 40, 30, 41],
+          rows: [
+            [4, 3, 0],
+            [1, 7, 15],
+            [20, 14, 18],
+            [7, 14, 3],
+            [30, 14, 20],
+          ],
+        },
+        {
+          pattern: [89, 79, 69, 68, 78, 88, 87, 77, 67, 66, 65, 64, 63, 62, 61],
+          rows: [
+            [7, 20, 3],
+            [18, 20, 15],
+            [0, 10, 19],
+            [26, 17, 5],
+            [7, 1, 18],
+          ],
+        },
+        {
+          pattern: [12, 11, 22, 33, 32, 21, 10, 0, 1, 2, 3, 13, 24, 25],
+          rows: [
+            [19, 7, 22],
+            [12, 3, 7],
+            [30, 9, 7],
+            [27, 17, 7],
+            [29, 14, 21],
+          ],
+        },
+        {
+          pattern: [88, 78, 87, 96, 86, 97, 98, 89, 79, 68, 57, 67, 56, 47],
+          rows: [
+            [29, 22, 16],
+            [1, 6, 18],
+            [23, 23, 16],
+            [26, 16, 22],
+            [8, 3, 19],
+          ],
+        },
+        {
+          pattern: [44, 43, 52, 63, 53, 42, 41, 32, 31, 21, 22, 12, 3, 4, 13],
+          rows: [
+            [4, 20, 13],
+            [20, 29, 11],
+            [26, 9, 24],
+            [2, 25, 16],
+            [8, 2, 6],
+          ],
+        },
+        {
+          pattern: [96, 97, 98, 87, 88, 78, 77, 76, 86, 66, 56, 46, 36, 26, 16, 6],
+          rows: [
+            [29, 20, 25],
+            [5, 11, 2],
+            [0, 3, 4],
+            [20, 18, 28],
+            [23, 0, 15],
+          ],
+        },
+        {
+          pattern: [90, 80, 70, 71, 72, 82, 92, 91, 81, 63, 54, 45, 36, 27, 18, 9],
+          rows: [
+            [10, 6, 17],
+            [18, 29, 26],
+            [9, 8, 26],
+            [0, 18, 8],
+            [6, 28, 14],
+          ],
+        },
+        {
+          pattern: [24, 25, 26, 17, 7, 6, 16, 15, 4, 5, 14, 23, 22, 33, 34, 35],
+          rows: [
+            [14, 28, 6],
+            [17, 27, 12],
+            [23, 2, 11],
+            [27, 4, 3],
+            [0, 24, 25],
+          ],
+        },
+      ];
+
+      // =========================================================================
+      // APPLICATION STATE
+      // =========================================================================
+      let activeDecoys = JSON.parse(JSON.stringify(DECOY));
+      let isSetupMode = false;
+      let setupRowCount = activeDecoys[0]?.rows?.length || 5;
+      let isDrawing = false;
+      let currentPattern = [];
+      let setupPattern = [];
+      let pointerPos = null;
+
+      // DOM Elements
+      const modeTitle = document.getElementById("modeTitle");
+      const toggleModeBtn = document.getElementById("toggleModeBtn");
+      const unlockSection = document.getElementById("unlockSection");
+      const setupSection = document.getElementById("setupSection");
+      const outputRowsEl = document.getElementById("outputRows");
+      const outputStateLabel = document.getElementById("outputStateLabel");
+      const setupRowsEl = document.getElementById("setupRows");
+      const toggleRowCountBtn = document.getElementById("toggleRowCountBtn");
+      const gridInstruction = document.getElementById("gridInstruction");
+      const clearPatternBtn = document.getElementById("clearPatternBtn");
+      const gridWrapper = document.getElementById("gridWrapper");
+      const gridNodesEl = document.getElementById("gridNodes");
+      const swipeSvg = document.getElementById("swipeSvg");
+      const statusMsg = document.getElementById("statusMsg");
+      const nodeCountBadge = document.getElementById("nodeCountBadge");
+      const setupActions = document.getElementById("setupActions");
+      const applySessionBtn = document.getElementById("applySessionBtn");
+      const downloadJsonBtn = document.getElementById("downloadJsonBtn");
+
+      // =========================================================================
+      // INITIALIZE 10x10 GRID
+      // =========================================================================
+      const nodeElements = [];
+
+      function buildGrid() {
+        gridNodesEl.innerHTML = "";
+        nodeElements.length = 0;
+
+        for (let i = 0; i < 100; i++) {
+          const cell = document.createElement("div");
+          cell.className = "node-cell";
+
+          const dot = document.createElement("div");
+          dot.className = "node-dot";
+          dot.dataset.index = i;
+
+          cell.appendChild(dot);
+          gridNodesEl.appendChild(cell);
+          nodeElements.push(dot);
+        }
+      }
+
+      // =========================================================================
+      // RENDER OUTPUT & SETUP INPUTS
+      // =========================================================================
+      function getDefaultRowCount() {
+        return activeDecoys[0]?.rows?.length || 5;
+      }
+
+      function renderPlaceholderOutput(rowCount = getDefaultRowCount()) {
+        outputRowsEl.innerHTML = "";
+        for (let r = 0; r < rowCount; r++) {
+          const rowDiv = document.createElement("div");
+          rowDiv.className = "data-row";
+          rowDiv.innerHTML = `
+          <span class="row-label">Row ${r + 1}</span>
+          <div class="value-box placeholder">--</div>
+          <div class="value-box placeholder">--</div>
+          <div class="value-box placeholder">--</div>
+        `;
+          outputRowsEl.appendChild(rowDiv);
+        }
+      }
+
+      function renderResultRows(rows) {
+        outputRowsEl.innerHTML = "";
+        rows.forEach((triple, idx) => {
+          const rowDiv = document.createElement("div");
+          rowDiv.className = "data-row";
+          rowDiv.innerHTML = `
+          <span class="row-label">Row ${idx + 1}</span>
+          <div class="value-box">${String(triple[0]).padStart(2, "0")}</div>
+          <div class="value-box">${String(triple[1]).padStart(2, "0")}</div>
+          <div class="value-box">${String(triple[2]).padStart(2, "0")}</div>
+        `;
+          outputRowsEl.appendChild(rowDiv);
+        });
+        outputStateLabel.textContent = "Data Loaded";
+      }
+
+      function renderSetupInputs() {
+        const existingValues = readSetupInputsRaw();
+        setupRowsEl.innerHTML = "";
+
+        for (let r = 0; r < setupRowCount; r++) {
+          const rowDiv = document.createElement("div");
+          rowDiv.className = "data-row";
+
+          const label = document.createElement("span");
+          label.className = "row-label";
+          label.textContent = `Row ${r + 1}`;
+          rowDiv.appendChild(label);
+
+          for (let c = 0; c < 3; c++) {
+            const input = document.createElement("input");
+            input.type = "number";
+            input.min = "0";
+            input.max = "30";
+            input.step = "1";
+            input.placeholder = "0-30";
+            input.dataset.row = r;
+            input.dataset.col = c;
+
+            if (existingValues[r] && existingValues[r][c] !== "") {
+              input.value = existingValues[r][c];
+            }
+
+            rowDiv.appendChild(input);
+          }
+          setupRowsEl.appendChild(rowDiv);
+        }
+      }
+
+      function readSetupInputsRaw() {
+        const matrix = [];
+        const inputs = setupRowsEl.querySelectorAll("input[type='number']");
+        inputs.forEach((inp) => {
+          const r = Number(inp.dataset.row);
+          const c = Number(inp.dataset.col);
+          if (!matrix[r]) matrix[r] = [];
+          matrix[r][c] = inp.value.trim();
+        });
+        return matrix;
+      }
+
+      function validateSetupData() {
+        const raw = readSetupInputsRaw();
+        const parsedRows = [];
+
+        for (let r = 0; r < setupRowCount; r++) {
+          const row = [];
+          for (let c = 0; c < 3; c++) {
+            const valStr = raw[r]?.[c] ?? "";
+            if (valStr === "") {
+              return { ok: false, error: `Row ${r + 1}, Value ${c + 1} is empty.` };
+            }
+            const num = Number(valStr);
+            if (!Number.isInteger(num) || num < 0 || num > 30) {
+              return {
+                ok: false,
+                error: `Row ${r + 1}, Value ${c + 1} must be an integer between 0 and 30.`,
+              };
+            }
+            row.push(num);
+          }
+          parsedRows.push(row);
+        }
+
+        if (setupPattern.length < 2) {
+          return { ok: false, error: "Draw a swipe pattern connecting at least 2 dots at the bottom." };
+        }
+
+        return {
+          ok: true,
+          entry: {
+            pattern: [...setupPattern],
+            rows: parsedRows,
+          },
+        };
+      }
+
+      // =========================================================================
+      // SWIPE GEOMETRY & DRAWING
+      // =========================================================================
+      function getNodeCenter(index) {
+        const wrapperRect = gridWrapper.getBoundingClientRect();
+        const dotRect = nodeElements[index].getBoundingClientRect();
+        return {
+          x: dotRect.left - wrapperRect.left + dotRect.width / 2,
+          y: dotRect.top - wrapperRect.top + dotRect.height / 2,
+        };
+      }
+
+      function getHitRadius() {
+        const wrapperRect = gridWrapper.getBoundingClientRect();
+        const cellSize = wrapperRect.width / 10;
+        return cellSize * 0.34;
+      }
+
+      function getRelativePointer(clientX, clientY) {
+        const rect = gridWrapper.getBoundingClientRect();
+        return {
+          x: clientX - rect.left,
+          y: clientY - rect.top,
+        };
+      }
+
+      function checkNodeHit(pt) {
+        const radius = getHitRadius();
+        for (let i = 0; i < 100; i++) {
+          if (currentPattern.includes(i)) continue;
+          const center = getNodeCenter(i);
+          const dist = Math.hypot(pt.x - center.x, pt.y - center.y);
+          if (dist <= radius) {
+            currentPattern.push(i);
+            updateGridVisuals(currentPattern, isDrawing ? pt : null);
+            break;
+          }
+        }
+      }
+
+      function updateGridVisuals(pattern, trailingPt = null) {
+        nodeElements.forEach((dot, idx) => {
+          dot.classList.remove("active", "start");
+          if (pattern.includes(idx)) {
+            dot.classList.add("active");
+            if (pattern[0] === idx) {
+              dot.classList.add("start");
+            }
+          }
+        });
+
+        swipeSvg.innerHTML = "";
+        if (pattern.length === 0) {
+          nodeCountBadge.textContent = "";
+          return;
+        }
+
+        nodeCountBadge.textContent = `${pattern.length} dots`;
+
+        const points = pattern.map((idx) => {
+          const c = getNodeCenter(idx);
+          return `${c.x},${c.y}`;
+        });
+
+        if (trailingPt) {
+          points.push(`${trailingPt.x},${trailingPt.y}`);
+        }
+
+        const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+        polyline.setAttribute("points", points.join(" "));
+        polyline.setAttribute("fill", "none");
+        polyline.setAttribute("stroke", "#38bdf8");
+        polyline.setAttribute("stroke-width", "3");
+        polyline.setAttribute("stroke-linecap", "round");
+        polyline.setAttribute("stroke-linejoin", "round");
+        polyline.setAttribute("opacity", "0.85");
+        swipeSvg.appendChild(polyline);
+      }
+
+      function patternsMatch(a, b) {
+        if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false;
+        for (let i = 0; i < a.length; i++) {
+          if (a[i] !== b[i]) return false;
+        }
+        return true;
+      }
+
+      // Generates deterministic, plausible 0-30 rows when a swipe is not in DECOY
+      // so random swipes look identical in structure without exposing stored entries.
+      function generateFallbackRows(pattern, targetRowCount) {
+        let seed = 2166136261;
+        for (let i = 0; i < pattern.length; i++) {
+          seed ^= pattern[i] + 17;
+          seed = Math.imul(seed, 16777619);
+        }
+
+        const rows = [];
+        for (let r = 0; r < targetRowCount; r++) {
+          const triple = [];
+          for (let c = 0; c < 3; c++) {
+            seed ^= seed << 13;
+            seed ^= seed >>> 17;
+            seed ^= seed << 5;
+            triple.push(Math.abs(seed) % 31);
+          }
+          rows.push(triple);
+        }
+        return rows;
+      }
+
+      function handleSwipeComplete() {
+        if (currentPattern.length < 2) {
+          currentPattern = [];
+          updateGridVisuals([]);
+          return;
+        }
+
+        if (isSetupMode) {
+          setupPattern = [...currentPattern];
+          updateGridVisuals(setupPattern, null);
+          setStatus(`Pattern recorded (${setupPattern.length} dots). Ready to save or download JSON.`, "ok");
+        } else {
+          const matchedEntry = activeDecoys.find((entry) => patternsMatch(currentPattern, entry.pattern));
+
+          if (matchedEntry) {
+            renderResultRows(matchedEntry.rows);
+          } else {
+            renderResultRows(generateFallbackRows(currentPattern, getDefaultRowCount()));
+          }
+          setStatus("Swipe processed.", "");
+
+          const snapshot = [...currentPattern];
+          updateGridVisuals(snapshot, null);
+          setTimeout(() => {
+            if (!isDrawing && !isSetupMode) {
+              updateGridVisuals([]);
+            }
+          }, 450);
+        }
+
+        currentPattern = [];
+      }
+
+      function setStatus(text, type = "") {
+        statusMsg.textContent = text;
+        statusMsg.className = "status-msg" + (type ? ` ${type}` : "");
+      }
+
+      // =========================================================================
+      // POINTER EVENTS (MOUSE & TOUCH)
+      // =========================================================================
+      function onPointerStart(clientX, clientY) {
+        isDrawing = true;
+        currentPattern = [];
+        const pt = getRelativePointer(clientX, clientY);
+        pointerPos = pt;
+        checkNodeHit(pt);
+      }
+
+      function onPointerMove(clientX, clientY) {
+        if (!isDrawing) return;
+        const pt = getRelativePointer(clientX, clientY);
+        pointerPos = pt;
+        checkNodeHit(pt);
+        if (currentPattern.length > 0) {
+          updateGridVisuals(currentPattern, pt);
+        }
+      }
+
+      function onPointerEnd() {
+        if (!isDrawing) return;
+        isDrawing = false;
+        pointerPos = null;
+        handleSwipeComplete();
+      }
+
+      gridWrapper.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        onPointerStart(e.clientX, e.clientY);
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        onPointerMove(e.clientX, e.clientY);
+      });
+
+      window.addEventListener("mouseup", () => {
+        onPointerEnd();
+      });
+
+      gridWrapper.addEventListener(
+        "touchstart",
+        (e) => {
+          e.preventDefault();
+          const touch = e.touches[0];
+          onPointerStart(touch.clientX, touch.clientY);
+        },
+        { passive: false },
+      );
+
+      gridWrapper.addEventListener(
+        "touchmove",
+        (e) => {
+          e.preventDefault();
+          const touch = e.touches[0];
+          onPointerMove(touch.clientX, touch.clientY);
+        },
+        { passive: false },
+      );
+
+      window.addEventListener("touchend", () => {
+        onPointerEnd();
+      });
+
+      window.addEventListener("resize", () => {
+        if (isSetupMode && setupPattern.length > 0) {
+          updateGridVisuals(setupPattern);
+        }
+      });
+
+      // =========================================================================
+      // MODE SWITCHING & BUTTON HANDLERS
+      // =========================================================================
+      toggleModeBtn.addEventListener("click", () => {
+        isSetupMode = !isSetupMode;
+        currentPattern = [];
+
+        if (isSetupMode) {
+          modeTitle.textContent = "Setup Mode";
+          toggleModeBtn.textContent = "Back to Swipe View";
+          unlockSection.classList.add("hidden");
+          setupSection.classList.remove("hidden");
+          setupActions.classList.remove("hidden");
+          clearPatternBtn.classList.remove("hidden");
+          gridInstruction.textContent = "Step 2: Draw Swipe Pattern at Bottom";
+          setupRowCount = getDefaultRowCount() === 3 ? 3 : 5;
+          toggleRowCountBtn.textContent = setupRowCount === 3 ? "Use 5 Rows" : "Use 3 Rows";
+          renderSetupInputs();
+          setupPattern = [];
+          updateGridVisuals([]);
+          setStatus("Enter numbers (0-30) above, then draw your pattern.", "");
+        } else {
+          modeTitle.textContent = "Swipe Pattern Input";
+          toggleModeBtn.textContent = "Setup Mode";
+          setupSection.classList.add("hidden");
+          setupActions.classList.add("hidden");
+          clearPatternBtn.classList.add("hidden");
+          unlockSection.classList.remove("hidden");
+          gridInstruction.textContent = "Draw 10×10 Pattern to Retrieve Data";
+          outputStateLabel.textContent = "Awaiting Swipe";
+          renderPlaceholderOutput();
+          updateGridVisuals([]);
+          setStatus("Drag across dots on the 10×10 grid.", "");
+        }
+      });
+
+      toggleRowCountBtn.addEventListener("click", () => {
+        setupRowCount = setupRowCount === 3 ? 5 : 3;
+        toggleRowCountBtn.textContent = setupRowCount === 3 ? "Use 5 Rows" : "Use 3 Rows";
+        renderSetupInputs();
+      });
+
+      clearPatternBtn.addEventListener("click", () => {
+        setupPattern = [];
+        currentPattern = [];
+        updateGridVisuals([]);
+        setStatus("Pattern cleared. Draw a new swipe pattern.", "");
+      });
+
+      applySessionBtn.addEventListener("click", () => {
+        const result = validateSetupData();
+        if (!result.ok) {
+          setStatus(result.error, "error");
+          return;
+        }
+
+        // Add or update this entry inside the active DECOY pool for immediate testing
+        const existingIdx = activeDecoys.findIndex((item) =>
+          patternsMatch(item.pattern, result.entry.pattern),
+        );
+        if (existingIdx !== -1) {
+          activeDecoys[existingIdx] = result.entry;
+        } else {
+          activeDecoys.push(result.entry);
+        }
+
+        setStatus("Added to active DECOY pool! Switching to Swipe View...", "ok");
+        setTimeout(() => {
+          toggleModeBtn.click();
+        }, 500);
+      });
+
+      downloadJsonBtn.addEventListener("click", () => {
+        const result = validateSetupData();
+        if (!result.ok) {
+          setStatus(result.error, "error");
+          return;
+        }
+
+        const jsonString = JSON.stringify(result.entry, null, 2);
+        const blob = new Blob([jsonString], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "decoy-entry.json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        setStatus("Downloaded decoy-entry.json! Paste it into const DECOY = [ ... ].", "ok");
+      });
+
+      // Boot
+      buildGrid();
+      renderPlaceholderOutput();
+    </script>
+  </body>
+</html>
