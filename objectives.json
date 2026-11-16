@@ -1,5 +1,22 @@
 [
   {
+    "weekTitle": "Week 11 – November 16 to November 20",
+    "objectives": "By the end of the week, students will use ratios to represent and solve constant-speed situations, compare situations by examining ratios, and organize equivalent ratios in tables. Students will explain how corresponding values are related and use tables, double number lines, and unit rates to support their reasoning. Students will also complete a lighter DeltaMath assignment and submit missing work before grades are finalized on November 20.",
+    "agenda": [
+      "<strong>Monday, November 16: Lesson 9 – Constant Speed</strong><br>Use ratios and double number line diagrams to represent distance and time at a constant speed. Find missing values and explain how equivalent ratios describe the same speed.<br><em>Cool-down:</em> Solve a constant-speed problem and justify the corresponding distance and time values.",
+      "<strong>Tuesday, November 17: Lesson 10 – Comparing Situations by Examining Ratios</strong><br>Compare two situations by examining their ratios, unit rates, tables, or double number line diagrams. Determine which situation has the greater rate and explain the comparison in context.<br><em>Cool-down:</em> Compare two ratio situations and support the conclusion with mathematical evidence.",
+      "<strong>Wednesday, November 18: Lesson 11 – Representing Ratios with Tables</strong><br>Organize equivalent ratios in tables and use multiplication or division to find missing values. Explain how each row represents the same ratio relationship.<br><em>Cool-down:</em> Complete a ratio table and explain how the values in each row are related.",
+      "<strong>Thursday, November 19: Independent DeltaMath and Grade Catch-Up</strong><br>Mr. Chen is out today. Complete this week's lighter DeltaMath assignment, review unfinished classwork, and submit missing assignments that can still be counted toward your grade. Work quietly, show your calculations, and ask the covering teacher for help with directions when needed.",
+      "<strong>Friday, November 20: Final Catch-Up Day – Grades Due</strong><br>Mr. Chen is out today. Finish and submit the lighter DeltaMath assignment and any remaining eligible missing work. Check that your name and homeroom are on every paper. Grades are due today, so use the class period responsibly and turn in completed work before the end of class."
+    ],
+    "homework": "Complete the lighter DeltaMath assignment and submit eligible missing work by Friday, November 20. Review your notes from Lessons 9–11 and correct cool-down responses when requested. Bring your notebook, paper, and a sharpened pencil to class every day.",
+    "languageObjectives": [
+      "Students will describe constant-speed relationships using the terms distance, time, speed, ratio, and equivalent.",
+      "Students will compare ratio situations using unit rate, greater than, less than, and mathematical evidence.",
+      "Students will explain how the rows and columns of a ratio table represent corresponding quantities and equivalent ratios."
+    ]
+  },
+  {
     "weekTitle": "Week 10 – November 9 to November 13",
     "objectives": "By the end of the week, students will represent and solve equivalent-ratio problems using double number line diagrams, determine unit rates by finding how much for one, and use ratios to reason about constant-speed situations. Students will explain how corresponding values are related and complete a cool-down after each instructional lesson to demonstrate individual understanding.",
     "agenda": [
@@ -77,94 +94,3 @@
       "<strong>Thursday, October 15: Lesson 15 – More Nets, More Surface Area</strong><br>Find the surface areas of prisms and pyramids using nets and labeled dimensions. Apply rectangle and triangle area formulas, identify corresponding bases and perpendicular heights, and justify your calculations.",
       "<strong>Friday, October 16: Surface Area Practice and Review</strong><br>Practice using nets, check for missing or double-counted faces, and explain your reasoning. <em>If ready: Lesson 16 – Distinguishing Between Surface Area and Volume (Optional).</em> Compare covering the outside of a solid with the space it occupies, using square units for surface area and cubic units for volume."
     ],
-    "homework": "Complete assigned DeltaMath practice. Review rectangle and triangle area formulas and use your class notes to practice finding surface area from a net. Bring your notebook, paper, and a sharpened pencil to every class.",
-    "languageObjectives": [
-      "Students will describe polyhedra and their nets using the terms face, edge, vertex, prism, and pyramid.",
-      "Students will explain and compare surface-area strategies, stating how each face was counted and why the total is measured in square units.",
-      "If ready for the optional extension, students will explain the difference between surface area and volume using the phrases covering the outside and occupying space, and the terms square units and cubic units."
-    ]
-  },
-  {
-    "weekTitle": "Week 5 – October 5 to October 9",
-    "objectives": "By the end of the week, students will describe surface area as the total area of all the faces of a polyhedron, identify faces, edges, and vertices, and connect three-dimensional solids to their two-dimensional nets. Students will calculate surface area by adding the areas of all faces and label answers in square units. As an optional extension, students will distinguish surface area from volume.",
-    "agenda": [
-      "<strong>Day 1 – Monday: Lesson 12 – What Is Surface Area?</strong><br>Explore how much material is needed to cover the outside of a solid. Find surface area by adding the areas of every face, including faces hidden from view, and express the total in square units.",
-      "<strong>Day 2 – Tuesday: Lesson 13 – Polyhedra</strong><br>Identify and count faces, edges, and vertices. Describe and compare prisms and pyramids using the shapes of their faces and the way those faces meet.",
-      "<strong>Day 3 – Wednesday: Lesson 14 – Nets and Surface Area</strong><br>Match nets to the solids they form. Use a net to organize the areas of all faces and calculate the surface area, counting each face exactly once.",
-      "<strong>Day 4 – Thursday: Lesson 15 – More Nets, More Surface Area</strong><br>Use nets and labeled dimensions to find the surface areas of prisms and pyramids. Apply rectangle and triangle area formulas, choose corresponding bases and perpendicular heights, and explain your calculations.",
-      "<strong>Day 5 – Friday: Surface Area Review and Lesson 16 – Distinguishing Between Surface Area and Volume (Optional)</strong><br>Review finding surface area with nets and compare solution strategies. As an optional extension, distinguish the area covering a solid from the space it occupies and explain when to use square units or cubic units."
-    ],
-    "homework": "Complete assigned DeltaMath practice. Review rectangle and triangle area formulas, the parts of polyhedra, and how nets help organize surface-area calculations. Bring your notebook, paper, and a sharpened pencil to class every day.",
-    "languageObjectives": [
-      "Students will describe and compare solids using the terms polyhedron, face, edge, vertex, prism, and pyramid.",
-      "Students will explain how a net represents a solid and justify surface-area calculations using the terms face area, total area, and square units.",
-      "As an optional extension, students will compare surface area and volume using the phrases covering the outside and occupying space, and distinguish square units from cubic units."
-    ]
-  },
-  {
-    "weekTitle": "Week 4 – September 28 to October 2",
-    "objectives": "By the end of the week, students will explain how triangle area relates to parallelogram area, identify a base and its corresponding perpendicular height, use A = (b × h) ÷ 2 to find triangle areas, and find polygon areas by decomposing them into simpler shapes. Students will explain their reasoning and label areas in square units.",
-    "agenda": [
-      "<strong>Day 1 – Monday: Lesson 7 – From Parallelograms to Triangles</strong><br>Split a parallelogram along a diagonal into two congruent triangles. Use diagrams to explain why each triangle has half the area of the parallelogram.",
-      "<strong>Day 2 – Tuesday: Lesson 8 – Area of Triangles</strong><br>Find triangle areas by composing two congruent copies into a parallelogram or by decomposing shapes with known areas. Compare strategies with a partner and explain your reasoning.",
-      "<strong>Day 3 – Wednesday: Lesson 9 – Formula for the Area of a Triangle</strong><br>Explain the one-half factor in <em>A = (b × h) ÷ 2</em>. Use the formula to calculate triangle areas and label answers in square units.",
-      "<strong>Day 4 – Thursday: Lesson 10 – Bases and Heights of Triangles</strong><br>Choose a base and identify or draw its corresponding perpendicular height. Find heights inside or outside a triangle, extending the base when needed, and distinguish height from a slanted side length.",
-      "<strong>Day 5 – Friday: Lesson 11 – Polygons</strong><br>Find polygon areas by decomposing figures into non-overlapping triangles, rectangles, or parallelograms and adding their areas. Compare different decompositions and justify why they give the same total area."
-    ],
-    "homework": "Complete assigned DeltaMath practice. Review your notes on triangle area, bases and heights, and polygon decomposition. Bring your notebook, paper, and a sharpened pencil to class every day.",
-    "languageObjectives": [
-      "Students will explain the relationship between triangle and parallelogram areas using the terms congruent, one-half, base, and height.",
-      "Students will describe how a height is perpendicular to its corresponding base or the line containing that base.",
-      "Students will compare and justify polygon area strategies using the terms decompose, non-overlapping, polygon, and square units."
-    ]
-  },
-  {
-    "weekTitle": "Week 3 – September 21 to September 25",
-    "objectives": "By the end of the week, students will calculate the area of parallelograms, use the properties of parallelograms to find missing side and angle measures, and classify different types of quadrilaterals.",
-    "agenda": [
-      "<strong>Day 1 – Monday: Area of Parallelograms</strong><br>Identify a base and its corresponding perpendicular height, then use <em>A = b × h</em> to find the area of a parallelogram. Explain how cutting and rearranging a parallelogram forms a rectangle with the same area.",
-      "<strong>Day 2 – Tuesday: Parallelogram Properties and Quadrilaterals</strong><br>Use the facts that opposite sides are parallel and congruent, opposite angles are congruent, and consecutive angles are supplementary to find missing side and angle measures. Classify and label parallelograms, rectangles, rhombuses, squares, trapezoids, and other quadrilaterals.",
-      "<strong>Day 3 – Wednesday: Applying Parallelogram Relationships</strong><br>Solve problems involving area, missing bases or heights, missing side lengths, and missing angle measures. Justify each answer using a parallelogram property.",
-      "<strong>Day 4 – Thursday: Quiz Review</strong><br>Complete mixed practice on parallelogram area, angle relationships, side relationships, and quadrilateral classification. Ask questions and correct misunderstandings before the quiz.",
-      "<strong>Day 5 – Friday: Quiz</strong><br>Demonstrate your understanding of parallelogram area and properties and the classification of quadrilaterals."
-    ],
-    "homework": "Complete assigned DeltaMath or review practice. Bring your notebook, paper, and a sharpened pencil to class every day. Study Thursday's review for Friday's quiz.",
-    "languageObjectives": [
-      "Students will explain how a base and its corresponding perpendicular height determine the area of a parallelogram.",
-      "Students will justify missing measures and classifications using the terms opposite, consecutive, parallel, congruent, supplementary, and quadrilateral."
-    ]
-  },
-  {
-    "weekTitle": "Week 2 – September 14 to September 18",
-    "objectives": "By the end of the week, students will explain the meaning of area and use tiling, decomposing, rearranging, enclosing, and subtracting to find and compare the areas of two-dimensional figures.",
-    "agenda": [
-      "<strong>Day 1 – Monday: Check Your Readiness</strong><br>Show what you already know about area, rectangles, parallel and perpendicular lines, and geometric figures. Explain your reasoning whenever possible.",
-      "<strong>Day 2 – Tuesday: Reasoning to Find Area</strong><br><em>Tiling the Plane:</em> Compare geometric patterns and explain how shapes cover a region without gaps or overlaps.<br><em>Finding Area by Decomposing and Rearranging:</em> Find area by composing smaller shapes, decomposing figures, and rearranging pieces into familiar shapes.",
-      "<strong>Day 3 – Wednesday: MAP Test English</strong><br>Complete the MAP English assessment carefully and give your best effort.",
-      "<strong>Day 4 – Thursday: MAP Test Math</strong><br>Complete the MAP Mathematics assessment carefully, use scratch paper, and show perseverance.",
-      "<strong>Day 5 – Friday: Reasoning to Find Area</strong><br>Use different strategies to find the area of polygons, compare strategies, explain your reasoning, and label answers with square units."
-    ],
-    "homework": "Complete any assigned DeltaMath practice. Bring your notebook, paper, and a sharpened pencil to class every day.",
-    "languageObjectives": [
-      "Students will explain that area is the amount of the plane covered by a two-dimensional region.",
-      "Students will compare and explain area strategies using the terms tile, compose, decompose, rearrange, and square units."
-    ]
-  },
-  {
-    "weekTitle": "Week 1 – September 8 to September 11",
-    "objectives": "By the end of the week, students will build our classroom community, learn the routines and materials needed for math class, set up DeltaMath, and demonstrate what they remember from Grade 5 math.",
-    "agenda": [
-      "<strong>Tuesday:</strong> Welcome to 6th Grade Math; make name tents; meet our class; review daily materials; receive an available take-home IM book; and begin the Grade 5 math diagnostic.",
-      "<strong>Wednesday:</strong> Complete the Grade 5 math diagnostic and register for DeltaMath.",
-      "<strong>Thursday:</strong> Practice our classroom routines and begin our first math lesson.",
-      "<strong>Friday:</strong> Continue the math lesson, share strategies, and reflect on our first week.",
-      "<strong>Name-Tent Directions:</strong> Fold an 8.5 × 11-inch sheet into thirds so it stands. Write your name large, dark, and easy to read. At the bottom, add one sport or activity you enjoy.",
-      "<strong>Daily Materials:</strong> Bring a notebook, paper, and a pencil to every class."
-    ],
-    "homework": "Bring your notebook, paper, and a pencil every day. Keep your assigned math book at home for review.",
-    "languageObjectives": [
-      "Students will introduce themselves and share one sport or activity they enjoy.",
-      "Students will explain their mathematical thinking and describe the strategies they use."
-    ]
-  }
-]
