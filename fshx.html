@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Chinese Handwriting & Pinyin Tracer (iPad)</title>
+  <!-- Optional CDN for automatic Pinyin conversion when pasting additional text -->
+  <script src="https://unpkg.com/pinyin-pro@3.19.6/dist/index.js"></script>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --grid-line: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --accent: #2563eb;
+      --ghost-opacity: 0.24;
+      --cell-size: 74px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Hiragino Sans GB", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding-bottom: 80px;
+    }
+
+    /* Sticky Top Toolbar */
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      justify-content: space-between;
+    }
+
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button, select {
+      font-size: 14px;
+      padding: 7px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    button:active {
+      background: #f1f5f9;
+    }
+
+    button.primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .swatch {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 1px #cbd5e1;
+      padding: 0;
+    }
+
+    .swatch.active {
+      box-shadow: 0 0 0 2px var(--accent);
+      transform: scale(1.08);
+    }
+
+    label.control-label {
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    input[type="range"] {
+      width: 85px;
+    }
+
+    .status-badge {
+      font-size: 12px;
+      color: #16a34a;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    /* Custom Text Drawer */
+    .drawer {
+      display: none;
+      max-width: 960px;
+      margin: 14px auto 0;
+      padding: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .drawer.open {
+      display: block;
+    }
+
+    .drawer textarea {
+      width: 100%;
+      min-height: 120px;
+      font-size: 16px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-family: inherit;
+      margin-bottom: 10px;
+    }
+
+    /* Main Practice Container */
+    .container {
+      max-width: 980px;
+      margin: 18px auto;
+      padding: 0 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .line-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px 18px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+      transition: border-color 0.2s;
+    }
+
+    .line-card.active-line {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+    }
+
+    .line-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .line-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .line-actions button {
+      font-size: 12px;
+      padding: 4px 10px;
+    }
+
+    /* Writing Overlay Stage */
+    .writing-stage {
+      position: relative;
+      width: 100%;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .guide-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      pointer-events: none;
+    }
+
+    .char-box {
+      width: var(--cell-size);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .char-box.space-box {
+      width: 24px;
+    }
+
+    .char-grid {
+      width: var(--cell-size);
+      height: var(--cell-size);
+      border: 1px solid var(--grid-line);
+      border-radius: 6px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-image:
+        linear-gradient(to right, transparent 49.5%, #f1f5f9 49.5%, #f1f5f9 50.5%, transparent 50.5%),
+        linear-gradient(to bottom, transparent 49.5%, #f1f5f9 49.5%, #f1f5f9 50.5%, transparent 50.5%);
+    }
+
+    .ghost-char {
+      font-family: "Kaiti TC", "STKaiti", "DFKai-SB", "PingFang TC", serif;
+      font-size: 52px;
+      line-height: 1;
+      color: #0f172a;
+      opacity: var(--ghost-opacity);
+    }
+
+    .pinyin-label {
+      margin-top: 4px;
+      height: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #475569;
+      letter-spacing: 0.2px;
+      text-align: center;
+    }
+
+    canvas.draw-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      touch-action: none; /* Prevents scrolling while writing with Apple Pencil */
+      cursor: crosshair;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="toolbar">
+    <div class="toolbar-group">
+      <button class="primary" id="resumeBtn" title="Scroll to last practiced line">Resume Left Off</button>
+      <button id="toggleDrawerBtn">Edit / Paste Text</button>
+    </div>
+
+    <div class="toolbar-group">
+      <button class="swatch active" data-color="#1e293b" style="background:#1e293b;" title="Ink Black"></button>
+      <button class="swatch" data-color="#2563eb" style="background:#2563eb;" title="Blue"></button>
+      <button class="swatch" data-color="#dc2626" style="background:#dc2626;" title="Red"></button>
+
+      <label class="control-label">
+        Size
+        <input type="range" id="penSize" min="1.5" max="8" step="0.5" value="3.5" />
+      </label>
+
+      <label class="control-label">
+        Overlay
+        <input type="range" id="ghostOpacity" min="0.06" max="0.55" step="0.02" value="0.24" />
+      </label>
+
+      <button id="togglePinyinBtn">Hide Pinyin</button>
+    </div>
+
+    <div class="toolbar-group">
+      <span class="status-badge" id="saveStatus">Saved locally</span>
+    </div>
+  </div>
+
+  <div class="drawer" id="textDrawer">
+    <p style="margin-top:0; font-size:14px; color:#475569;">
+      Paste any Chinese lines below (one line per practice strip). Pinyin will be generated automatically and saved on this iPad.
+    </p>
+    <textarea id="customTextInput" placeholder="Paste Chinese text here..."></textarea>
+    <div style="display:flex; gap:10px; justify-content:flex-end;">
+      <button id="resetDefaultBtn">Reset Default Sample</button>
+      <button class="primary" id="applyTextBtn">Load & Save Text</button>
+    </div>
+  </div>
+
+  <main class="container" id="practiceContainer"></main>
+
+  <script>
+    // Pre-verified 4-line excerpt with exact Pinyin
+    const DEFAULT_ENTRIES = [
+      {
+        text: "誰都只得那雙手 靠擁抱亦難任你擁有",
+        pinyin: ["shuí","dōu","zhǐ","dé","nà","shuāng","shǒu","","kào","yōng","bào","yì","nán","rèn","nǐ","yōng","yǒu"]
+      },
+      {
+        text: "要擁有必先懂失去怎接受",
+        pinyin: ["yào","yōng","yǒu","bì","xiān","dǒng","shī","qù","zěn","jiē","shòu"]
+      },
+      {
+        text: "曾沿著雪路浪遊 為何為好事淚流？",
+        pinyin: ["céng","yán","zhe","xuě","lù","làng","yóu","","wèi","hé","wèi","hǎo","shì","lèi","liú",""]
+      },
+      {
+        text: "誰能憑愛意要富士山私有？",
+        pinyin: ["shuí","néng","píng","ài","yì","yào","fù","shì","shān","sī","yǒu",""]
+      }
+    ];
+
+    const STORAGE_KEYS = {
+      TEXT: "ipad_zh_tracer_text_v1",
+      LAST_LINE: "ipad_zh_tracer_last_line_v1",
+      SETTINGS: "ipad_zh_tracer_settings_v1",
+      CANVAS_PREFIX: "ipad_zh_tracer_canvas_v1_"
+    };
+
+    let state = {
+      penColor: "#1e293b",
+      penSize: 3.5,
+      ghostOpacity: 0.24,
+      showPinyin: true,
+      lastLine: 0
+    };
+
+    const container = document.getElementById("practiceContainer");
+    const saveStatus = document.getElementById("saveStatus");
+    const textDrawer = document.getElementById("textDrawer");
+    const customTextInput = document.getElementById("customTextInput");
+
+    function loadSettings() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.SETTINGS));
+        if (saved) state = { ...state, ...saved };
+        const lastLine = parseInt(localStorage.getItem(STORAGE_KEYS.LAST_LINE), 10);
+        if (!isNaN(lastLine)) state.lastLine = lastLine;
+      } catch (e) {}
+
+      document.documentElement.style.setProperty("--ghost-opacity", state.ghostOpacity);
+      document.getElementById("ghostOpacity").value = state.ghostOpacity;
+      document.getElementById("penSize").value = state.penSize;
+      document.getElementById("togglePinyinBtn").textContent = state.showPinyin ? "Hide Pinyin" : "Show Pinyin";
+
+      document.querySelectorAll(".swatch").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.color === state.penColor);
+      });
+    }
+
+    function persistSettings() {
+      localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(state));
+      flashSaved("Settings saved");
+    }
+
+    function flashSaved(msg = "Saved locally") {
+      saveStatus.textContent = msg;
+      saveStatus.style.opacity = "1";
+    }
+
+    function getEntries() {
+      const savedText = localStorage.getItem(STORAGE_KEYS.TEXT);
+      if (!savedText) return DEFAULT_ENTRIES;
+
+      const lines = savedText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      return lines.map(line => {
+        const chars = Array.from(line);
+        let pyList = chars.map(() => "");
+        if (window.pinyinPro && typeof window.pinyinPro.pinyin === "function") {
+          pyList = chars.map(ch => {
+            if (/[\u4e00-\u9fff]/.test(ch)) {
+              return window.pinyinPro.pinyin(ch, { toneType: "symbol" });
+            }
+            return "";
+          });
+        }
+        return { text: line, pinyin: pyList };
+      });
+    }
+
+    function setActiveLine(index) {
+      state.lastLine = index;
+      localStorage.setItem(STORAGE_KEYS.LAST_LINE, String(index));
+      document.querySelectorAll(".line-card").forEach((card, idx) => {
+        card.classList.toggle("active-line", idx === index);
+      });
+    }
+
+    function setupCanvas(canvas, lineIndex) {
+      const ctx = canvas.getContext("2d");
+      let isDrawing = false;
+      let lastX = 0;
+      let lastY = 0;
+
+      function resizeAndRestore() {
+        const rect = canvas.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.round(rect.width * dpr);
+        canvas.height = Math.round(rect.height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+
+        const savedData = localStorage.getItem(STORAGE_KEYS.CANVAS_PREFIX + lineIndex);
+        if (savedData) {
+          const img = new Image();
+          img.onload = () => {
+            ctx.drawImage(img, 0, 0, rect.width, rect.height);
+          };
+          img.src = savedData;
+        }
+      }
+
+      resizeAndRestore();
+
+      const observer = new ResizeObserver(() => resizeAndRestore());
+      observer.observe(canvas.parentElement);
+
+      function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top
+        };
+      }
+
+      canvas.addEventListener("pointerdown", (e) => {
+        // Ignore multi-touch gestures so two fingers can scroll if needed
+        if (e.pointerType === "touch" && !e.isPrimary) return;
+        isDrawing = true;
+        canvas.setPointerCapture(e.pointerId);
+        setActiveLine(lineIndex);
+
+        const pos = getPos(e);
+        lastX = pos.x;
+        lastY = pos.y;
+
+        ctx.strokeStyle = state.penColor;
+        const pressure = e.pressure && e.pressure > 0 ? e.pressure : 0.5;
+        ctx.lineWidth = state.penSize * (0.65 + pressure * 0.7);
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(lastX + 0.1, lastY + 0.1);
+        ctx.stroke();
+      });
+
+      canvas.addEventListener("pointermove", (e) => {
+        if (!isDrawing) return;
+        const pos = getPos(e);
+        const pressure = e.pressure && e.pressure > 0 ? e.pressure : 0.5;
+        ctx.strokeStyle = state.penColor;
+        ctx.lineWidth = state.penSize * (0.65 + pressure * 0.7);
+
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+
+        lastX = pos.x;
+        lastY = pos.y;
+      });
+
+      function endStroke() {
+        if (!isDrawing) return;
+        isDrawing = false;
+        try {
+          localStorage.setItem(STORAGE_KEYS.CANVAS_PREFIX + lineIndex, canvas.toDataURL("image/png"));
+          flashSaved(`Saved Line ${lineIndex + 1}`);
+        } catch (err) {
+          flashSaved("Storage full");
+        }
+      }
+
+      canvas.addEventListener("pointerup", endStroke);
+      canvas.addEventListener("pointercancel", endStroke);
+
+      return {
+        clear: () => {
+          const rect = canvas.getBoundingClientRect();
+          ctx.clearRect(0, 0, rect.width, rect.height);
+          localStorage.removeItem(STORAGE_KEYS.CANVAS_PREFIX + lineIndex);
+          flashSaved(`Cleared Line ${lineIndex + 1}`);
+        }
+      };
+    }
+
+    function renderAll() {
+      container.innerHTML = "";
+      const entries = getEntries();
+
+      entries.forEach((entry, idx) => {
+        const card = document.createElement("section");
+        card.className = "line-card" + (idx === state.lastLine ? " active-line" : "");
+        card.id = `line-card-${idx}`;
+
+        const header = document.createElement("div");
+        header.className = "line-header";
+        header.innerHTML = `<span>Line ${idx + 1} of ${entries.length}</span>`;
+
+        const actions = document.createElement("div");
+        actions.className = "line-actions";
+
+        const markBtn = document.createElement("button");
+        markBtn.textContent = "Bookmark Here";
+        markBtn.onclick = () => {
+          setActiveLine(idx);
+          flashSaved(`Bookmarked Line ${idx + 1}`);
+        };
+
+        const clearBtn = document.createElement("button");
+        clearBtn.textContent = "Clear Line";
+
+        actions.appendChild(markBtn);
+        actions.appendChild(clearBtn);
+        header.appendChild(actions);
+
+        const stage = document.createElement("div");
+        stage.className = "writing-stage";
+
+        const guideRow = document.createElement("div");
+        guideRow.className = "guide-row";
+
+        const chars = Array.from(entry.text);
+        chars.forEach((ch, cIdx) => {
+          const box = document.createElement("div");
+          if (ch === " ") {
+            box.className = "char-box space-box";
+            guideRow.appendChild(box);
+            return;
+          }
+          box.className = "char-box";
+
+          const grid = document.createElement("div");
+          grid.className = "char-grid";
+
+          const ghost = document.createElement("span");
+          ghost.className = "ghost-char";
+          ghost.textContent = ch;
+          grid.appendChild(ghost);
+
+          const py = document.createElement("div");
+          py.className = "pinyin-label";
+          py.style.visibility = state.showPinyin ? "visible" : "hidden";
+          py.textContent = entry.pinyin[cIdx] || "";
+
+          box.appendChild(grid);
+          box.appendChild(py);
+          guideRow.appendChild(box);
+        });
+
+        const canvas = document.createElement("canvas");
+        canvas.className = "draw-canvas";
+
+        stage.appendChild(guideRow);
+        stage.appendChild(canvas);
+        card.appendChild(header);
+        card.appendChild(stage);
+        container.appendChild(card);
+
+        const controller = setupCanvas(canvas, idx);
+        clearBtn.onclick = () => controller.clear();
+      });
+    }
+
+    function scrollToLastLine() {
+      const target = document.getElementById(`line-card-${state.lastLine}`);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+
+    // Toolbar Event Listeners
+    document.querySelectorAll(".swatch").forEach(btn => {
+      btn.addEventListener("click", () => {
+        state.penColor = btn.dataset.color;
+        document.querySelectorAll(".swatch").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        persistSettings();
+      });
+    });
+
+    document.getElementById("penSize").addEventListener("input", (e) => {
+      state.penSize = parseFloat(e.target.value);
+      persistSettings();
+    });
+
+    document.getElementById("ghostOpacity").addEventListener("input", (e) => {
+      state.ghostOpacity = parseFloat(e.target.value);
+      document.documentElement.style.setProperty("--ghost-opacity", state.ghostOpacity);
+      persistSettings();
+    });
+
+    document.getElementById("togglePinyinBtn").addEventListener("click", (e) => {
+      state.showPinyin = !state.showPinyin;
+      e.target.textContent = state.showPinyin ? "Hide Pinyin" : "Show Pinyin";
+      document.querySelectorAll(".pinyin-label").forEach(el => {
+        el.style.visibility = state.showPinyin ? "visible" : "hidden";
+      });
+      persistSettings();
+    });
+
+    document.getElementById("resumeBtn").addEventListener("click", scrollToLastLine);
+
+    document.getElementById("toggleDrawerBtn").addEventListener("click", () => {
+      textDrawer.classList.toggle("open");
+      if (textDrawer.classList.contains("open")) {
+        const current = localStorage.getItem(STORAGE_KEYS.TEXT) || DEFAULT_ENTRIES.map(e => e.text).join("\n");
+        customTextInput.value = current;
+      }
+    });
+
+    document.getElementById("applyTextBtn").addEventListener("click", () => {
+      const val = customTextInput.value.trim();
+      if (!val) return;
+      // Clear old canvas snapshots when replacing text lines
+      Object.keys(localStorage).forEach(k => {
+        if (k.startsWith(STORAGE_KEYS.CANVAS_PREFIX)) localStorage.removeItem(k);
+      });
+      localStorage.setItem(STORAGE_KEYS.TEXT, val);
+      setActiveLine(0);
+      textDrawer.classList.remove("open");
+      renderAll();
+      flashSaved("Loaded new text");
+    });
+
+    document.getElementById("resetDefaultBtn").addEventListener("click", () => {
+      Object.keys(localStorage).forEach(k => {
+        if (k.startsWith(STORAGE_KEYS.CANVAS_PREFIX)) localStorage.removeItem(k);
+      });
+      localStorage.removeItem(STORAGE_KEYS.TEXT);
+      setActiveLine(0);
+      textDrawer.classList.remove("open");
+      renderAll();
+      flashSaved("Reset to default");
+    });
+
+    // Initialize
+    loadSettings();
+    renderAll();
+    setTimeout(scrollToLastLine, 250);
+  </script>
+</body>
+</html>
