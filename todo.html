@@ -25,14 +25,14 @@
   </div>
 <script>
   // Paste your web app URL (ends in /exec) from Deploy > Manage deployments.
-  const WEB_APP_URL = 'https://script.google.com/macros/s/PASTE_YOUR_DEPLOYMENT_ID/exec';
+  const WEB_APP_URL = 'https://script.google.com/a/macros/bostonpublicschools.org/s/AKfycbxfrUPnTDajvx0lfxHJHG36OTqMCfd-Ep4vb4gM1K7buA8WIb4nDnE8BKgPO_GR88knPw/exec';
 
   const go = document.getElementById('go');
   if (WEB_APP_URL.includes('PASTE_YOUR')) {
     document.getElementById('note').textContent = 'Add your web app URL to this file to finish setup.';
     go.remove();
   } else {
-    go.href = https://script.google.com/a/macros/bostonpublicschools.org/s/AKfycbxfrUPnTDajvx0lfxHJHG36OTqMCfd-Ep4vb4gM1K7buA8WIb4nDnE8BKgPO_GR88knPw/exec;
+    go.href = WEB_APP_URL;
     location.replace(WEB_APP_URL);   // sends you straight there; the button is a fallback
   }
 </script>
