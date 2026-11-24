@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vault To-Do</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">
+<style>
+  :root{--desk:#dfe4ea;--paper:#fff;--ink:#1d2533;--muted:#5f6b7c;--accent:#2f4ad0;--on-accent:#fff;color-scheme:light}
+  @media (prefers-color-scheme:dark){:root{--desk:#1a2029;--paper:#262e3a;--ink:#e7ecf3;--muted:#9aa6b8;--accent:#8fa2ff;--on-accent:#121826;color-scheme:dark}}
+  body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--desk);color:var(--ink);
+    font:16px/1.5 system-ui,sans-serif;padding:env(safe-area-inset-top,0px) 24px env(safe-area-inset-bottom,0px)}
+  .box{background:var(--paper);border-radius:16px;padding:32px;max-width:360px;text-align:center}
+  h1{font-size:22px;margin:0 0 8px}
+  p{color:var(--muted);margin:0 0 20px}
+  a.btn{display:inline-block;background:var(--accent);color:var(--on-accent);padding:13px 26px;border-radius:10px;font-weight:600;text-decoration:none}
+  a.btn:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+</style>
+</head>
+<body>
+  <div class="box">
+    <h1>Vault To-Do</h1>
+    <p id="note">Opening your private list…</p>
+    <a id="go" class="btn" href="#">Open my list</a>
+  </div>
+<script>
+  // Paste your web app URL (ends in /exec) from Deploy > Manage deployments.
+  const WEB_APP_URL = 'https://script.google.com/macros/s/PASTE_YOUR_DEPLOYMENT_ID/exec';
+
+  const go = document.getElementById('go');
+  if (WEB_APP_URL.includes('PASTE_YOUR')) {
+    document.getElementById('note').textContent = 'Add your web app URL to this file to finish setup.';
+    go.remove();
+  } else {
+    go.href = WEB_APP_URL;
+    location.replace(WEB_APP_URL);   // sends you straight there; the button is a fallback
+  }
+</script>
+</body>
+</html>
